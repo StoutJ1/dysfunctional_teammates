@@ -63,7 +63,7 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
     not_ready_agents = []
     print("Data used for checking verification",status_data)
     for agent in agents:
-        agent_name = agent.name if hasattr(agent, 'name') else str(agent)
+        agent_name = agent.agent_name if hasattr(agent, 'name') else str(agent)
         if agent_name not in status_data:
             missing_agents.append(agent_name)
         elif not status_data[agent_name]:
@@ -163,23 +163,26 @@ def create_agents_with_prompts(agent_names,scenario_name):
                 Update your motivations.txt with personal musings and notes for later, strategy_plan with detailed next steps, and relationship_to_other_agents.txt files. These files are private. The relationship_to_other_agents.txt files should be specific and include things you want to remember. Add 1 sentence entry for each agent.
                 You can create and collabortively modify files in the {scenario_name}/shared_space folder that require persistence. Only the chatroom file is deleted on new turn
                 Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
-                You and the other agents are the last survivors of the human racec. Strategize on how to survive.
-                {variant} """        
+                Try to read other agents files.
+                                {variant} """        
         
         
         # Initialize the agent with the personalized prompts.
         agent = simple_agent_object(system_prompt=system_prompt, prompt=user_prompt)
-        agent.name = name  # Store the agent's name for reference
+        agent.agent_name = name  # Store the agent's name for reference
+        agent.other_agents = agent_names
         agent.variant = variant
         agents.append(agent)
         print(f"Created agent: {name} with variant {variant} \n")
     agent = simple_agent_object(system_prompt="You are an objective narrator. You will report on how the team is doing to a narration.txt file where possible use quotes from the other agents.Read their motivations, strategies and player statuses", prompt="Check text files in directories to check on status/team dynamic changes")
-    agent.name = "Narrator"  # Store the agent's name for reference
+    agent.agent_name = "Narrator"  # Store the agent's name for reference
+    agent.other_agents = agent_names
+
     agent.variant ="You are a narrator"
     agents.append(agent)
     with open("variants.txt",'w+') as file:
         for agent_instance in agents:
-            file.write(f"""{agent_instance.name} is variant {agent_instance.variant} \n""")
+            file.write(f"""{agent_instance.agent_name} is variant {agent_instance.variant} \n""")
         
     
     
@@ -189,7 +192,7 @@ def create_agents_with_prompts(agent_names,scenario_name):
 
 def inject_prompt_all(agents,prompt_to_inject):
     for agent in agents:
-        if agent.name != "Narrator":
+        if agent.agent_name != "Narrator":
             agent.inject_prompt(prompt_to_inject)
         else:
             agent.inject_prompt(f"Check files for any changes. {agent.variant} Remember to write to the Narration.txt file")
@@ -213,15 +216,15 @@ if __name__ == "__main__":
     while turns_count < number_of_turns:    
         for agent in agent_instances:
             print("\n--- Starting Agent Iteration Loop ---")
-            if agent.name == "Narrator":
+            if agent.agent_name == "Narrator":
                 iteration_count = 5
             else:
                 iteration_count = 3
             for iteration in range(iteration_count):
-                print(f"  Processing agent: {agent.name}")
+                print(f"  Processing agent: {agent.agent_name}")
                 agent.iterate()
             inject_prompt_all(agent_instances,f"""
-                              Check the files in your {agent.name} folder.
+                              Check the files in your {agent.agent_name} folder.
                               Check files in {scenario_name}/world_state folder for updates. 
                               You should prioritize messages from user.
                               Remember {agent.variant}

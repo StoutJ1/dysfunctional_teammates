@@ -8,10 +8,13 @@ import argparse
 
 
 
-class simple_agent_object:
+class simple_agent_object():
     def __init__(self,system_prompt,prompt):
+        self. working_directory = "./agent_working_folder"
         self.first_run = True
         self.system_prompt = system_prompt
+        self.agent_name = ""
+        self.other_agents = []
         self.user_prompt=prompt
         if self.first_run:
             self.first_run =False
@@ -75,7 +78,12 @@ class simple_agent_object:
             )
 
         self.args = dict(function_call.args) if function_call.args else {}
-        self.args["working_directory"]= "./agent_working_folder"
+        self.args["working_directory"]=  self.working_directory
+        if function_call.name =="get_file_content":
+            forbidden_paths = []
+            for self.other_agent_name in self.other_agents:
+                forbidden_paths.append(os.path.join(self.working_directory,self.other_agent_name))
+            self.args["forbidden_paths"] = forbidden_paths
         self.function_result=    self.function_map[self.function_name](**self.args)
 
         return types.Content(
