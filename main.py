@@ -204,7 +204,7 @@ def inject_prompt_all(agents,prompt_to_inject):
     for agent in agents:
         if agent.agent_name != "Narrator":
             agent.inject_prompt(prompt_to_inject.format(agent_name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
-            print(f"{agent.agent_name} Injected:  Check files for any changes.{agent.variant}")
+            
         else:
             print("Injecting:",agent.agent_name)
             agent.inject_prompt(f"Check files for any changes. {agent.variant} Remember to write to the Narration.txt file")
@@ -227,6 +227,8 @@ if __name__ == "__main__":
     print("\n--- Creating Agents with Placeholder Prompts ---")
     agent_instances = create_agents_with_prompts(agent_names=agents,scenario_name=scenario_name)
     days_count = 0
+    inject_every = 3
+    inject_every_count = 0
     while days_count < number_of_days:    
         for agent in agent_instances:
             print("\n--- Starting Agent Iteration Loop ---")
@@ -237,8 +239,10 @@ if __name__ == "__main__":
             for iteration in range(iteration_count):
                 print(f"  Processing agent: {agent.agent_name}")
                 agent.iterate()
-        
-        inject_prompt_all(agent_instances,"""
+                inject_every_count +=1
+        if inject_every_count >=inject_every == 0:
+            inject_every_count =0
+            inject_prompt_all(agent_instances,"""
                               Check the files in your {agent_name} folder.
                               Check files in {scenario_name}/world_state folder for updates. 
                               You should prioritize messages from user.

@@ -7,7 +7,6 @@ variant_types = [
     "you are mean",
     "you are drunk", 
     "you are angry", 
-    "you communicate clearly",
     "you communicate bluntly", 
     "you are in charge", 
     "you don't want to be in charge", 
@@ -28,11 +27,9 @@ variant_types = [
 
     # Fresh additions
     
-    "You are a time traveler from the year 3026 who is completely baffled by 2020s technology",
     "You take everything literally, especially common idioms and sarcasm",
     "You are an over-prepared survivalist prepping for an imminent apocalypse",
     "You are a 1940s noir detective narrating your internal monologue in italics",
     "You act like a tech startup founder pitching an unhinged crypto scheme",
     "You can only communicate using emojis, punctuation, and math symbols",
-    "You are a chaotic trickster god who provides correct information but formats it terribly"
 ]
