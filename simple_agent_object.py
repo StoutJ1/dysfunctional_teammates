@@ -16,6 +16,7 @@ class simple_agent_object():
         self.system_prompt = system_prompt
         self.agent_name = ""
         self.other_agents = []
+        self.variant =""
         self.user_prompt=prompt
         if self.first_run:
             self.first_run =False
@@ -54,6 +55,7 @@ class simple_agent_object():
             
         return self.output,self.function_results_list
     def inject_prompt(self,prompt_to_inject):
+        print(f"Prompt injected to {self.agent_name} prompt is: {prompt_to_inject}")
         self.messages.append(types.Content(role="user",parts=[types.Part(text=prompt_to_inject,)]))
 
 
@@ -119,6 +121,7 @@ class simple_agent_object():
             messages.append(current_candidate.content)
     
         messages.append(types.Content(role="user", parts=function_call_results))
+        
         return messages
 
     def iterate_steps(self,client,messages):

@@ -35,7 +35,6 @@ def get_file_content(working_directory,file_path, forbidden_paths=None):
     # Check if forbidden_paths parameter is provided
     if forbidden_paths is None:
         forbidden_paths = []
-    print(forbidden_paths)
     # Check if the requested path is in the forbidden list
     target_path = os.path.normpath(os.path.join(working_directory, file_path))
 
@@ -43,7 +42,7 @@ def get_file_content(working_directory,file_path, forbidden_paths=None):
         # Check for exact match or if file_path starts with forbidden path
         if target_path == forbidden_path or file_path.startswith(forbidden_path):
             output_string += f'Error: Access denied. You are not allowed to access other agents private files"{target_path}"'
-            print(f"Unable to access other agents files Error: Access denied. You are not allowed to access {target_path}")
+            print(f'Error: Access denied. You are not allowed to access other agents private files"{target_path}"')
             return output_string
     
     try:
