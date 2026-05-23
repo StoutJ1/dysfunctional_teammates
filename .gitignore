@@ -8,3 +8,5 @@ wheels/
 .env
 # Virtual environments
 .venv
+backup_folder/
+agent_working_folder/

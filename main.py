@@ -6,10 +6,12 @@ import os
 import json
 from dotenv import load_dotenv
 from scenario_setup import initialize_scenario
-agent_variants = ["you are drunk", "you are angry", "you communicate clearly","you communicate bluntly", "you are in charge", "you don't want to be in charge", "you are having a bad day.","you are the editor","you can only think about lunch"]
+from  backup_script import backup_scenario
+from variants import variant_types
+agent_variants = variant_types
 number_of_turns = 10
 number_of_agents = 3
-scenario_name = "movie_script"
+scenario_name = "save_files"
 
 # Load random names from file
 def load_names(filename):
@@ -22,7 +24,7 @@ def load_names(filename):
                 names.append(name)
     return names
 
-# Function to verify if all player statuses in shared_space have agent_name: ready_for_next_turn format
+# Function to verify if all player statuses in shared_space have agent_name: ready_for_next_day format
 def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"):
     """
     Verify that all agents have reported readiness status.
@@ -51,7 +53,7 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
                     if line:
                         agent_name, status = line.split(':', 1)
                         print(status.strip().lower())
-                        status_data[agent_name.strip()] = (status.strip().lower() == 'ready_for_next_turn')
+                        status_data[agent_name.strip()] = (status.strip().lower() == 'ready_for_next_day')
     except Exception as e:
         print(f"ERROR: Failed to read status file: {e}")
         return False
@@ -83,7 +85,7 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
 
 
 def new_turn(scenario_name: str = "scenario"):
-    shared_space_path = os.path.join("agent_working_folder",scenario_name, 'shared_space')
+    shared_space_path = os.path.join("agent_working_folder","save_files",scenario_name, 'shared_space')
     
     if not os.path.exists(shared_space_path):
         print(f"Error: shared_space directory not found at {shared_space_path}")
@@ -92,7 +94,7 @@ def new_turn(scenario_name: str = "scenario"):
     # Get all files in shared_space
     files_in_shared_space = os.listdir(shared_space_path)
     
-    # Process player_status.txt to reset ready messages (keep names, remove ready_for_next_turn)
+    # Process player_status.txt to reset ready messages (keep names, remove ready_for_next_day)
     player_status_file = os.path.join(shared_space_path, 'player_status.txt')
     
     if os.path.exists(player_status_file):
@@ -146,28 +148,40 @@ def create_agents_with_prompts(agent_names,scenario_name):
                   Update your motivations.txt with personal musings and notes for later, strategy_plan with detailed next steps, and relationship_to_other_agents.txt files. These files are private. The relationship_to_other_agents.txt files should be specific and include things you want to remember. Add 1 sentence entry for each agent.
                   If you and your team are ready for a new turn use the set player status tool. Make sure there is consensus before using the set player status tool.
                   You should use the shared_space folder for documents that need to persist. 
-                  If the team wants to ask broad strategy questions use the {scenario_name}/world_state/user_conversation.txt Use this when seeking direction for next task. Reply and clarify statements in file as needed
+                  If the team wants to ask broad strategy questions use the {scenario_name}/world_state/user_conversation.txt Use this when seeking direction. Reply and clarify statements in file as needed
                         "You can use functions to:
                          - Update text files by appending
                          - Read Files
                          - Get file information
-                         - And set your player status when you are done with a turn.
+                         - And set your status to indicate when you are done with a day.
                         """
-        
+        variant = random.choice(agent_variants)
         # Create personalized user prompt using the agent's name
         user_prompt = f""" 
                 Read your {scenario_name}/{name}/strategy_plan.txt, relationship_to_other_agents.txt and motivations.txt files. 
                 All communications should be short and blunt.
                 Update your motivations.txt with personal musings and notes for later, strategy_plan with detailed next steps, and relationship_to_other_agents.txt files. These files are private. The relationship_to_other_agents.txt files should be specific and include things you want to remember. Add 1 sentence entry for each agent.
-                If you and your team are ready for a new turn use the set player status tool. Make sure there is consensus before using the set player status tool.
                 You can create and collabortively modify files in the {scenario_name}/shared_space folder that require persistence. Only the chatroom file is deleted on new turn
-                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. {random.choice(agent_variants)} """        
+                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
+                You and the other agents are the last survivors of the human racec. Strategize on how to survive.
+                {variant} """        
+        
+        
         # Initialize the agent with the personalized prompts.
         agent = simple_agent_object(system_prompt=system_prompt, prompt=user_prompt)
         agent.name = name  # Store the agent's name for reference
+        agent.variant = variant
         agents.append(agent)
+        print(f"Created agent: {name} with variant {variant} \n")
+    agent = simple_agent_object(system_prompt="You are an objective narrator. You will report on how the team is doing to a narration.txt file where possible use quotes from the other agents.Read their motivations, strategies and player statuses", prompt="Check text files in directories to check on status/team dynamic changes")
+    agent.name = "Narrator"  # Store the agent's name for reference
+    agent.variant ="You are a narrator"
+    agents.append(agent)
+    with open("variants.txt",'w+') as file:
+        for agent_instance in agents:
+            file.write(f"""{agent_instance.name} is variant {agent_instance.variant} \n""")
         
-        print(f"Created agent: {name}")
+    
     
     print(f"\nSuccessfully created {len(agents)} agents.")
     return agents
@@ -175,8 +189,11 @@ def create_agents_with_prompts(agent_names,scenario_name):
 
 def inject_prompt_all(agents,prompt_to_inject):
     for agent in agents:
-        agent.inject_prompt(prompt_to_inject)
-    
+        if agent.name != "Narrator":
+            agent.inject_prompt(prompt_to_inject)
+        else:
+            agent.inject_prompt(f"Check files for any changes. {agent.variant} Remember to write to the Narration.txt file")
+
     print(f"Successfully injected prompt to agents")
     
 
@@ -186,9 +203,7 @@ if __name__ == "__main__":
 
     working_directory = os.environ.get("WORKING_DIRECTORY")
     name_list = load_names("random_names.txt")
-    agents = []
-    for agent_num in range(number_of_agents):
-        agents.append(random.choice(name_list))
+    agents = random.sample(name_list,number_of_agents)
     scenario_info = setup_scenario(working_directory,scenario_name, agents)
     
     # Create simple agents with placeholder prompts using the scenario agent names
@@ -198,11 +213,19 @@ if __name__ == "__main__":
     while turns_count < number_of_turns:    
         for agent in agent_instances:
             print("\n--- Starting Agent Iteration Loop ---")
-            
-            for iteration in range(2):
+            if agent.name == "Narrator":
+                iteration_count = 5
+            else:
+                iteration_count = 3
+            for iteration in range(iteration_count):
                 print(f"  Processing agent: {agent.name}")
                 agent.iterate()
-            inject_prompt_all(agent_instances,"Check files in world_state folder for updates. Remember to ask user for next steps/strategy. Confirm team consensus responding or writing. File should be treated like an interactive prompt, you should reply to messages from User:")
+            inject_prompt_all(agent_instances,f"""
+                              Check the files in your {agent.name} folder.
+                              Check files in {scenario_name}/world_state folder for updates. 
+                              You should prioritize messages from user.
+                              Remember {agent.variant}
+                              Update your relationship_to_other_agents.txt with your opinion of the other agents""")
 
                 #Agent phases:
                 # Check Current Motivation
@@ -221,6 +244,6 @@ if __name__ == "__main__":
         if verification_result:
             print(f"Ready for new turn")
             new_turn(scenario_name)
-            inject_prompt_all(agent_instances,"New Turn. Shared state has been reset.")
+            inject_prompt_all(agent_instances,"New Day. Shared state has been reset.")
             turns_count +=1
-
+        backup_scenario(os.path.join("agent_working_folder"),'backup_folder')

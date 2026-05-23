@@ -29,6 +29,7 @@ def get_file_content(working_directory, file_path):
     if os.path.exists(target_path):
         if os.path.commonpath([working_dir_abs,target_path]) == working_dir_abs:
             if os.path.isfile(target_path) == True:
+                print(f"File Read is: {file_path}")
                 with  open(target_path,'r') as file:
                     contents = file.read()
                     if len(contents) > MAX_CHARS:

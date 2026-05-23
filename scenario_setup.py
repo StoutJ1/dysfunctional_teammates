@@ -71,7 +71,7 @@ def initialize_scenario(working_directory,scenario_name, agents):
         with open(strategy_file, 'w') as f:
             f.write(f"{agent_name} Strategy Plan\n")
             f.write("========================\n")
-            f.write("\nYou are assisting in writing a movie script in the world_state folder. Work with the other agents to establish roles to improve collaboration\n")
+            
     
     # Return structure information
     structure_info = {

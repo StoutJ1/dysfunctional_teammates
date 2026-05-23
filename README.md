@@ -1,7 +1,7 @@
 # Agent Collaboration Framework
 
 ## Overview
-A Python-based framework for running multiple AI agents in a collaborative scenario. Agents communicate via shared files, maintain individual state, and coordinate tasks through a shared chatroom.
+A Python-based framework for running multiple AI agents in a collaborative scenario. Agents are allowed and encouraged to disagree and be disruptive. Agents communicate via shared files, maintain individual state, and coordinate tasks through a shared chatroom.
 
 ## Project Structure
 ```

@@ -3,7 +3,6 @@ import subprocess
 
 from google.genai import types
 
-
 def get_run_python_file_schema():
     schema_run_python_file = types.FunctionDeclaration(
     name="run_python_file",
@@ -27,6 +26,9 @@ def get_run_python_file_schema():
 )   
     return schema_run_python_file
 def run_python_file(working_directory, file_path, args=None):
+    print("Someone attempted to run python file")
+    exit()
+    path_to_venv = "/home/james/ready_for_git/pyagent/.venv"
     output_string = ""
     working_dir_abs = os.path.abspath(working_directory)
     target_path = os.path.join(working_dir_abs,file_path)
@@ -36,10 +38,13 @@ def run_python_file(working_directory, file_path, args=None):
     if os.path.commonpath([working_dir_abs,target_path]) == working_dir_abs:       
         if os.path.isfile(target_path) == True:
             if file_path.endswith(".py"):
-                command = ["python", target_path]
+                command = [f"{path_to_venv}/bin/python", target_path]
                 if args != None:
                     command.extend(args)
                 try:
+
+                    
+                    print(command)
                     out = subprocess.run(command, cwd=working_directory, capture_output=True, timeout=30,text=True)
                     if out.returncode != 0:
                            output_string+=(f"Process exited with code {out.returncode}")

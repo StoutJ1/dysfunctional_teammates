@@ -6,7 +6,7 @@ def get_set_player_status_schema():
     """Schema for setting player status in the shared_space/player_status.txt file."""
     schema_set_player_status = types.FunctionDeclaration(
         name="set_player_status",
-        description="Sets the player state of the agent to ready_for_next_turn or more_actions_pending. Writes to the scenario/shared_space/player_status.txt file in the scenario directory.",
+        description="Sets the player state of the agent to ready_for_next_day or more_actions_pending. Writes to the scenario/shared_space/player_status.txt file in the scenario directory.",
         parameters=types.Schema(
             type=types.Type.OBJECT,
             properties={
@@ -31,7 +31,7 @@ def get_set_player_status_schema():
 
 def set_player_status(working_directory, agent_name,status):
     """
-    Sets the player state of the agent to ready_for_next_turn or more_actions_pending.
+    Sets the player state of the agent to ready_for_next_day or more_actions_pending.
     
     Writes to the shared_space/player_status.txt file in the scenario directory.
     
@@ -45,7 +45,7 @@ def set_player_status(working_directory, agent_name,status):
     working_dir_abs = os.path.abspath(working_directory)
     
     # Check path is within working directory
-    target_path = os.path.join(working_dir_abs,"Space", "shared_space", "player_status.txt")
+    target_path = os.path.join(working_dir_abs,"save_files", "shared_space", "player_status.txt")
     target_path = os.path.normpath(target_path)
     
     if os.path.commonpath([working_dir_abs, target_path]) != working_dir_abs:
@@ -54,13 +54,13 @@ def set_player_status(working_directory, agent_name,status):
         }
     
     # Validate status
-    valid_statuses = ['ready_for_next_turn', 'more_actions_pending']
+    valid_statuses = ['ready_for_next_day', 'more_actions_pending']
 
     # Write the status to player_status.txt
     try:
         with open(target_path, 'a+') as file:
             if status:
-                file.write(f"{agent_name}: ready_for_next_turn\n")
+                file.write(f"{agent_name}: ready_for_next_day\n")
             else:
                 file.write(f"{agent_name}: more_actions_pending\n")
 
