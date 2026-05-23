@@ -1,8 +1,25 @@
 import os
+from google.genai import types
 
 MAX_CHARS = 1000
+def get_file_content_schema():
+    schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description="Gets contents of file and returns the last 1000 characters if there are more than 1000 characters",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="Name of file to get contents of relative to working directory (default is the working directory itself.) "
+            )
+        },
+        required=["file_path"]
+    ),
+)   
+    return schema_get_file_content
 
-def get_file_content(file_path, forbidden_paths=None):
+def get_file_content(working_directory,file_path, forbidden_paths=None):
     """
     Gets contents of file and returns the last 1000 characters if there are more than 1000 characters.
     
@@ -18,25 +35,24 @@ def get_file_content(file_path, forbidden_paths=None):
     # Check if forbidden_paths parameter is provided
     if forbidden_paths is None:
         forbidden_paths = []
-    
+    print(forbidden_paths)
     # Check if the requested path is in the forbidden list
+    target_path = os.path.normpath(os.path.join(working_directory, file_path))
+
     for forbidden_path in forbidden_paths:
         # Check for exact match or if file_path starts with forbidden path
-        if file_path == forbidden_path or file_path.startswith(forbidden_path):
-            output_string += f'Error: Access denied. You are not allowed to access "{file_path}"'
+        if target_path == forbidden_path or file_path.startswith(forbidden_path):
+            output_string += f'Error: Access denied. You are not allowed to access other agents private files"{target_path}"'
+            print(f"Unable to access other agents files Error: Access denied. You are not allowed to access {target_path}")
             return output_string
     
-    # Normalize the path to prevent path traversal attacks
     try:
-        # Get the absolute path of the working directory
-        working_dir = os.getcwd()
         
-        # Combine working directory with file path and normalize
-        target_path = os.path.normpath(os.path.join(working_dir, file_path))
-        
+
         # Check if the resolved path is within the working directory
-        if not target_path.startswith(working_dir):
+        if not target_path.startswith(working_directory):
             output_string += f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
+            print("Outside working directory:",working_directory, "Attempted to access:",target_path)
             return output_string
         
         # Check if file exists and is a regular file
@@ -59,6 +75,8 @@ def get_file_content(file_path, forbidden_paths=None):
                 output_string += f'Error: File not found or is not a regular file: "{file_path}"'
     except Exception as e:
         output_string += f'Error: Failed to read file "{file_path}": {str(e)}'
+        print(f"File Attempted to Read is: {target_path}")
+
     
     return output_string
 
