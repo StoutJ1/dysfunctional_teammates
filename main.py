@@ -65,7 +65,7 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
     missing_agents = []
     not_ready_agents = []
     print("Data used for checking verification",status_data)
-    for agent in agents:
+    for agent in agent_instances:
         agent_name = agent.agent_name if hasattr(agent, 'name') else str(agent)
         if agent_name not in status_data:
             missing_agents.append(agent_name)
@@ -172,9 +172,10 @@ def create_agents_with_prompts(agent_names,scenario_name):
                 Update your motivations.txt with personal musings and notes for later, strategy_plan with detailed next steps, and relationship_to_other_agents.txt files. These files are private. The relationship_to_other_agents.txt files should be specific and include things you want to remember. Add 1 sentence entry for each agent.
                 You can create and collabortively modify files in the {scenario_name}/shared_space folder that require persistence. Only the chatroom file is deleted on new turn
                 Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone.
-                Create a new tool based off the "get_files_info.py" file in world_state that allows an agent to spin up and turn off an agent. When an agent is turned off the agent's folder should have _Terminated appended to its folder. """
+                You are a team approaching the first ever extraterrestial spaceship it looks hostile, you can only communicate with each other and the alien in chatroom.txt 
+                Use the voting tool to decide approaches."""
+
         # Initialize the agent with the personalized prompts.
-        print(f"Creating new agent for {name}")
         agents.append(create_new_agent(system_prompt=system_prompt,user_prompt=user_prompt,agent_name=name))
 
     
@@ -206,7 +207,6 @@ if __name__ == "__main__":
     
     # Create simple agents with placeholder prompts using the scenario agent names
     print("\n--- Creating Agents with Placeholder Prompts ---")
-    print(agent_names)
     agent_instances = create_agents_with_prompts(agent_names=agent_names,scenario_name=scenario_name)
     days_count = 0
     inject_every = 3

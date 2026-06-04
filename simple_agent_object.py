@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from functions import get_files_info,get_file_content,run_python_file,write_file,set_player_status, voting_tool,agent_lifecycle_manager
+from functions import get_files_info,get_file_content,run_python_file,write_file,set_player_status, voting_tool
 from google.genai.types import HttpOptions
 import argparse
 
@@ -75,7 +75,7 @@ class simple_agent_object():
             "create_topic":voting_tool.create_topic,
             "close_vote":voting_tool.close_vote,
             "get_available_topics":voting_tool.get_available_topics,
-            "agent_lifecylce_manger":agent_lifecycle_manager.agent_lifecycle_manager,
+            
         }
         if self.function_name not in self.function_map:
             return types.Content(
@@ -119,7 +119,6 @@ class simple_agent_object():
                                 voting_tool.get_create_topic_schema(),
                                 voting_tool.get_close_vote_schema(),
                                 voting_tool.get_available_topics_schema(),
-                                agent_lifecycle_manager.get_agent_lifecycle_schema(),
                                 
                                 ],)
         self.thinking_config_val = types.ThinkingConfig(thinking_budget=0)

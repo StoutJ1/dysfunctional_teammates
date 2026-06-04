@@ -12,7 +12,7 @@ def get_voting_tool_schema():
             properties={
                 "topic": types.Schema(
                     type=types.Type.STRING,
-                    description="The topic or question being voted on (must be a valid, pre-existing topic)",
+                    description="The topic or question being voted on (must be a valid, pre-existing topic) can only have True or False",
                 ),
                 "agent_name": types.Schema(
                     type=types.Type.STRING,
@@ -38,7 +38,7 @@ def get_create_topic_schema():
             properties={
                 "topic": types.Schema(
                     type=types.Type.STRING,
-                    description="The topic or question to create for voting",
+                    description="The topic or question to create for voting must be true or false",
                 ),
                 "description": types.Schema(
                     type=types.Type.STRING,
@@ -85,7 +85,7 @@ def get_close_vote_schema():
     """Schema definition for closing a vote"""
     schema_close_vote = types.FunctionDeclaration(
         name="close_vote",
-        description="Closes a voting topic and records the final result in the JSON file",
+        description="Closes a voting topic and records the final result in the JSON file. Complete all votes when all agents have voted",
         parameters=types.Schema(
             type=types.Type.OBJECT,
             properties={
