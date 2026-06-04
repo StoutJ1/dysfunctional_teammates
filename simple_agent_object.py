@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from functions import get_files_info,get_file_content,run_python_file,write_file,set_player_status
+from functions import get_files_info,get_file_content,run_python_file,write_file,set_player_status, voting_tool,agent_lifecycle_manager
 from google.genai.types import HttpOptions
 import argparse
 
@@ -70,7 +70,12 @@ class simple_agent_object():
             "run_python_file": run_python_file.run_python_file,
             # New functions from new_functions directory
             "set_player_status": set_player_status.set_player_status,
-            
+            "submit_vote":voting_tool.submit_vote,
+            "get_consensus":voting_tool.get_consensus,
+            "create_topic":voting_tool.create_topic,
+            "close_vote":voting_tool.close_vote,
+            "get_available_topics":voting_tool.get_available_topics,
+            "agent_lifecylce_manger":agent_lifecycle_manager.agent_lifecycle_manager,
         }
         if self.function_name not in self.function_map:
             return types.Content(
@@ -109,6 +114,13 @@ class simple_agent_object():
                                 run_python_file.get_run_python_file_schema(),
                                 # New functions from new_functions directory
                                 set_player_status.get_set_player_status_schema(),
+                                voting_tool.get_voting_tool_schema(),
+                                voting_tool.get_consensus_schema(),
+                                voting_tool.get_create_topic_schema(),
+                                voting_tool.get_close_vote_schema(),
+                                voting_tool.get_available_topics_schema(),
+                                agent_lifecycle_manager.get_agent_lifecycle_schema(),
+                                
                                 ],)
         self.thinking_config_val = types.ThinkingConfig(thinking_budget=0)
         self.config = types.GenerateContentConfig(tools=[self.available_functions],
@@ -143,7 +155,7 @@ class simple_agent_object():
         self.base_url_env = os.environ.get("BASE_URL_ENV")
         self.client = genai.Client(api_key=self.api_key,http_options=HttpOptions(base_url=self.base_url_env))
         
-        #print("Model list:",list(client.models.list()))
+        #print("Model list:",list(self.client.models.list()))
         
         
         self.iterate_steps(self.client,self.messages,)

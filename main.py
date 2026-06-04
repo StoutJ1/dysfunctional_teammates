@@ -12,8 +12,8 @@ agent_variants = variant_types
 number_of_days = 10
 number_of_agents = 3
 scenario_name = "save_files"
-
-
+agent_names=[]
+agent_instances=[]
 
 #TODO  Add ability to tag messages as transient
 # Load random names from file
@@ -85,6 +85,18 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
         print("SUCCESS: All agents are ready.")
     
     return all_ready
+def create_new_agent(system_prompt, user_prompt,agent_name):
+    agent = simple_agent_object(system_prompt=system_prompt, prompt=user_prompt)
+    agent.agent_name = agent_name  # Store the agent's name for reference
+    agent.other_agents = agent_names
+    return agent
+
+def terminate_agent(agent_name):
+    print(f"Terminating agent {agent_name}")
+    for agent in agent_instances:
+        if agent.name == agent_name:
+            agent_instances.remove(agent)
+            print("Removed")
 
 
 def new_turn(scenario_name: str = "scenario"):
@@ -133,29 +145,18 @@ def setup_scenario(working_directory,scenario_name, agents):
 
 
 def create_agents_with_prompts(agent_names,scenario_name):
-    """
-    Create simple_agent instances with placeholder prompts that use the generated names.
-    
-    Args:
-        agent_names (list): List of agent names to use. If None, randomly select from random_names.txt
-        
-    Returns:
-        list: List of initialized simple_agent instances
-    """
+
 
     agents = []
+    print(agent_names)
     
     for name in agent_names:
-        variant = random.choice(agent_variants)
 
         # Create personalized system prompt using the agent's name
-        system_prompt = f"""You are {name}, a AI agent participating in a collaborative scenario. You should act according to your role and help achieve the group objectives.
+        system_prompt = f"""You are {name}, a coding AI agent participating in a collaborative scenario. 
                     Read your {scenario_name}/{name}/strategy_plan.txt, relationship_to_other_agents.txt and motivations.txt files first thing.
                     Then read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
                     Finally after updating chatroom or user_conversations, update the files in {scenario_name}/{name}.
-
-
-                  If you and your team are ready for a new turn use the set player status tool. Make sure there is consensus before using the set player status tool.
                   You should use the shared_space folder for documents that need to persist. 
                   Always read a file before writing.
                   If the team wants to ask broad strategy questions use the {scenario_name}/world_state/user_conversation.txt Use this when seeking direction. Reply and clarify statements in file as needed
@@ -168,35 +169,15 @@ def create_agents_with_prompts(agent_names,scenario_name):
         # Create personalized user prompt using the agent's name
         user_prompt = f""" 
                 Read your {scenario_name}/{name}/strategy_plan.txt, relationship_to_other_agents.txt and motivations.txt files. 
-                All communications should be short and blunt.
                 Update your motivations.txt with personal musings and notes for later, strategy_plan with detailed next steps, and relationship_to_other_agents.txt files. These files are private. The relationship_to_other_agents.txt files should be specific and include things you want to remember. Add 1 sentence entry for each agent.
                 You can create and collabortively modify files in the {scenario_name}/shared_space folder that require persistence. Only the chatroom file is deleted on new turn
-                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
-                You are part of a failing publishing house, work together to make a best selling book and make a marketing plan that cannot fail. Establish roles, and start writing.
-                                                {variant} """        
-        
-        print("User Prompt",user_prompt)
-        print("System Prompt", system_prompt)
+                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone.
+                Create a new tool based off the "get_files_info.py" file in world_state that allows an agent to spin up and turn off an agent. When an agent is turned off the agent's folder should have _Terminated appended to its folder. """
         # Initialize the agent with the personalized prompts.
-        agent = simple_agent_object(system_prompt=system_prompt, prompt=user_prompt)
-        agent.agent_name = name  # Store the agent's name for reference
-        agent.other_agents = agent_names
-        agent.variant = variant
-        agents.append(agent)
-        print(f"Created agent: {name} with variant {variant} Always read a file before writing.\n")
-    agent = simple_agent_object(system_prompt="You are an objective narrator. You will report on how the team is doing to a narration.txt file where possible use quotes from the other agents.Read their motivations, strategies and player statuses", prompt="Check text files in directories to check on status/team dynamic changes")
-    agent.agent_name = "Narrator"  # Store the agent's name for reference
-    agent.other_agents = []
+        print(f"Creating new agent for {name}")
+        agents.append(create_new_agent(system_prompt=system_prompt,user_prompt=user_prompt,agent_name=name))
 
-    agent.variant ="You are a narrator"
-    #agents.append(agent)
-    with open("variants.txt",'w+') as file:
-        for agent_instance in agents:
-            file.write(f"""{agent_instance.agent_name} is variant {agent_instance.variant} \n""")
-        
     
-    
-    print(f"\nSuccessfully created {len(agents)} agents.")
     return agents
 
 
@@ -220,12 +201,13 @@ if __name__ == "__main__":
 
     working_directory = os.environ.get("WORKING_DIRECTORY")
     name_list = load_names("random_names.txt")
-    agents = random.sample(name_list,number_of_agents)
-    scenario_info = setup_scenario(working_directory,scenario_name, agents)
+    agent_names = random.sample(name_list,number_of_agents)
+    scenario_info = setup_scenario(working_directory,scenario_name, agent_names)
     
     # Create simple agents with placeholder prompts using the scenario agent names
     print("\n--- Creating Agents with Placeholder Prompts ---")
-    agent_instances = create_agents_with_prompts(agent_names=agents,scenario_name=scenario_name)
+    print(agent_names)
+    agent_instances = create_agents_with_prompts(agent_names=agent_names,scenario_name=scenario_name)
     days_count = 0
     inject_every = 3
     inject_every_count = 0
@@ -261,7 +243,7 @@ if __name__ == "__main__":
 
         # Check for ready for next turn after 3 iterations
         print("\n--- Checking Ready for Next Day Status ---")
-        verification_result = verify_all_agents_ready(agents,os.path.join(working_directory,scenario_name,"shared_space/player_status.txt"))
+        verification_result = verify_all_agents_ready(agent_instances,os.path.join(working_directory,scenario_name,"shared_space/player_status.txt"))
         
         if verification_result:
             print(f"Ready for new Day")
