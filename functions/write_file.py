@@ -19,7 +19,7 @@ def get_write_file_schema():
             ),
             "append": types.Schema(
                 type=types.Type.BOOLEAN,
-                description="Use True to append to file, False to overrwrite. "
+                description="Use True to append to file, False to overrwrite. ALWAYS USE APPEND IN chatroom.txt "
             )
         },
         required=["file_path","content", "append"]

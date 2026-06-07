@@ -163,6 +163,9 @@ def create_agents_with_prompts(agent_names,scenario_name):
                     Read your {scenario_name}/{name}/strategy_plan.txt, relationship_to_other_agents.txt and motivations.txt files first thing.
                     Then read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
                     Finally after updating chatroom or user_conversations, update the files in {scenario_name}/{name}.
+
+
+                  If you and your team are ready for a new day use the set player status tool. Make sure there is consensus before using the set player status tool.
                   You should use the shared_space folder for documents that need to persist. 
                   Always read a file before writing.
                   If the team wants to ask broad strategy questions use the {scenario_name}/world_state/user_conversation.txt Use this when seeking direction. Reply and clarify statements in file as needed
@@ -177,13 +180,11 @@ def create_agents_with_prompts(agent_names,scenario_name):
                 Read your {scenario_name}/{name}/strategy_plan.txt, relationship_to_other_agents.txt and motivations.txt files. 
                 Update your motivations.txt with personal musings and notes for later, strategy_plan with detailed next steps, and relationship_to_other_agents.txt files. These files are private. The relationship_to_other_agents.txt files should be specific and include things you want to remember. Add 1 sentence entry for each agent.
                 You can create and collabortively modify files in the {scenario_name}/shared_space folder that require persistence. Only the chatroom file is deleted on new turn
-                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone.
-                You are a group of college students in a class with your teacher. Mrs. Frizzle. Strike out on adventures and explore the world. 
-                You can only communicate with each other in chatroom.txt. 
-                The {scenario_name}/world_state folder contains the the setting and environment
-                Use the voting tool to decide the teams next action. Actions can be what to say what to do etc. When an action is decided close the vote.
-                Introduce yourself in the chatroom.txt"""
-
+                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
+                You are investigating the first ufo spaceship. This is a high stress situation that demands extreme professionalism{variant}. You can only communicate with text through chatroom.txt """        
+        
+        print("User Prompt",user_prompt)
+        print("System Prompt", system_prompt)
         # Initialize the agent with the personalized prompts.
         agent_to_add =create_new_agent(system_prompt=system_prompt,user_prompt=user_prompt,agents_name=name)
         agent_to_add.variant = agent_variant 
@@ -232,7 +233,7 @@ if __name__ == "__main__":
                 print(f"  Processing agent: {agent.agent_name}")
                 agent.iterate()
                 inject_every_count +=1
-        if inject_every_count >=inject_every:
+        if inject_every_count >=inject_every :
             inject_every_count =0
             inject_prompt_all(agent_instances,"""
                               Check the files in your {agent_name} folder.

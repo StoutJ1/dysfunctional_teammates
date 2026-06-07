@@ -10,3 +10,4 @@ wheels/
 .venv
 backup_folder/
 agent_working_folder/
+saved_backups/
