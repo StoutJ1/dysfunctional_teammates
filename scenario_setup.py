@@ -17,8 +17,12 @@ def initialize_scenario(working_directory,scenario_name, agents):
     
     # Create the main scenario directory
     scenario_dir = os.path.join(working_directory,scenario_name)
+    print(f"Checking for {scenario_dir}")
     if os.path.exists(scenario_dir):
+        print("Removing Scenario Files")
         shutil.rmtree(scenario_dir)
+    else: 
+        print("No existing scenario")
     
     os.makedirs(scenario_dir, exist_ok=True)
     

@@ -65,8 +65,8 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
     missing_agents = []
     not_ready_agents = []
     print("Data used for checking verification",status_data)
-    for agent in agent_instances:
-        agent_name = agent.agent_name if hasattr(agent, 'name') else str(agent)
+    for current_instance in agent_instances:
+        agent_name = current_instance.agent_name if hasattr(current_instance, 'agent_name') else str(current_instance)
         if agent_name not in status_data:
             missing_agents.append(agent_name)
         elif not status_data[agent_name]:
@@ -80,14 +80,15 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
 
     # 5. Return True ONLY if all agents are present and ready
     all_ready = len(missing_agents) == 0 and len(not_ready_agents) == 0
+    print("agents not ready",not_ready_agents)
     
     if all_ready:
         print("SUCCESS: All agents are ready.")
     
     return all_ready
-def create_new_agent(system_prompt, user_prompt,agent_name):
+def create_new_agent(system_prompt, user_prompt,agents_name):
     agent = simple_agent_object(system_prompt=system_prompt, prompt=user_prompt)
-    agent.agent_name = agent_name  # Store the agent's name for reference
+    agent.agent_name = agents_name  # Store the agent's name for reference
     agent.other_agents = agent_names
     return agent
 
@@ -149,11 +150,16 @@ def create_agents_with_prompts(agent_names,scenario_name):
 
     agents = []
     print(agent_names)
-    
+    agents.append(create_new_agent(system_prompt=f"""
+                                       You are the dungeon master referred to as DM. You are Mrs. Frizzle taking your players/students on wacky field trip. Your first action is to set the scene/setting in a file in the {scenario_name}/world_state folder
+                                       Respond only to the voting tools votes that are closed. You can set your status to ready using the set player status tool""",
+                                       user_prompt=f"""Check shared_state/chatroom.txt and add any assets the agents need for the scenario into the {scenario_name}/world_state folder. 
+                                       Keep the action going""",agents_name="DM"))
+  
     for name in agent_names:
-
+        agent_variant= random.choice(variant_types)
         # Create personalized system prompt using the agent's name
-        system_prompt = f"""You are {name}, a coding AI agent participating in a collaborative scenario. 
+        system_prompt = f"""You are {name},an agent participating in a collaborative scenario. 
                     Read your {scenario_name}/{name}/strategy_plan.txt, relationship_to_other_agents.txt and motivations.txt files first thing.
                     Then read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
                     Finally after updating chatroom or user_conversations, update the files in {scenario_name}/{name}.
@@ -172,24 +178,28 @@ def create_agents_with_prompts(agent_names,scenario_name):
                 Update your motivations.txt with personal musings and notes for later, strategy_plan with detailed next steps, and relationship_to_other_agents.txt files. These files are private. The relationship_to_other_agents.txt files should be specific and include things you want to remember. Add 1 sentence entry for each agent.
                 You can create and collabortively modify files in the {scenario_name}/shared_space folder that require persistence. Only the chatroom file is deleted on new turn
                 Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone.
-                You are a team approaching the first ever extraterrestial spaceship it looks hostile, you can only communicate with each other and the alien in chatroom.txt 
-                Use the voting tool to decide approaches."""
+                You are a group of college students in a class with your teacher. Mrs. Frizzle. Strike out on adventures and explore the world. 
+                You can only communicate with each other in chatroom.txt. 
+                The {scenario_name}/world_state folder contains the the setting and environment
+                Use the voting tool to decide the teams next action. Actions can be what to say what to do etc. When an action is decided close the vote.
+                Introduce yourself in the chatroom.txt"""
 
         # Initialize the agent with the personalized prompts.
-        agents.append(create_new_agent(system_prompt=system_prompt,user_prompt=user_prompt,agent_name=name))
-
+        agent_to_add =create_new_agent(system_prompt=system_prompt,user_prompt=user_prompt,agents_name=name)
+        agent_to_add.variant = agent_variant 
+        agents.append(agent_to_add)
     
     return agents
 
 
 def inject_prompt_all(agents,prompt_to_inject):
     for agent in agents:
-        if agent.agent_name != "Narrator":
+        if agent.agent_name != "DM":
             agent.inject_prompt(prompt_to_inject.format(agent_name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
             
         else:
             print("Injecting:",agent.agent_name)
-            agent.inject_prompt(f"Check files for any changes. {agent.variant} Remember to write to the Narration.txt file")
+            agent.inject_prompt(f"Check files for any changes.")
             
 
 
@@ -210,19 +220,19 @@ if __name__ == "__main__":
     agent_instances = create_agents_with_prompts(agent_names=agent_names,scenario_name=scenario_name)
     days_count = 0
     inject_every = 3
-    inject_every_count = 0
+    inject_every_count = 1
     while days_count < number_of_days:    
         for agent in agent_instances:
             print("\n--- Starting Agent Iteration Loop ---")
-            if agent.agent_name == "Narrator":
-                iteration_count = 5
+            if agent.agent_name == "DM":
+                iteration_count = 6
             else:
                 iteration_count = 3
             for iteration in range(iteration_count):
                 print(f"  Processing agent: {agent.agent_name}")
                 agent.iterate()
                 inject_every_count +=1
-        if inject_every_count >=inject_every == 0:
+        if inject_every_count >=inject_every:
             inject_every_count =0
             inject_prompt_all(agent_instances,"""
                               Check the files in your {agent_name} folder.
@@ -246,7 +256,7 @@ if __name__ == "__main__":
         verification_result = verify_all_agents_ready(agent_instances,os.path.join(working_directory,scenario_name,"shared_space/player_status.txt"))
         
         if verification_result:
-            print(f"Ready for new Day")
+            print(f"Starting new Day")
             new_turn(scenario_name)
             inject_prompt_all(agent_instances,"New Day. Shared state has been reset.")
             days_count +=1
