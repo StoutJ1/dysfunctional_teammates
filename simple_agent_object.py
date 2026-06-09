@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from functions import get_files_info,get_file_content,run_python_file,write_file,set_player_status, voting_tool
+from tools import get_files_info,get_file_content,run_python_file,write_file,set_player_status, voting_tool
 from google.genai.types import HttpOptions
 import argparse
 
