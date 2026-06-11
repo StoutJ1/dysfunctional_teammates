@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from tools import get_files_info,get_file_content,run_python_file,write_file,set_player_status, voting_tool
+from tool_functions import get_files_info,get_file_content,run_python_file,write_file,set_player_status, voting_tool
 from google.genai.types import HttpOptions
 import argparse
 
@@ -27,9 +27,10 @@ class simple_agent_object():
         self.function_results_list = []
         load_dotenv()
 
-        self.output = client.models.generate_content(model=f'models/{os.environ.get("MODEL")}',
+        self.output = client.models.generate_content(model=f'{os.environ.get("MODEL")}',
                                                 contents=messages,
                                                 config=system_config)
+        print(f"output: {self.output}")
         if self.output.usage_metadata != None:
             for self.current_candidate in self.output.candidates:
                 for part in self.current_candidate.content.parts:
@@ -113,18 +114,19 @@ class simple_agent_object():
                                 write_file.get_write_file_schema(),
                                 run_python_file.get_run_python_file_schema(),
                                 # New functions from new_functions directory
-                                set_player_status.get_set_player_status_schema(),
-                                voting_tool.get_voting_tool_schema(),
-                                voting_tool.get_consensus_schema(),
-                                voting_tool.get_create_topic_schema(),
-                                voting_tool.get_close_vote_schema(),
-                                voting_tool.get_available_topics_schema(),
+                                #set_player_status.get_set_player_status_schema(),
+                                #voting_tool.get_voting_tool_schema(),
+                                #voting_tool.get_consensus_schema(),
+                                #voting_tool.get_create_topic_schema(),
+                                #voting_tool.get_close_vote_schema(),
+                                #voting_tool.get_available_topics_schema(),
                                 
                                 ],)
         self.thinking_config_val = types.ThinkingConfig(thinking_budget=0)
-        self.config = types.GenerateContentConfig(tools=[self.available_functions],
-                                                thinking_config=self.thinking_config_val,
-                                                system_instruction=self.system_prompt,)   
+        #self.config = types.GenerateContentConfig(tools=[self.available_functions],
+        #                                        thinking_config=self.thinking_config_val,
+         #                                       system_instruction=self.system_prompt,)   
+        self.config = types.GenerateContentConfig(system_instruction=self.system_prompt)
         return self.config
 
     def save_to_messages(self,messages,output_from_send_message,function_call_results):
@@ -142,10 +144,6 @@ class simple_agent_object():
         print("-"*50)
         if len(self.function_call_results)== 0:
             print("No more functions to run.")
-            # with open("save_history.txt",'w+') as file:
-            #     for content in self.messages:
-            #         file.write(str(content.parts))
-            # print("Wrote History")
             return "Finished"
             
     def iterate(self):
@@ -153,7 +151,6 @@ class simple_agent_object():
         self.api_key = os.environ.get("GEMINI_API_KEY")
         self.base_url_env = os.environ.get("BASE_URL_ENV")
         self.client = genai.Client(api_key=self.api_key,http_options=HttpOptions(base_url=self.base_url_env))
-        
         #print("Model list:",list(self.client.models.list()))
         
         

@@ -103,9 +103,7 @@ def create_agents_with_prompts(agent_names,scenario_name):
         system_prompt = prompt_strings.get_player_system_prompt(name=name,scenario_name=scenario_name)
         # Create personalized user prompt using the agent's name
         user_prompt = prompt_strings.get_player_user_prompt(name=name,scenario_name=scenario_name,variant=agent_variant)
-        print("User Prompt",user_prompt)
-        print("System Prompt", system_prompt)
-        # Initialize the agent with the personalized prompts.
+     
         agent_to_add =create_new_agent(system_prompt=system_prompt,user_prompt=user_prompt,agents_name=name)
         agent_to_add.variant = agent_variant 
         agents.append(agent_to_add)
@@ -133,6 +131,8 @@ if __name__ == "__main__":
     
     # Create simple agents with placeholder prompts using the scenario agent names
     print("\n--- Creating Agents with Placeholder Prompts ---")
+    
+
     agent_instances = create_agents_with_prompts(agent_names=agent_names,scenario_name=scenario_name)
     days_count = 0
     inject_every = 3
