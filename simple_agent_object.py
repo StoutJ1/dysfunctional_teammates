@@ -9,9 +9,8 @@ import argparse
 
 
 class simple_agent_object():
-    def __init__(self,system_prompt,prompt):
-        self. working_directory = "agent_working_folder"
-        self. working_directory_save_files = "./agent_working_folder/save_files"
+    def __init__(self,system_prompt,prompt,working_dir):
+        self. working_directory = working_dir
         self.first_run = True
         self.system_prompt = system_prompt
         self.agent_name = ""
@@ -25,22 +24,18 @@ class simple_agent_object():
             
     def send_message(self,client,messages,system_config):
         self.function_results_list = []
+        self.function_call_results = []
         load_dotenv()
 
         self.output = client.models.generate_content(model=f'{os.environ.get("MODEL")}',
                                                 contents=messages,
                                                 config=system_config)
-        print(f"output: {self.output}")
+        
         if self.output.usage_metadata != None:
-            for self.current_candidate in self.output.candidates:
-                for part in self.current_candidate.content.parts:
-                    if part.text:
-                        print(part.text)
-
             if self.output.function_calls != None:
-                #print(output.function_calls)
+                print(self.output.function_calls)
                 for self.call in self.output.function_calls:
-                    #print(f"Calling function: {call.name}({call.args})")
+                    print(f"Calling function: {self.call.name}({self.call.args})")
                     
                     self.function_call_result = self.call_function(self.call)
                     if self.function_call_result.parts == None:
@@ -49,12 +44,14 @@ class simple_agent_object():
                         raise "Empty function response"
                     if self.function_call_result.parts[0].function_response.response == None:
                         raise "Empty function response response"
+                    
                     self.function_results_list.append(self.function_call_result.parts[0])
+                    #print("Function Call Results:" ,self.function_call_result)
                     
         else:
             print("API Error")
-            
         return self.output,self.function_results_list
+    
     def inject_prompt(self,prompt_to_inject):
         print(f"Prompt injected to {self.agent_name} prompt is: {prompt_to_inject}")
         self.messages.append(types.Content(role="user",parts=[types.Part(text=prompt_to_inject,)]))
@@ -85,17 +82,16 @@ class simple_agent_object():
                     types.Part.from_function_response(name=self.function_name,response={"error":f"Unknown function: {self.function_name}"})
                 ]
             )
-
         self.args = dict(function_call.args) if function_call.args else {}
         self.args["working_directory"]=  self.working_directory
-        if function_call.name =="get_file_content":
-            forbidden_paths = []
-            for self.other_agent_name in self.other_agents:
-                if not self.other_agent_name == self.agent_name:
-                    forbidden_paths.append(os.path.join("save_files",self.other_agent_name))
-            self.args["forbidden_paths"] = forbidden_paths
+        #if function_call.name =="get_file_content":
+        #    forbidden_paths = []
+        #    for self.other_agent_name in self.other_agents:
+        #        if not self.other_agent_name == self.agent_name:
+        #            forbidden_paths.append(os.path.join("save_files",self.other_agent_name))
+        #    self.args["forbidden_paths"] = forbidden_paths
         self.function_result=   self.function_map[self.function_name](**self.args)
-
+        ##print("Function result:",self.function_result)
         return types.Content(
         role="tool",
         parts=[
@@ -114,44 +110,75 @@ class simple_agent_object():
                                 write_file.get_write_file_schema(),
                                 run_python_file.get_run_python_file_schema(),
                                 # New functions from new_functions directory
-                                #set_player_status.get_set_player_status_schema(),
-                                #voting_tool.get_voting_tool_schema(),
-                                #voting_tool.get_consensus_schema(),
-                                #voting_tool.get_create_topic_schema(),
-                                #voting_tool.get_close_vote_schema(),
-                                #voting_tool.get_available_topics_schema(),
+                               # set_player_status.get_set_player_status_schema(),
+                                voting_tool.get_voting_tool_schema(),
+                                voting_tool.get_consensus_schema(),
+                                voting_tool.get_create_topic_schema(),
+                                voting_tool.get_close_vote_schema(),
+                                voting_tool.get_available_topics_schema(),
                                 
                                 ],)
         self.thinking_config_val = types.ThinkingConfig(thinking_budget=0)
-        #self.config = types.GenerateContentConfig(tools=[self.available_functions],
-        #                                        thinking_config=self.thinking_config_val,
-         #                                       system_instruction=self.system_prompt,)   
-        self.config = types.GenerateContentConfig(system_instruction=self.system_prompt)
+        tools=[self.available_functions]
+        self.config = types.GenerateContentConfig(
+                                                thinking_config=self.thinking_config_val,
+                                               system_instruction=self.system_prompt,)   
+        self.config = types.GenerateContentConfig(system_instruction=self.system_prompt,        tools=[self.available_functions]
+)
         return self.config
 
-    def save_to_messages(self,messages,output_from_send_message,function_call_results):
-        for current_candidate in output_from_send_message.candidates:
-            messages.append(current_candidate.content)
-    
-        messages.append(types.Content(role="user", parts=function_call_results))
+    def remove_thinking(self,messages):
+        print("-"*100)
+        cleaned_messages = []
+        for content in messages:
+            cleaned_parts = []
+
+            for part in content.parts:
+                print(f"Part being checked: {part}")
+                if part.text != None or part.function_call != None or part.thought!=None or part.function_call != None :
+                    print(f"Part being added:{part}")
+                    cleaned_parts.append(part)
+                else:
+                    print(f"Skipping blank part {part}")
+            if len(cleaned_parts)>0:
+                   cleaned_messages.append(types.Content(role=content.role,parts=cleaned_parts))
+            print(f"Cleaned {content}")
         
+        print("Messages",cleaned_messages)
+        return cleaned_messages
+
+
+                        
+    def save_to_messages(self,messages,output_from_send_message,function_call_results):
+        #Check here for type of reasoning/thinking
+        print("-"*100)
+        print("Length of Messages:",len(messages))        
+        print("-"*100)
+        if output_from_send_message.candidates:
+            for current_candidate in output_from_send_message.candidates:
+                messages.append(current_candidate.content)
+                for part in current_candidate.content.parts:
+                            print(part.text)
+            #print("Appending User Info",self.function_call_results)
+            
+            messages.append(types.Content(role="user", parts=function_call_results))
+            messages = self.remove_thinking(messages)
         return messages
 
-    def iterate_steps(self,client,messages):
-        self.config = self.get_config()
-        self.generate_content_results,self.function_call_results = self.send_message(client,messages,self.config)
-        self.messages  = self.save_to_messages(self.messages,self.generate_content_results,self.function_call_results)
-        print("-"*50)
-        if len(self.function_call_results)== 0:
-            print("No more functions to run.")
-            return "Finished"
+     
             
     def iterate(self):
         load_dotenv()
         self.api_key = os.environ.get("GEMINI_API_KEY")
         self.base_url_env = os.environ.get("BASE_URL_ENV")
         self.client = genai.Client(api_key=self.api_key,http_options=HttpOptions(base_url=self.base_url_env))
-        #print("Model list:",list(self.client.models.list()))
         
         
-        self.iterate_steps(self.client,self.messages,)
+        
+        self.config = self.get_config()
+        self.generate_content_results,self.function_call_results = self.send_message(self.client,self.messages,self.config)
+        self.messages  = self.save_to_messages(self.messages,self.generate_content_results,self.function_call_results)
+        print("-"*50)
+        if len(self.function_call_results)== 0:
+            print("No more functions to run.")
+            return "Finished"

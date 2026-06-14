@@ -14,7 +14,7 @@ from turn_manager import new_turn
 variant_types = variants.variant_types
 agent_variants = variant_types
 number_of_days = 10
-number_of_agents = 3
+number_of_agents = 2
 scenario_name = "save_files"
 agent_names=[]
 agent_instances=[]
@@ -56,7 +56,7 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
     # 3. Verify ALL agents in the list have reported readiness
     missing_agents = []
     not_ready_agents = []
-    print("Data used for checking verification",status_data)
+    #print("Data used for checking verification",status_data)
     for current_instance in agent_instances:
         agent_name = current_instance.agent_name if hasattr(current_instance, 'agent_name') else str(current_instance)
         if agent_name not in status_data:
@@ -79,7 +79,7 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
     
     return all_ready
 def create_new_agent(system_prompt, user_prompt,agents_name):
-    agent = simple_agent_object(system_prompt=system_prompt, prompt=user_prompt)
+    agent = simple_agent_object(system_prompt=system_prompt, prompt=user_prompt,working_dir=working_directory)
     agent.agent_name = agents_name  # Store the agent's name for reference
     agent.other_agents = agent_names
     return agent
@@ -95,7 +95,7 @@ def create_agents_with_prompts(agent_names,scenario_name):
     agents = []
     print(agent_names)
 
-    agents.append(create_new_agent(system_prompt=f""+prompt_strings.get_dm_system_prompt(scenario_name=scenario_name,name="Mrs.Frizzle",),user_prompt=prompt_strings.get_dm_user_prompt(name="Mrs.Frizzle",scenario_name=scenario_name),agents_name="DM"))
+   # agents.append(create_new_agent(system_prompt=f""+prompt_strings.get_dm_system_prompt(scenario_name=scenario_name,name="Mrs.Frizzle",),user_prompt=prompt_strings.get_dm_user_prompt(name="Mrs.Frizzle",scenario_name=scenario_name),agents_name="DM"))
   
     for name in agent_names:
         agent_variant= random.choice(variant_types)
@@ -110,14 +110,16 @@ def create_agents_with_prompts(agent_names,scenario_name):
     return agents
 
 
-def inject_prompt_all(agents,prompt_to_inject):
+def inject_prompt_all(agents):
     for agent in agents:
         if agent.agent_name != "DM":
-            agent.inject_prompt(prompt_to_inject.format(agent_name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
+            agent.inject_prompt(prompt_strings.get_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
+
             
         else:
-            print("Injecting:",agent.agent_name)
-            agent.inject_prompt(f"Check files for any changes.")
+           # print("Injecting:",agent.agent_name)
+           print("Skipping Injection")
+           #agent.inject_prompt(f"Check files for any changes.")
                 
 
 
@@ -146,16 +148,12 @@ if __name__ == "__main__":
                 iteration_count = 3
             for iteration in range(iteration_count):
                 print(f"  Processing agent: {agent.agent_name}")
-                agent.iterate()
+                if agent.iterate() == "Finished":
+                    break
                 inject_every_count +=1
         if inject_every_count >=inject_every :
             inject_every_count =0
-            inject_prompt_all(agent_instances,"""
-                              Check the files in your {agent_name} folder.
-                              Check files in {scenario_name}/world_state folder for updates. 
-                              You should prioritize messages from user.
-                              Remember {variant}
-                              Update your relationship_to_other_agents.txt with your opinion of the other agents""")
+            inject_prompt_all(agent_instances)
 
 
         # Check for ready for next turn after 3 iterations

@@ -23,6 +23,7 @@ def get_files_info(working_directory, directory="."):
     working_dir_abs = os.path.abspath(working_directory)
     target_path = os.path.join(working_dir_abs,directory)
     target_path = os.path.normpath(target_path)
+    print("Checking file info",target_path)
     if os.path.exists(target_path):
         if os.path.commonpath([working_dir_abs,target_path]) == working_dir_abs:
             if os.path.isfile(directory) == False:

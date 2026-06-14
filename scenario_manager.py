@@ -8,7 +8,7 @@ populating it with default text files.
 
 import os
 import shutil
-
+from datetime import datetime
 
 def initialize_scenario(working_directory,scenario_name, agents):
 
