@@ -148,8 +148,8 @@ if __name__ == "__main__":
                 iteration_count = 3
             for iteration in range(iteration_count):
                 print(f"  Processing agent: {agent.agent_name}")
-                if agent.iterate() == "Finished":
-                    break
+                agent.iterate() 
+                    
                 inject_every_count +=1
         if inject_every_count >=inject_every :
             inject_every_count =0
