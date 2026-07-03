@@ -110,14 +110,17 @@ def create_agents_with_prompts(agent_names,scenario_name):
     return agents
 
 
-def inject_prompt_all(agents,prompt_to_inject):
+def inject_prompt_all(agents,prompt_to_inject=""):
     for agent in agents:
+        if prompt_to_inject == "":
+            prompt_to_inject=prompt_strings.get_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant)
+
         if agent.agent_name != "DM":
             agent.inject_prompt(prompt_strings.get_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
 
             
         else:
-           print("Injecting:",agent.agent_name)
+           # print("Injecting:",agent.agent_name)
            print("Skipping Injection")
            #agent.inject_prompt(f"Check files for any changes.")
                 
