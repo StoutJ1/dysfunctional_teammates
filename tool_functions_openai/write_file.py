@@ -2,7 +2,7 @@ import os
 from google.genai import types
 
 def get_write_file_schema():
-    schema_write_file = [{
+    schema_write_file = {
         "type": "function",
         "name": "write_file",
         "description": "Writes content to specificed filename relative to the working directory",
@@ -20,11 +20,14 @@ def get_write_file_schema():
                 "append": {
                     "type": "boolean",
                     "description": "Use True to append to file, False to overrwrite. ALWAYS USE APPEND IN chatroom.txt"
-                }
-            }
+                },
+
+            },
+            "required": ["file_path", "content","append"]
+
         },
-        "required": ["file_path", "content", "append"]
-    }]
+        "strict":True
+    }
 
     return schema_write_file
 

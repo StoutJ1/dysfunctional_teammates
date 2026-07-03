@@ -3,106 +3,129 @@ from google.genai import types
 import json
 
 def get_submit_vote_schema():
-    schema_submit_vote = [{
-        "type": "function",
-        "name": "submit_vote",
-        "description": "Allows agents to submit boolean votes on a topic and returns the current vote tally",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "topic": {
-                    "type": "string",
-                    "description": "The topic or question being voted on (must be a valid, pre-existing topic) can only have True or False"
-                },
-                "agent_name": {
-                    "type": "string",
-                    "description": "Name of the agent submitting the vote"
-                },
-                "vote": {
-                    "type": "boolean",
-                    "description": "The vote - must be a boolean true or false value"
-                }
-            }
+    schema_submit_vote = {
+  "type": "function",
+    "name": "submit_vote",
+    "description": "Allows agents to submit boolean votes on a topic and returns the current vote tally.",
+    "strict": True,
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "The topic or question being voted on. Must refer to a valid, pre-existing topic that can be answered with true or false."
         },
-        "required": ["topic", "agent_name", "vote"]
-    }]
+        "agent_name": {
+          "type": "string",
+          "description": "Name of the agent submitting the vote."
+        },
+        "vote": {
+          "type": "boolean",
+          "description": "The agent's vote: true for yes, false for no."
+        }
+      },
+      "required": [
+        "topic",
+        "agent_name",
+        "vote"
+      ],
+      "additionalProperties": False
+    }
+  
+}
 
     return schema_submit_vote
 
 def get_create_topic_schema():
-    schema_create_topic = [{
-        "type": "function",
-        "name": "create_topic",
-        "description": "Creates a new voting topic that agents can vote on",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "topic": {
-                    "type": "string",
-                    "description": "The topic or question to create for voting must be true or false"
-                },
-                "description": {
-                    "type": "string",
-                    "description": "Optional description of what the topic is about"
-                }
-            }
+    schema_create_topic = {
+  "type": "function",
+    "name": "create_topic",
+    "description": "Creates a new voting topic that agents can vote on.",
+    "strict": True,
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "The topic or question to create for voting. It must be phrased so it can be answered with true or false."
         },
-        "required": ["topic"]
-    }]
+        "description": {
+          "type": "string",
+          "description": "Optional description providing additional context about the voting topic."
+        }
+      },
+      "required": [
+        "topic"
+      ],
+      "additionalProperties": False
+    }
+  
+}
 
     return schema_create_topic
 
 
 def get_consensus_schema():
-    schema_get_consensus = [{
-        "type": "function",
-        "name": "get_consensus",
-        "description": "Retrieves the current consensus/results for a voting topic",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "topic": {
-                    "type": "string",
-                    "description": "The topic to retrieve voting results for"
-                }
-            }
-        },
-        "required": ["topic"]
-    }]
+    schema_get_consensus = {
+  "type": "function",
+    "name": "get_consensus",
+    "description": "Retrieves the current consensus and voting results for a voting topic.",
+    "strict": True,
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "The topic for which to retrieve the current voting results and consensus."
+        }
+      },
+      "required": [
+        "topic"
+      ],
+      "additionalProperties": False
+    
+  }
+}
 
     return schema_get_consensus
 
 
 def get_available_topics_schema():
-    schema_get_available_topics = [{
-        "type": "function",
-        "name": "get_available_topics",
-        "description": "Returns a list of all available voting topics that agents can vote on",
-        "parameters": {
-            "type": "object",
-            "properties": {}
-        },
-        "required": []
-    }]
+    schema_get_available_topics = {
+  "type": "function",
+    "name": "get_available_topics",
+    "description": "Returns a list of all available voting topics that agents can vote on.",
+    "strict": True,
+    "parameters": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": False
+    }
+  }
 
     return schema_get_available_topics
 
 def get_close_vote_schema():
-    schema_close_vote = [{
-        "type": "function",
-        "name": "close_vote",
-        "description": "Closes a voting topic and records the final result in the JSON file. Complete all votes when all agents have voted",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "topic": {
-                    "type": "string",
-                    "description": "The topic to close the vote for"
-                }
-            }
-        },
-        "required": ["topic"]
-    }]
+    schema_close_vote = {
+  "type": "function",    "name": "close_vote",
+    "description": "Closes a voting topic and records the final result in the JSON file. Completes the voting process once all agents have voted.",
+    "strict": True,
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "The topic for which the vote should be closed."
+        }
+      },
+      "required": [
+        "topic"
+      ],
+      "additionalProperties": False
+    }
+  }
+
 
     return schema_close_vote
 def initialize_voting_system(working_directory):
@@ -296,7 +319,7 @@ def get_available_topics(working_directory):
         if topic_info['final_decision'] is not None:
             result += f"   Final Decision: {topic_info['final_decision']}\n"
         result += "\n"
-    
+    print("Result of get topics:", result)
     return result
 
 def close_vote(working_directory, topic):

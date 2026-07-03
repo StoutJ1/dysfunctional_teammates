@@ -12,9 +12,11 @@ def get_files_info_schema():
                     "type": "string",
                     "description": "Path to list files from, relative to the working directory (default is the working directory itself)"
                 }
-            }
+            },
+                    "required": ["directory"]
+
         },
-        "required": ["directory"]
+        "strict":True
     }
 
     return schema_get_files_info

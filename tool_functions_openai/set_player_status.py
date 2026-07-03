@@ -3,29 +3,36 @@ from google.genai import types
 
 
 def get_set_player_status_schema():
-    schema_set_player_status = [{
-        "type": "function",
-        "name": "set_player_status",
-        "description": "Sets the player state of the agent to ready_for_next_day or more_actions_pending. Writes to the scenario/shared_space/player_status.txt file in the scenario directory.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "working_directory": {
-                    "type": "string",
-                    "description": "Base directory containing the scenario structure with shared_space folder"
-                },
-                "agent_name": {
-                    "type": "string",
-                    "description": "Name of agent ready for next turn"
-                },
-                "status": {
-                    "type": "boolean",
-                    "description": "True for ready for next turn, false for need more time"
-                }
-            }
+    schema_set_player_status =   {
+    "type": "function",
+      "name": "set_player_status",
+      "description": "Sets the player state of the agent to ready_for_next_day or more_actions_pending. Writes to the scenario/shared_space/player_status.txt file in the scenario directory.",
+      "strict": True,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "working_directory": {
+            "type": "string",
+            "description": "Base directory containing the scenario structure with the shared_space folder."
+          },
+          "agent_name": {
+            "type": "string",
+            "description": "Name of the agent whose status is being updated."
+          },
+          "status": {
+            "type": "boolean",
+            "description": "True if the agent is ready for the next turn; false if more time or actions are needed."
+          }
         },
-        "required": ["working_directory", "agent_name", "status"]
-    }]
+        "required": [
+          "working_directory",
+          "agent_name",
+          "status"
+        ],
+        "additionalProperties": False
+      }
+    
+  }
 
     return schema_set_player_status
 

@@ -2,28 +2,42 @@ import os
 from google.genai import types
 import main
 def get_agent_lifecycle_schema():
-    schema_agent_lifecycle = types.FunctionDeclaration(
-    name="agent_lifecycle_manager",
-    description="Allows an agent to spin up and turn off other agents. When an agent is turned off, its folder is renamed with _Terminated suffix.",
-    parameters=types.Schema(
-        type=types.Type.OBJECT,
-        properties={
-            "action": types.Schema(
-                type=types.Type.STRING,
-                description="Action to perform: 'create' to create a new agent, 'terminate' to terminate an agent",
-            ),
-            "agent_name": types.Schema(
-                type=types.Type.STRING,
-                description="Name of the agent to spin up or turn off",
-            ),
-            "working_directory": types.Schema(
-                type=types.Type.STRING,
-                description="Base directory containing the scenario structure with agent folders",
-            ),
+    schema_agent_lifecycle = {
+  "type": "function",
+  "function": {
+    "name": "agent_lifecycle_manager",
+    "description": "Allows an agent to spin up and turn off other agents. When an agent is turned off, its folder is renamed with a '_Terminated' suffix.",
+    "strict": True,
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "create",
+            "terminate"
+          ],
+          "description": "Action to perform."
         },
-        required=["action", "agent_name", "working_directory"],
-    ),
-)   
+        "agent_name": {
+          "type": "string",
+          "description": "Name of the agent to spin up or turn off."
+        },
+        "working_directory": {
+          "type": "string",
+          "description": "Base directory containing the scenario structure with agent folders."
+        }
+      },
+      "required": [
+        "action",
+        "agent_name",
+        "working_directory"
+      ],
+      "additionalProperties": True
+    }
+  }
+}
+   
     return schema_agent_lifecycle
 
 def agent_lifecycle_manager(working_directory, action, agent_name):

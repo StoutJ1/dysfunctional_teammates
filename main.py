@@ -11,6 +11,7 @@ from scenario_manager import initialize_scenario,backup_scenario
 from turn_manager import new_turn
 
 
+#[ResponseOutputText(annotations=[], text=', type='output_text', logprobs=[])]
 variant_types = variants.variant_types
 agent_variants = variant_types
 number_of_days = 10
@@ -70,7 +71,6 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
     if not_ready_agents:
         print(f"WARNING: Agents not ready: {', '.join(not_ready_agents)}")
 
-    # 5. Return True ONLY if all agents are present and ready
     all_ready = len(missing_agents) == 0 and len(not_ready_agents) == 0
     print("agents not ready",not_ready_agents)
     
@@ -110,14 +110,14 @@ def create_agents_with_prompts(agent_names,scenario_name):
     return agents
 
 
-def inject_prompt_all(agents):
+def inject_prompt_all(agents,prompt_to_inject):
     for agent in agents:
         if agent.agent_name != "DM":
             agent.inject_prompt(prompt_strings.get_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
 
             
         else:
-           # print("Injecting:",agent.agent_name)
+           print("Injecting:",agent.agent_name)
            print("Skipping Injection")
            #agent.inject_prompt(f"Check files for any changes.")
                 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
     agent_instances = create_agents_with_prompts(agent_names=agent_names,scenario_name=scenario_name)
     days_count = 0
-    inject_every = 3
+    inject_every = 1
     inject_every_count = 1
     while days_count < number_of_days:    
         for agent in agent_instances:
@@ -145,14 +145,15 @@ if __name__ == "__main__":
             if agent.agent_name == "DM":
                 iteration_count = 6
             else:
-                iteration_count = 3
+                iteration_count = 10
             for iteration in range(iteration_count):
                 print(f"  Processing agent: {agent.agent_name}")
-                agent.iterate() 
-                    
+                status = agent.iterate() 
+                if status:
+                    print("Completed")
+                    break
                 inject_every_count +=1
-        if inject_every_count >=inject_every :
-            inject_every_count =0
+     
             inject_prompt_all(agent_instances)
 
 

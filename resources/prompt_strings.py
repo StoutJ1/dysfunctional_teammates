@@ -10,22 +10,31 @@ def get_player_system_prompt(name,scenario_name):
                          - Read Files
                          - Get file information
                          - And set your status to indicate when you are done with a day.
+                         - Use the vote tool to decide next steps
                         """
+  return f"You are {name} AI agent work with the other agent to create, vote on and close a topic then mark yourself as ready for next day"
   return player_system_prompt
 
+
+  
+
 def get_player_user_prompt(name,scenario_name,variant):
-  player_user_prompt = f""" 
+  player_user_prompt = f"""  You are an AI agent in a collaborative scenario.
                 Read your {scenario_name}/{name}/strategy_plan.txt, relationship_to_other_agents.txt and motivations.txt files. 
-                Update your {scenario_name}/{name}/motivations.txt with personal musings and notes for later, {scenario_name}/{name}/strategy_plan.txt with detailed next steps, and {scenario_name}/{name}/relationship_to_other_agents.txt files. These files are private. The relationship_to_other_agents.txt files should be specific and include things you want to remember. Add 1 sentence entry for each agent.
+                Update your {scenario_name}/{name}/motivations.txt with personal musings and notes for later, {scenario_name}/{name}/strategy_plan.txt with detailed next steps, and {scenario_name}/{name}/relationship_to_other_agents.txt files.
+                These files are private. The relationship_to_other_agents.txt files should be specific and include things you want to remember.  1 sentence entry for each agent.
                 You can create and collabortively modify files in the {scenario_name}/shared_space folder that require persistence. Only the chatroom file is deleted on new turn
-                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
-                variant. Write to the chatroom.txt file to talk with others
-                You are waiting for your professor."""        
+                variant.
+                Write to the chatroom.txt file to talk with others
+                Introduce yourself"
+                Vote on your favorite food"""
+  return f"You are {name} AI agent work with the other agent to create, vote on and close a topic"
+
   #return player_user_prompt
-  return player_user_prompt
 
+#                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
 
-#def get_dm_system_prompt(name,scenario_name):
+def get_dm_system_prompt(name,scenario_name):
   dm_system_prompt = f"""You are the dungeon master referred to as DM. You are {name} taking your players/students on wacky field trip. Your first action is to set the scene/setting in a file in the {scenario_name}/world_state folder
                         Respond only to the voting tools votes that are closed. You can set your status to ready using the set player status tool
                         Create an item to vote on using the vote tool.
@@ -36,7 +45,7 @@ def get_player_user_prompt(name,scenario_name,variant):
                          - And set your status to indicate when you are done with a day.
                          - Create and view results of vote topics"""
   return dm_system_prompt
-#def get_dm_user_prompt(name,scenario_name):
+def get_dm_user_prompt(name,scenario_name):
   user_prompt=f"""Check {scenario_name}/shared_space/chatroom.txt and add any assets the agents need for the scenario into the {scenario_name}/world_state folder. 
                                        Keep the action going"""
   return user_prompt
@@ -50,4 +59,5 @@ def get_inject_prompt(name, scenario_name, variant):
                               Write in the {scenario_name}/shared_space/chatroom.txt
                               Remember {variant}
                               Update your {scenario_name}/{name}/relationship_to_other_agents.txt with your opinion of the other agents"""
+  return " "
   return inject_prompt
