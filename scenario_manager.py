@@ -135,6 +135,8 @@ def cleanup_scenario(scenario_name="scenario"):
     """
     if os.path.exists(scenario_name):
         shutil.rmtree(scenario_name)
+    if os.path.exists("agent_working_folder/votes.json"):
+        os.remove("/home/james/ready_for_git/pyagent/agent_working_folder/votes.json")
 
 
 

@@ -10,12 +10,10 @@ from dotenv import load_dotenv
 from scenario_manager import initialize_scenario,backup_scenario
 from turn_manager import new_turn
 
-
-#[ResponseOutputText(annotations=[], text=', type='output_text', logprobs=[])]
 variant_types = variants.variant_types
 agent_variants = variant_types
 number_of_days = 10
-number_of_agents = 2
+number_of_agents = 3
 scenario_name = "save_files"
 agent_names=[]
 agent_instances=[]

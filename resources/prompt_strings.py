@@ -12,7 +12,6 @@ def get_player_system_prompt(name,scenario_name):
                          - And set your status to indicate when you are done with a day.
                          - Use the vote tool to decide next steps
                         """
-  return f"You are {name} AI agent work with the other agent to create, vote on and close a topic then mark yourself as ready for next day"
   return player_system_prompt
 
 
@@ -26,11 +25,8 @@ def get_player_user_prompt(name,scenario_name,variant):
                 You can create and collabortively modify files in the {scenario_name}/shared_space folder that require persistence. Only the chatroom file is deleted on new turn
                 variant.
                 Write to the chatroom.txt file to talk with others
-                Introduce yourself"
-                Vote on your favorite food"""
-  return f"You are {name} AI agent work with the other agent to create, vote on and close a topic"
-
-  #return player_user_prompt
+                Introduce yourself then collaborate to create a short story."""
+  return player_user_prompt
 
 #                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
 
@@ -53,11 +49,10 @@ def get_dm_user_prompt(name,scenario_name):
 
 
 def get_inject_prompt(name, scenario_name, variant):
-  inject_prompt = f""" You are {name}Update the txt files in {scenario_name}/{name}/
+  inject_prompt = f""" You are {name} Update the txt files in {scenario_name}/{name}/
                               Check files in {scenario_name}/world_state folder for updates. 
                               You should prioritize messages from user read the {scenario_name}/world_state/user_conversation.txt file
                               Write in the {scenario_name}/shared_space/chatroom.txt
                               Remember {variant}
                               Update your {scenario_name}/{name}/relationship_to_other_agents.txt with your opinion of the other agents"""
-  return " "
   return inject_prompt
