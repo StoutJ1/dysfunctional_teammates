@@ -58,7 +58,7 @@ def get_file_content(working_directory,file_path, forbidden_paths=None):
         
         # Check if file exists and is a regular file
         if os.path.isfile(target_path):
-            print(f"File Read is: {file_path}")
+            #print(f"File Read is: {file_path}")
             with open(target_path, 'r') as file:
                 contents = file.read()
                 if len(contents) > MAX_CHARS:

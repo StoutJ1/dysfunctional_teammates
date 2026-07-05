@@ -10,7 +10,6 @@ import argparse
 
 class simple_agent_object():
     def __init__(self,system_prompt,prompt,working_dir):
-        print(f"Initiating agent")
         self. working_directory = working_dir
         self.first_run = True
         self.system_prompt = system_prompt
@@ -24,12 +23,13 @@ class simple_agent_object():
         self.base_url = os.environ.get("BASE_URL_ENV")
         self.working_directory = os.environ.get("WORKING_DIRECTORY")
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
+        
 
 
         if self.first_run:
             self.first_run =False
-            self.context = [{"role":"user",
-                   "content":self.user_prompt},{"role":"system","content":self.system_prompt}]
+            self.context = [{"role":"system","content":self.system_prompt},{"role":"user",
+                   "content":self.user_prompt}]
     def call_function(self,item,):
             function_name = item.name or ""
             print(f'Calling function: {item.name}')
@@ -63,7 +63,7 @@ class simple_agent_object():
         load_dotenv()
         
         client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
-        response = client.responses.create(model=self.model,tools=self.tools,input=context)
+        response = client.responses.create(model=self.model,tools=self.tools,input=context,reasoning={"effort":"low"})
         for item in response.output:
             if response.output_text:
                 print("Status is Completed")
@@ -81,7 +81,7 @@ class simple_agent_object():
                 context.append(item)
         return context
     def inject_prompt(self,prompt_to_inject):
-        print(f"Prompt injected to {self.agent_name} prompt is: {prompt_to_inject}")
+        #print(f"Prompt injected to {self.agent_name} prompt is: {prompt_to_inject}")
         self.context.append({"role":"system","content":prompt_to_inject})
 
 
@@ -109,7 +109,7 @@ class simple_agent_object():
         load_dotenv()
         self.tools=self.get_tools()
 
-        self.completed = self.send_message(self.client,self.context)
+        self.completed = self.send_message(self.client,self.context,)
         if self.completed == True:
             return self.completed
         print("-"*50)

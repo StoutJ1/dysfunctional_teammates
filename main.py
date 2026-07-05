@@ -9,7 +9,7 @@ import json
 from dotenv import load_dotenv
 from scenario_manager import initialize_scenario,backup_scenario
 from turn_manager import new_turn
-
+from time import time
 variant_types = variants.variant_types
 agent_variants = variant_types
 number_of_days = 10
@@ -17,6 +17,11 @@ number_of_agents = 3
 scenario_name = "save_files"
 agent_names=[]
 agent_instances=[]
+
+#multitail command:
+#multitail --follow-all -s 5 -du -q 1 "*/*.txt" "../votes.json"
+#multitail --follow-all -s 2 -du -q 1 "*/*relation*.txt" "../votes.json" "shared_space/chatroom.txt" -q 1 "world_state/*.txt"
+#multitail --follow-all -s 2 -du -q 1 "save_files/*/*relation*.txt" "votes.json" "save_files/shared_space/chatroom.txt" -q 1 "save_files/world_state/*.txt"
 
 #TODO  Add ability to tag messages as transient
 # Load random names from file
@@ -93,7 +98,7 @@ def create_agents_with_prompts(agent_names,scenario_name):
     agents = []
     print(agent_names)
 
-   # agents.append(create_new_agent(system_prompt=f""+prompt_strings.get_dm_system_prompt(scenario_name=scenario_name,name="Mrs.Frizzle",),user_prompt=prompt_strings.get_dm_user_prompt(name="Mrs.Frizzle",scenario_name=scenario_name),agents_name="DM"))
+    agents.append(create_new_agent(system_prompt=f""+prompt_strings.get_dm_system_prompt(scenario_name=scenario_name,name="Mrs.Frizzle",),user_prompt=prompt_strings.get_dm_user_prompt(name="Mrs.Frizzle",scenario_name=scenario_name),agents_name="DM"))
   
     for name in agent_names:
         agent_variant= random.choice(variant_types)
@@ -111,16 +116,15 @@ def create_agents_with_prompts(agent_names,scenario_name):
 def inject_prompt_all(agents,prompt_to_inject=""):
     for agent in agents:
         if prompt_to_inject == "":
-            prompt_to_inject=prompt_strings.get_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant)
+            prompt_to_inject=prompt_strings.get_player_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant)
 
-        if agent.agent_name != "DM":
-            agent.inject_prompt(prompt_strings.get_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
+        if agent.agent_name == "DM":
+            agent.inject_prompt(prompt_strings.get_dm_inject_prompt(name=agent.agent_name,scenario_name=scenario_name))
+        else: 
+            agent.inject_prompt(prompt_strings.get_player_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
 
             
-        else:
-           # print("Injecting:",agent.agent_name)
-           print("Skipping Injection")
-           #agent.inject_prompt(f"Check files for any changes.")
+
                 
 
 
@@ -149,10 +153,13 @@ if __name__ == "__main__":
                 iteration_count = 10
             for iteration in range(iteration_count):
                 print(f"  Processing agent: {agent.agent_name}")
+                timerstart = time()
                 status = agent.iterate() 
+                print("*"*10,f"Completed Iteration: {time()-timerstart:.2f} secs","*"*10)
+
                 if status:
-                    print("Completed")
-                    break
+                    print("Model says ending turn early, disabled")
+                    #break
                 inject_every_count +=1
      
             inject_prompt_all(agent_instances)

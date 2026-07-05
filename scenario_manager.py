@@ -5,13 +5,13 @@ This module provides functions to initialize a scenario by creating
 the necessary directory structure for the agent simulation and
 populating it with default text files.
 """
-
+import tool_functions_openai.voting_tool
 import os
 import shutil
 from datetime import datetime
 
 def initialize_scenario(working_directory,scenario_name, agents):
-
+    
     if agents is None:
         agents = []
     
@@ -20,7 +20,7 @@ def initialize_scenario(working_directory,scenario_name, agents):
     print(f"Checking for {scenario_dir}")
     if os.path.exists(scenario_dir):
         print("Removing Scenario Files")
-        shutil.rmtree(scenario_dir)
+        cleanup_scenario(scenario_name)
     else: 
         print("No existing scenario")
     
@@ -76,7 +76,7 @@ def initialize_scenario(working_directory,scenario_name, agents):
             f.write(f"{agent_name} Strategy Plan\n")
             f.write("========================\n")
             
-    
+    tool_functions_openai.voting_tool.initialize_voting_system(working_directory)
     # Return structure information
     structure_info = {
         "scenario_dir": scenario_dir,
@@ -84,7 +84,7 @@ def initialize_scenario(working_directory,scenario_name, agents):
         "shared_space_dir": shared_space_dir,
         "agent_dirs": agent_dirs
     }
-    
+
     return structure_info
 
 
@@ -127,16 +127,22 @@ def create_agent_folder(scenario_name, agent_name):
 
 
 def cleanup_scenario(scenario_name="scenario"):
+    working_directory = os.environ.get("WORKING_DIRECTORY")
+
     """
     Remove an existing scenario directory and all its contents.
     
     Args:
         scenario_name (str): Name of the scenario directory to remove (default: "scenario")
     """
-    if os.path.exists(scenario_name):
-        shutil.rmtree(scenario_name)
-    if os.path.exists("agent_working_folder/votes.json"):
-        os.remove("/home/james/ready_for_git/pyagent/agent_working_folder/votes.json")
+    if os.path.exists(os.path.join(working_directory,scenario_name)):
+        shutil.rmtree(os.path.join(working_directory,scenario_name))
+    else:
+        print("Path does not exist to sencario")
+    if os.path.exists(os.path.join(working_directory,"votes.json")):
+        os.remove(os.path.join(working_directory,"votes.json"))
+    else:
+        print("Votes does not exist",os.path.join(working_directory,"votes.json"))
 
 
 
