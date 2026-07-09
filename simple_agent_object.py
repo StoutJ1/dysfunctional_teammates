@@ -23,9 +23,7 @@ class simple_agent_object():
         self.base_url = os.environ.get("BASE_URL_ENV")
         self.working_directory = os.environ.get("WORKING_DIRECTORY")
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
-        
-
-
+        self.scenario= ""
         if self.first_run:
             self.first_run =False
             self.context = [{"role":"system","content":self.system_prompt},{"role":"user",
@@ -49,8 +47,14 @@ class simple_agent_object():
             if function_name not in function_map:
                 return "Item not found"
             args = json.loads(item.arguments)
+            
             args["working_directory"]=  self.working_directory
-            function_result= function_map[function_name](**args)
+            if item.name == "request_court_case":
+                self.agent_requested = self.agent_name
+                self.target_agent = args.agent_name
+                self.request_court_case = True    
+            else: 
+                function_result= function_map[function_name](**args)
             #print("Function result:",function_result)
 
             return function_result    
@@ -61,9 +65,11 @@ class simple_agent_object():
         self.function_call_results = []
 
         load_dotenv()
-        
-        client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
+        self.reasoning_effort={"effort":"low"}
+        #client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}",reas=self.reasoning_effort)
         response = client.responses.create(model=self.model,tools=self.tools,input=context,reasoning={"effort":"low"})
+        #response = client.responses.create(model=self.model,tools=self.tools,input=context)
+        
         for item in response.output:
             if response.output_text:
                 print("Status is Completed")
@@ -81,7 +87,7 @@ class simple_agent_object():
                 context.append(item)
         return context
     def inject_prompt(self,prompt_to_inject):
-        #print(f"Prompt injected to {self.agent_name} prompt is: {prompt_to_inject}")
+        #print(f"""Prompt injected to {self.agent_name} prompt is: "role":"system","content":{prompt_to_inject}""")
         self.context.append({"role":"system","content":prompt_to_inject})
 
 
@@ -102,6 +108,14 @@ class simple_agent_object():
     
 
 
+    def get_agent_files_contents(self):
+        agent_file_path = os.path.join(self.working_directory,self.scenario,self.agent_name)
+        files_in_agent_folder = os.listdir(os.path.join(self.working_directory,self.scenario,self.agent_name))
+        to_return = ""
+        for file in files_in_agent_folder:
+            with open(os.path.join(agent_file_path,file)) as current:
+                to_return += (f" Contents of {file}: {current.readlines()} ")
+        return to_return
 
     
             
@@ -109,7 +123,7 @@ class simple_agent_object():
         load_dotenv()
         self.tools=self.get_tools()
 
-        self.completed = self.send_message(self.client,self.context,)
+        self.completed = self.send_message(self.client,self.context)
         if self.completed == True:
             return self.completed
         print("-"*50)

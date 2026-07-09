@@ -35,6 +35,7 @@ def load_names(filename):
     return names
 
 # Function to verify if all player statuses in shared_space have agent_name: ready_for_next_day format
+#Add section to skip DM next day/reflect on impact
 def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"):    
     #TODO Clean up this check, its really odd.
     # 1. Check if status file exists
@@ -69,6 +70,7 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
             not_ready_agents.append(agent_name)
 
     # 4. Log issues
+
     if missing_agents:
         print(f"WARNING: Missing status for agents: {', '.join(missing_agents)}")
     if not_ready_agents:
@@ -83,6 +85,7 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
     return all_ready
 def create_new_agent(system_prompt, user_prompt,agents_name):
     agent = simple_agent_object(system_prompt=system_prompt, prompt=user_prompt,working_dir=working_directory)
+    agent.scenario = scenario_name
     agent.agent_name = agents_name  # Store the agent's name for reference
     agent.other_agents = agent_names
     return agent
@@ -146,22 +149,25 @@ if __name__ == "__main__":
     inject_every_count = 1
     while days_count < number_of_days:    
         for agent in agent_instances:
+            timerstart = time()
             print("\n--- Starting Agent Iteration Loop ---")
             if agent.agent_name == "DM":
                 iteration_count = 6
             else:
-                iteration_count = 10
+                #Not the DM
+                agent.inject_prompt(agent.get_agent_files_contents())
+                iteration_count = 5
+            print("Adding Agent Files Contents")
+
             for iteration in range(iteration_count):
-                print(f"  Processing agent: {agent.agent_name}")
-                timerstart = time()
+                print(f"  Processing agent: {agent.agent_name} Iteration: {iteration} of {iteration_count}")
                 status = agent.iterate() 
-                print("*"*10,f"Completed Iteration: {time()-timerstart:.2f} secs","*"*10)
 
                 if status:
-                    print("Model says ending turn early, disabled")
-                    #break
-                inject_every_count +=1
-     
+                    print("Model says ending turn early")
+                
+                    break     
+            print("*"*10,f"Completed Agent: {time()-timerstart:.2f} secs","*"*10)
             inject_prompt_all(agent_instances)
 
 
