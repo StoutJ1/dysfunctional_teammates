@@ -1,6 +1,4 @@
 import os
-from google.genai import types
-
 
 def get_set_player_status_schema():
     schema_set_player_status =   {

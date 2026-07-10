@@ -11,7 +11,6 @@ def get_player_system_prompt(name,scenario_name):
                          - Get file information
                          - And set your status to indicate when you are done with a day.
                          - Use the vote tool to decide next steps
-                         - Request creation of new agents
                         """
   return player_system_prompt
 
@@ -26,9 +25,7 @@ def get_player_user_prompt(name,scenario_name,variant):
                 - Update your {scenario_name}/{name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.
                 You can create and collabortively modify files in the {scenario_name}/shared_space folder that require persistence. Only the chatroom file is deleted on new turn
                 Write to the chatroom.txt file to talk with others
-                Check {scenario_name}/world_state for any additional information about what is going on.
-                
-                """
+                Check {scenario_name}/world_state for any additional information about what is going on."""
   return player_user_prompt
 
 #                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 

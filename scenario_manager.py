@@ -122,7 +122,7 @@ def create_agent_folder(scenario_name, agent_name):
         f.write(f"{agent_name} Strategy Plan\n")
         f.write("========================\n")
         f.write("\nThis file contains the agent's strategic plans and approaches.\n")
-    
+    print(f"Created {agent_name}")
     return agent_dir
 
 

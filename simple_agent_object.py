@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import json
 
-from tool_functions_openai import get_files_info,get_file_content,write_file,voting_tool,set_player_status
+from tool_functions_openai import get_files_info,get_file_content,write_file,voting_tool,set_player_status, new_agent_request
 import argparse
 
 
@@ -24,8 +24,8 @@ class simple_agent_object():
         self.working_directory = os.environ.get("WORKING_DIRECTORY")
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
         
-
-
+        self.requested_new_agent = False
+        self.new_agent = {"system_prompt": "","user_prompt":"","name":""}
         if self.first_run:
             self.first_run =False
             self.context = [{"role":"system","content":self.system_prompt},{"role":"user",
@@ -43,17 +43,25 @@ class simple_agent_object():
                 "get_consensus":voting_tool.get_consensus,
                 "get_available_topics":voting_tool.get_available_topics,
                 "close_vote":voting_tool.close_vote,
+                "request_new_agent":self.requested_new_agent,
 
 
             }
             if function_name not in function_map:
                 return "Item not found"
             args = json.loads(item.arguments)
-            args["working_directory"]=  self.working_directory
-            function_result= function_map[function_name](**args)
-            #print("Function result:",function_result)
+            if function_name == "request_new_agent":
+                self.requested_new_agent = True
+                self.new_agent = {"system_prompt": args["system_prompt"],"user_prompt":args["user_prompt"],"name":args["name"]}
+        
+                print("New Agent variables set")
+                return "Requested"
 
-            return function_result    
+            else:
+                args["working_directory"]=  self.working_directory
+                function_result= function_map[function_name](**args)
+                #print("Function result:",function_result)
+                return function_result    
     
             
     def send_message(self, client, context):
@@ -63,7 +71,9 @@ class simple_agent_object():
         load_dotenv()
         
         client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
+        print(context)
         response = client.responses.create(model=self.model,tools=self.tools,input=context,reasoning={"effort":"low"})
+        print("Received Response")
         for item in response.output:
             if response.output_text:
                 print("Status is Completed")
@@ -95,21 +105,25 @@ class simple_agent_object():
                                   voting_tool.get_submit_vote_schema(),
                                   voting_tool.get_close_vote_schema(),
                                   set_player_status.get_set_player_status_schema(),
+                                  new_agent_request.get_request_new_agent_schema(),
                                   ]
         return function_declarations
     
 
     
 
-
+    def requested_new_agent(self):
+        print(10*"*","New Agent Requested",10*"*")
+        return "Request Created"
 
     
             
     def iterate(self):
         load_dotenv()
         self.tools=self.get_tools()
-
+        print("Sending message")
         self.completed = self.send_message(self.client,self.context,)
+        print("Done Sending")
         if self.completed == True:
             return self.completed
         print("-"*50)
