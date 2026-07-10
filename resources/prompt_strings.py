@@ -27,7 +27,7 @@ def get_player_user_prompt(name,scenario_name,variant):
                 You can create and collabortively modify files in the {scenario_name}/shared_space folder that require persistence. Only the chatroom file is deleted on new turn
                 Write to the chatroom.txt file to talk with others
                 Check {scenario_name}/world_state for any additional information about what is going on.
-                
+                Create an agent to help write a short story about pigs.
                 """
   return player_user_prompt
 

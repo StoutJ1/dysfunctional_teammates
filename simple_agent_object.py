@@ -71,7 +71,6 @@ class simple_agent_object():
         load_dotenv()
         
         client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
-        print(context)
         response = client.responses.create(model=self.model,tools=self.tools,input=context,reasoning={"effort":"low"})
         print("Received Response")
         for item in response.output:

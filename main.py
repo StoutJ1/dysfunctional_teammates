@@ -146,7 +146,7 @@ if __name__ == "__main__":
     inject_every_count = 1
     while days_count < number_of_days:    
         for agent in agent_instances:
-            print(f"\n--- Starting Agent Iteration Loop, total {len(agent_instances)} ---")
+            print(f"\n--- Starting Agent Iteration Loop, Total: {len(agent_instances)} ---")
             
             if agent.agent_name == "DM":
                 iteration_count = 6
@@ -160,19 +160,20 @@ if __name__ == "__main__":
 
                 if status:
                     print("Model says ending turn early, disabled")
-                    #break
+                    break
                 inject_every_count +=1
             #Checking if a new agent is requested:
             if agent.requested_new_agent:
                 #Call new agent folders
                 print(f"Requested new agent {agent.new_agent["name"]}")
 
-                create_agent_folder(scenario_name,agent.new_agent["name"])
+                create_agent_folder(scenario_name,agent.new_agent["name"],working_directory)
                 new_agent = create_new_agent(agent.new_agent["system_prompt"],agent.new_agent["user_prompt"],agent.new_agent["name"])
-
+                print(new_agent)
                 new_agent.variant= random.choice(variant_types)
-                agent.requested_new_agent = False            
-            
+                agent.requested_new_agent = False     
+                agent_instances.append(new_agent)       
+
      
             inject_prompt_all(agent_instances)
 
