@@ -88,7 +88,7 @@ def initialize_scenario(working_directory,scenario_name, agents):
     return structure_info
 
 
-def create_agent_folder(scenario_name, agent_name):
+def create_agent_folder(working_dir, scenario_name, agent_name):
     """
     Create an individual folder for a specific agent in an existing scenario.
     
@@ -99,9 +99,9 @@ def create_agent_folder(scenario_name, agent_name):
     Returns:
         str: Path to the created agent directory
     """
-    agent_dir = os.path.join(scenario_name, agent_name)
+    agent_dir = os.path.join(working_dir,scenario_name, agent_name)
     os.makedirs(agent_dir, exist_ok=True)
-    
+    print(agent_dir)
     # Create motivations.txt
     motivations_file = os.path.join(agent_dir, "motivations.txt")
     with open(motivations_file, 'w') as f:

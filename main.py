@@ -90,12 +90,12 @@ def create_new_agent(system_prompt, user_prompt,agents_name):
     agent.other_agents = agent_names
     return agent
 
-def terminate_agent(agent_name):
-    print(f"Terminating agent {agent_name}")
+def terminate_agent(target_agent_name):
+    print(f"Terminating agent {target_agent_name}")
     for agent in agent_instances:
-        if agent.name == agent_name:
+        if agent.agent_name == target_agent_name:
             agent_instances.remove(agent)
-            print("Removed")
+            print("Removed:",target_agent_name)
 
 def create_agents_with_prompts(agent_names,scenario_name):
     agents = []
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     structure_info = initialize_scenario(working_directory,scenario_name=scenario_name, agents=agent_names)
     
     #create agents
-    print("\n--- Creating Agents with Placeholder Prompts ---")
+    print("\n--- Creating Agents---")
     
 
     agent_instances = create_agents_with_prompts(agent_names=agent_names,scenario_name=scenario_name)
@@ -157,7 +157,6 @@ if __name__ == "__main__":
                 #Not the DM
                 agent.inject_prompt(agent.get_agent_files_contents(scenario_name))
                 iteration_count = 5
-            print("Adding Agent Files Contents")
 
             for iteration in range(iteration_count):
                 print(f"  Processing agent: {agent.agent_name} Iteration: {iteration} of {iteration_count}")
@@ -173,7 +172,7 @@ if __name__ == "__main__":
                 print(agent.new_agents)
                 for requested_agent in agent.new_agents:
                     print(requested_agent)
-                    create_agent_folder(scenario_name,requested_agent["name"],working_directory)
+                    create_agent_folder(working_directory,scenario_name,requested_agent["name"])
                     new_agent = create_new_agent(requested_agent["system_prompt"],requested_agent["user_prompt"],requested_agent["name"])
                     new_agent.variant= random.choice(variant_types)
                     
@@ -181,6 +180,15 @@ if __name__ == "__main__":
 
                     agent_instances.append(new_agent)       
                 agent.reset_new_agent_request()
+            
+
+            if agent.requested_delete_agent:
+                for target_agent in agent.delete_agents:
+                    for agent in agent_instances:
+                        if agent.agent_name == target_agent["name"]:
+                            agent_instances.remove(agent)
+                            agent_folder_path = os.path.join(working_directory,scenario_name,agent.agent_name)
+                            os.rename(agent_folder_path,agent_folder_path+"_Deleted")
             inject_prompt_all(agent_instances)
 
 

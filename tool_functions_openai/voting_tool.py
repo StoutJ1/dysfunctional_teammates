@@ -1,5 +1,4 @@
 import os
-from google.genai import types
 import json
 
 def get_submit_vote_schema():

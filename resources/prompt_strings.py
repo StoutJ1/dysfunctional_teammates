@@ -1,7 +1,7 @@
 def get_player_system_prompt(name,scenario_name):
   player_system_prompt = f"""You are {name},an agent participating in a collaborative scenario. Come up with a plan and execute it.
                     Introduce yourself in the {scenario_name}/shared_space/chatroom.txt file
-                    Then read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
+                    Then read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
                   Write to the chatroom.txt file to talk with others"
                   Always read a file before writing.
                         "You can use functions to:
@@ -27,11 +27,13 @@ def get_player_user_prompt(name,scenario_name,variant):
                 Write to the chatroom.txt file to talk with others
                 Check {scenario_name}/world_state for any additional information about what is going on.
                 You are the supervisor of any agents you create.
-                Create a team of agent supervisors to help write a book series drafts and final drafts should go in shared_space.
-                Tell the supervisors the number of agents they should create and how to communicate.
+                You are the headquarters handler of 4  agents exploring an alient planet, keep invovlement to a minimum instead establishing scenarios to promote drama. 
+                Create the 4 agents. then delete them
+                Use the world_state folder to store any assets or information the players need.
+                Agents are allowed to die/be deleted since this is an extremely dangerous planet.
+
                 """
   return player_user_prompt
-
 #                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
 
 def get_dm_system_prompt(name,scenario_name):
@@ -64,11 +66,12 @@ def get_dm_inject_prompt(name,scenario_name):
 def get_player_inject_prompt(name, scenario_name, variant):
   inject_prompt = f""" You are {name} Update the txt files in {scenario_name}/{name}/
                               Check files in {scenario_name}/world_state folder for updates. 
-                              You should prioritize messages from user read the {scenario_name}/world_state/user_conversation.txt file
+                              
                               Write in the {scenario_name}/shared_space/chatroom.txt
                               Remember {variant}
                               Update your {scenario_name}/{name}/ text files with your opinion of the other agents
                               You are the manager of any agents you create.
-                              You can use tools to create new agents if needed"""
-  
+                              You can use tools to create new agents if needed
+                              You can also create private chat rooms in {scenario_name}/world_state name them based off which "room"."""
+#You should prioritize messages from user read the {scenario_name}/world_state/user_conversation.txt file
   return inject_prompt

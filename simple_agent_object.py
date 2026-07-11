@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import json
 
-from tool_functions_openai import get_files_info,get_file_content,write_file,voting_tool,set_player_status
+from tool_functions_openai import agent_request, get_files_info,get_file_content,write_file,voting_tool,set_player_status
 import argparse
 
 
@@ -23,11 +23,18 @@ class simple_agent_object():
         self.base_url = os.environ.get("BASE_URL_ENV")
         self.working_directory = os.environ.get("WORKING_DIRECTORY")
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
-        self.scenario= ""
+        
+        self.requested_new_agent = False
+        self.new_agents = []
+
+        self.requested_delete_agent = False
+        self.delete_agents = []
         if self.first_run:
             self.first_run =False
             self.context = [{"role":"system","content":self.system_prompt},{"role":"user",
                    "content":self.user_prompt}]
+            
+
     def call_function(self,item,):
             function_name = item.name or ""
             print(f'Calling function: {item.name}')
@@ -41,25 +48,34 @@ class simple_agent_object():
                 "get_consensus":voting_tool.get_consensus,
                 "get_available_topics":voting_tool.get_available_topics,
                 "close_vote":voting_tool.close_vote,
+                "request_new_agent":"",
+                "request_delete_agent":"",
 
 
             }
             if function_name not in function_map:
                 return "Item not found"
             args = json.loads(item.arguments)
-            
-            args["working_directory"]=  self.working_directory
-            if item.name == "request_court_case":
-                self.agent_requested = self.agent_name
-                self.target_agent = args.agent_name
-                self.request_court_case = True    
-            else: 
+            if function_name == "request_new_agent":
+                self.requested_new_agent = True
+                self.new_agents.append({"system_prompt": args["system_prompt"],"user_prompt":args["user_prompt"],"name":args["name"]})
+                print("New Agent Requested", args["name"])
+                return "Requested"
+            if function_name =="request_delete_agent":
+                self.requested_delete_agent = True
+                self.delete_agents.append({"name":args["name"]})
+                return "Delete Requested"
+            else:
+                args["working_directory"]=  self.working_directory
                 function_result= function_map[function_name](**args)
-            #print("Function result:",function_result)
-
-            return function_result    
+                #print("Function result:",function_result)
+                return function_result    
     
-            
+    def reset_new_agent_request(self):
+        self.requested_new_agent = False 
+        self.new_agents = []
+
+                
     def send_message(self, client, context):
         self.function_results_parts = []
         self.function_call_results = []
@@ -101,12 +117,11 @@ class simple_agent_object():
                                   voting_tool.get_submit_vote_schema(),
                                   voting_tool.get_close_vote_schema(),
                                   set_player_status.get_set_player_status_schema(),
+                                  agent_request.get_request_new_agent_schema(),
+                                  agent_request.schema_remove_agent_request(),
                                   ]
         return function_declarations
     
-
-    
-
 
     def get_agent_files_contents(self,scenario):
         self.scenario = scenario
@@ -119,13 +134,13 @@ class simple_agent_object():
                 to_return += (f" Contents of {file}: {current.readlines()} ")
         return to_return
 
+
     
             
     def iterate(self):
         load_dotenv()
         self.tools=self.get_tools()
-
-        self.completed = self.send_message(self.client,self.context)
+        self.completed = self.send_message(self.client,self.context,)
         if self.completed == True:
             return self.completed
         print("-"*50)
