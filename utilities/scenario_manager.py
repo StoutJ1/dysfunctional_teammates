@@ -29,6 +29,10 @@ def initialize_scenario(working_directory,scenario_name, agents):
     # Create world_state directory and world_state.txt file
     world_state_dir = os.path.join(scenario_dir, "world_state")
     os.makedirs(world_state_dir, exist_ok=True)
+    util_dir = os.path.join("utilities","world_state")
+    if len(os.listdir(util_dir)) > 0:
+        print("Copying Files")
+        shutil.copytree(util_dir+"/",world_state_dir+"/",dirs_exist_ok=True)
     world_state_file = os.path.join(world_state_dir, "user_conversation.txt")
     with open(world_state_file, 'w') as f:
         f.write("Conversation or Questions for User\n")
