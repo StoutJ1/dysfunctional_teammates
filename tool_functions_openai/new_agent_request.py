@@ -35,7 +35,7 @@ def schema_remove_agent_request():
     schema_new_agent_request = {
         "type": "function",
         "name": "request_new_agent",
-        "description": "Requests a new agent",
+        "description": "Requests a new agent, will be created at the end of the turn",
         "parameters": {
             "type": "object",
             "properties": {

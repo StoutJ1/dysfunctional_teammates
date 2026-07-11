@@ -27,7 +27,9 @@ def get_player_user_prompt(name,scenario_name,variant):
                 You can create and collabortively modify files in the {scenario_name}/shared_space folder that require persistence. Only the chatroom file is deleted on new turn
                 Write to the chatroom.txt file to talk with others
                 Check {scenario_name}/world_state for any additional information about what is going on.
-                Create an agent to help write a short story about pigs.
+                You are the supervisor of any agents you create.
+                Create a team of agent supervisors to help write a book series drafts and final drafts should go in shared_space.
+                Tell the supervisors the number of agents they should create and how to communicate.
                 """
   return player_user_prompt
 
@@ -61,5 +63,8 @@ def get_player_inject_prompt(name, scenario_name, variant):
                               You should prioritize messages from user read the {scenario_name}/world_state/user_conversation.txt file
                               Write in the {scenario_name}/shared_space/chatroom.txt
                               Remember {variant}
-                              Update your {scenario_name}/{name}/ text files with your opinion of the other agents"""
+                              Update your {scenario_name}/{name}/ text files with your opinion of the other agents
+                              You are the manager of any agents you create.
+                              You can use tools to create new agents if needed"""
+  
   return inject_prompt

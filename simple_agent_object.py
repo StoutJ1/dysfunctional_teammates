@@ -25,11 +25,13 @@ class simple_agent_object():
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
         
         self.requested_new_agent = False
-        self.new_agent = {"system_prompt": "","user_prompt":"","name":""}
+        self.new_agents = []
         if self.first_run:
             self.first_run =False
             self.context = [{"role":"system","content":self.system_prompt},{"role":"user",
                    "content":self.user_prompt}]
+            
+
     def call_function(self,item,):
             function_name = item.name or ""
             print(f'Calling function: {item.name}')
@@ -43,7 +45,7 @@ class simple_agent_object():
                 "get_consensus":voting_tool.get_consensus,
                 "get_available_topics":voting_tool.get_available_topics,
                 "close_vote":voting_tool.close_vote,
-                "request_new_agent":self.requested_new_agent,
+                "request_new_agent":"",
 
 
             }
@@ -52,9 +54,8 @@ class simple_agent_object():
             args = json.loads(item.arguments)
             if function_name == "request_new_agent":
                 self.requested_new_agent = True
-                self.new_agent = {"system_prompt": args["system_prompt"],"user_prompt":args["user_prompt"],"name":args["name"]}
-        
-                print("New Agent variables set")
+                self.new_agents.append({"system_prompt": args["system_prompt"],"user_prompt":args["user_prompt"],"name":args["name"]})
+                print("New Agent Requested", args["name"])
                 return "Requested"
 
             else:
@@ -63,7 +64,11 @@ class simple_agent_object():
                 #print("Function result:",function_result)
                 return function_result    
     
-            
+    def reset_new_agent_request(self):
+        self.requested_new_agent = False 
+        self.new_agents = []
+
+                
     def send_message(self, client, context):
         self.function_results_parts = []
         self.function_call_results = []
@@ -72,7 +77,6 @@ class simple_agent_object():
         
         client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
         response = client.responses.create(model=self.model,tools=self.tools,input=context,reasoning={"effort":"low"})
-        print("Received Response")
         for item in response.output:
             if response.output_text:
                 print("Status is Completed")
@@ -111,18 +115,12 @@ class simple_agent_object():
 
     
 
-    def requested_new_agent(self):
-        print(10*"*","New Agent Requested",10*"*")
-        return "Request Created"
-
     
             
     def iterate(self):
         load_dotenv()
         self.tools=self.get_tools()
-        print("Sending message")
         self.completed = self.send_message(self.client,self.context,)
-        print("Done Sending")
         if self.completed == True:
             return self.completed
         print("-"*50)

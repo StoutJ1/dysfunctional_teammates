@@ -17,6 +17,7 @@ def new_turn(scenario_name: str = "scenario"):
             f.write("")
             
     # Remove other text files in shared_space (except player_status.txt)
+    #TODO This isn't deleting.
     to_delete_files_shared_space = ["chat_room.txt"]
     for filename in to_delete_files_shared_space:
         file_path = os.path.join(shared_space_path, filename)
