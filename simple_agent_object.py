@@ -108,7 +108,9 @@ class simple_agent_object():
     
 
 
-    def get_agent_files_contents(self):
+    def get_agent_files_contents(self,scenario):
+        self.scenario = scenario
+        print("Scenario file",self.scenario)
         agent_file_path = os.path.join(self.working_directory,self.scenario,self.agent_name)
         files_in_agent_folder = os.listdir(os.path.join(self.working_directory,self.scenario,self.agent_name))
         to_return = ""

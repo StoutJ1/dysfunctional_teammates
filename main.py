@@ -155,7 +155,7 @@ if __name__ == "__main__":
                 iteration_count = 6
             else:
                 #Not the DM
-                agent.inject_prompt(agent.get_agent_files_contents())
+                agent.inject_prompt(agent.get_agent_files_contents(scenario_name))
                 iteration_count = 5
             print("Adding Agent Files Contents")
 
