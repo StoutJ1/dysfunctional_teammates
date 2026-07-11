@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import json
 
-from tool_functions_openai import agent_request, get_files_info,get_file_content,write_file,voting_tool,set_player_status
+from tools import agent_request, get_files_info,get_file_content,write_file,voting_tool,set_player_status
 import argparse
 
 
@@ -118,7 +118,7 @@ class simple_agent_object():
                                   voting_tool.get_close_vote_schema(),
                                   set_player_status.get_set_player_status_schema(),
                                   agent_request.get_request_new_agent_schema(),
-                                  agent_request.schema_remove_agent_request(),
+                                  agent_request.get_remove_agent_request_schema(),
                                   ]
         return function_declarations
     

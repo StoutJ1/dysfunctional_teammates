@@ -31,7 +31,7 @@ def get_request_new_agent_schema():
     return schema_new_agent_request
 #logic for this tool will be primarily in the agent file
 
-def schema_remove_agent_request():
+def get_remove_agent_request_schema():
     schema_remove_agent_request = {
         "type": "function",
         "name": "request_delete_agent",

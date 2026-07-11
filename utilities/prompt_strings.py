@@ -10,7 +10,7 @@ def get_player_system_prompt(name,scenario_name):
                          - Get file information
                          - And set your status to indicate when you are done with a day.
                          - Use the vote tool to decide next steps
-                         - Request creation of new agents
+                         - Request creation of 
                         """
   return player_system_prompt
 

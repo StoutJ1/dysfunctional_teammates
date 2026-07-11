@@ -5,7 +5,7 @@ This module provides functions to initialize a scenario by creating
 the necessary directory structure for the agent simulation and
 populating it with default text files.
 """
-import tool_functions_openai.voting_tool
+import tools.voting_tool
 import os
 import shutil
 from datetime import datetime
@@ -76,7 +76,7 @@ def initialize_scenario(working_directory,scenario_name, agents):
             f.write(f"{agent_name} Strategy Plan\n")
             f.write("========================\n")
             
-    tool_functions_openai.voting_tool.initialize_voting_system(working_directory)
+    tools.voting_tool.initialize_voting_system(working_directory)
     # Return structure information
     structure_info = {
         "scenario_dir": scenario_dir,

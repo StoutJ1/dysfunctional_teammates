@@ -1,14 +1,12 @@
 import random
 from simple_agent_object import simple_agent_object
-from resources import variants
-from resources import prompt_strings
+from utilities import variants
+from utilities import prompt_strings
 import random
-import shutil
 import os
-import json
 from dotenv import load_dotenv
-from scenario_manager import initialize_scenario,backup_scenario,create_agent_folder
-from turn_manager import new_turn
+from utilities.scenario_manager import initialize_scenario,backup_scenario,create_agent_folder
+from utilities.turn_manager import new_turn
 from time import time
 variant_types = variants.variant_types
 agent_variants = variant_types
@@ -135,7 +133,7 @@ if __name__ == "__main__":
     load_dotenv()
 
     working_directory = os.environ.get("WORKING_DIRECTORY")
-    name_list = load_names("random_names.txt")
+    name_list = load_names("utilities/random_names.txt")
     agent_names = random.sample(name_list,number_of_agents)
     structure_info = initialize_scenario(working_directory,scenario_name=scenario_name, agents=agent_names)
     
