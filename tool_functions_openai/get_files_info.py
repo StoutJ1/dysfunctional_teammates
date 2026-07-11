@@ -1,5 +1,4 @@
 import os
-from google.genai import types
 def get_files_info_schema():
     schema_get_files_info = {
         "type": "function",

@@ -139,7 +139,7 @@ if __name__ == "__main__":
     agent_names = random.sample(name_list,number_of_agents)
     structure_info = initialize_scenario(working_directory,scenario_name=scenario_name, agents=agent_names)
     
-    # Create simple agents with placeholder prompts using the scenario agent names
+    #create agents
     print("\n--- Creating Agents with Placeholder Prompts ---")
     
 
@@ -184,7 +184,6 @@ if __name__ == "__main__":
             inject_prompt_all(agent_instances)
 
 
-        # Check for ready for next turn after 3 iterations
         print("\n--- Checking Ready for Next Day Status ---")
         verification_result = verify_all_agents_ready(agent_instances,os.path.join(working_directory,scenario_name,"shared_space/player_status.txt"))
         
