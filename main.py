@@ -7,13 +7,13 @@ import shutil
 import os
 import json
 from dotenv import load_dotenv
-from scenario_manager import initialize_scenario,backup_scenario
+from scenario_manager import initialize_scenario,backup_scenario,create_agent_folder
 from turn_manager import new_turn
 from time import time
 variant_types = variants.variant_types
 agent_variants = variant_types
 number_of_days = 10
-number_of_agents = 3
+number_of_agents = 1
 scenario_name = "save_files"
 agent_names=[]
 agent_instances=[]
@@ -81,12 +81,12 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
     
     if all_ready:
         print("All agents are ready.")
-    
     return all_ready
+
 def create_new_agent(system_prompt, user_prompt,agents_name):
+    agents_name.strip("/")
     agent = simple_agent_object(system_prompt=system_prompt, prompt=user_prompt,working_dir=working_directory)
-    agent.scenario = scenario_name
-    agent.agent_name = agents_name  # Store the agent's name for reference
+    agent.agent_name = agents_name  # Stoagent_working_folder/save_files/Zilviare the agent's name for reference
     agent.other_agents = agent_names
     return agent
 
@@ -101,7 +101,7 @@ def create_agents_with_prompts(agent_names,scenario_name):
     agents = []
     print(agent_names)
 
-    agents.append(create_new_agent(system_prompt=f""+prompt_strings.get_dm_system_prompt(scenario_name=scenario_name,name="Dungeon Master",),user_prompt=prompt_strings.get_dm_user_prompt(name="Mrs.Frizzle",scenario_name=scenario_name),agents_name="DM"))
+    #agents.append(create_new_agent(system_prompt=f""+prompt_strings.get_dm_system_prompt(scenario_name=scenario_name,name="Mrs.Frizzle",),user_prompt=prompt_strings.get_dm_user_prompt(name="Mrs.Frizzle",scenario_name=scenario_name),agents_name="DM"))
   
     for name in agent_names:
         agent_variant= random.choice(variant_types)
@@ -149,8 +149,8 @@ if __name__ == "__main__":
     inject_every_count = 1
     while days_count < number_of_days:    
         for agent in agent_instances:
-            timerstart = time()
-            print("\n--- Starting Agent Iteration Loop ---")
+            print(f"\n--- Starting Agent Iteration Loop, Total Agents: {len(agent_instances)} ---")
+            
             if agent.agent_name == "DM":
                 iteration_count = 6
             else:
@@ -165,9 +165,22 @@ if __name__ == "__main__":
 
                 if status:
                     print("Model says ending turn early")
-                
-                    break     
-            print("*"*10,f"Completed Agent: {time()-timerstart:.2f} secs","*"*10)
+                    break
+                inject_every_count +=1
+            #Checking if a new agent is requested:
+            if agent.requested_new_agent:
+                #Call new agent folders
+                print(agent.new_agents)
+                for requested_agent in agent.new_agents:
+                    print(requested_agent)
+                    create_agent_folder(scenario_name,requested_agent["name"],working_directory)
+                    new_agent = create_new_agent(requested_agent["system_prompt"],requested_agent["user_prompt"],requested_agent["name"])
+                    new_agent.variant= random.choice(variant_types)
+                    
+                    print(f"Created new agent {new_agent.agent_name}, Variant: {new_agent.variant}")
+
+                    agent_instances.append(new_agent)       
+                agent.reset_new_agent_request()
             inject_prompt_all(agent_instances)
 
 

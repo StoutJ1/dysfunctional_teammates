@@ -1,0 +1,4 @@
+Barnaby Relationships
+=========================
+
+This file contains information about this agent's relationships with other agents.
