@@ -105,8 +105,6 @@ def create_agent_folder(working_dir, scenario_name, agent_name):
     """
     agent_dir = os.path.join(working_dir,scenario_name, agent_name)
     os.makedirs(agent_dir, exist_ok=True)
-    print(agent_dir)
-    # Create motivations.txt
     motivations_file = os.path.join(agent_dir, "motivations.txt")
     with open(motivations_file, 'w') as f:
         f.write(f"{agent_name} Motivations\n")

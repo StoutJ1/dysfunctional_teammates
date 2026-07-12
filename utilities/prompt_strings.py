@@ -10,7 +10,8 @@ def get_player_system_prompt(name,scenario_name):
                          - Get file information
                          - And set your status to indicate when you are done with a day.
                          - Use the vote tool to decide next steps
-                         - Request creation of 
+                         - Create and run python files
+                         - Request creation of agents
                         """
   return player_system_prompt
 
@@ -27,15 +28,13 @@ def get_player_user_prompt(name,scenario_name,variant):
                 Write to the chatroom.txt file to talk with others
                 Check {scenario_name}/world_state for any additional information about what is going on.
                 You are the supervisor of any agents you create.
-                You are the headquarters handler of 4  agents exploring an alient planet, keep invovlement to a minimum instead establishing scenarios to promote drama. 
-                Create the 4 agents. then delete them
-                Use the world_state folder to store any assets or information the players need.
-                Agents are allowed to die/be deleted since this is an extremely dangerous planet.
-
+                
                 """
   return player_user_prompt
 #                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
-
+#You are the headquarters handler of 2 scripting agents, create the agents. 
+ #               Based on the python code in world_state create a new function/file that uses curl to download to a local folder. The folder should be created if it doesn't exist.
+                
 def get_dm_system_prompt(name,scenario_name):
   dm_system_prompt = f"""You are the dungeon master referred to as DM. 
   You are a DM running a first contact scenario with a hostile alien. Players are exploring its ship which appears to be abandoned. 
@@ -66,9 +65,9 @@ def get_dm_inject_prompt(name,scenario_name):
 def get_player_inject_prompt(name, scenario_name, variant):
   inject_prompt = f""" You are {name} Update the txt files in {scenario_name}/{name}/
                               Check files in {scenario_name}/world_state folder for updates. 
-                              
                               Write in the {scenario_name}/shared_space/chatroom.txt
                               Remember {variant}
+                              Prioritze checking world_state/user_conversation.txt for new instructions
                               Update your {scenario_name}/{name}/ text files with your opinion of the other agents
                               You are the manager of any agents you create.
                               You can use tools to create new agents if needed

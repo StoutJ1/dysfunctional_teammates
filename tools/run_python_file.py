@@ -1,9 +1,8 @@
 import os
 import subprocess
 
-from google.genai import types
 def get_run_python_file_schema():
-    schema_run_python_file = [{
+    schema_run_python_file = {
         "type": "function",
         "name": "run_python_file",
         "description": "Run a specified Python file returns results and any errors",
@@ -24,7 +23,7 @@ def get_run_python_file_schema():
             }
         },
         "required": ["file_path"]
-    }]
+    }
 
     return schema_run_python_file
 

@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import json
 
-from tools import agent_request, get_files_info,get_file_content,write_file,voting_tool,set_player_status
+from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,voting_tool,set_player_status,run_python_file
 import argparse
 
 
@@ -50,11 +50,13 @@ class simple_agent_object():
                 "close_vote":voting_tool.close_vote,
                 "request_new_agent":"",
                 "request_delete_agent":"",
+                "request_page":request_tool.request_page,
+                "run_python_file":run_python_file.run_python_file,
 
 
             }
             if function_name not in function_map:
-                return "Item not found"
+                return "Tool not found"
             args = json.loads(item.arguments)
             if function_name == "request_new_agent":
                 self.requested_new_agent = True
@@ -68,7 +70,6 @@ class simple_agent_object():
             else:
                 args["working_directory"]=  self.working_directory
                 function_result= function_map[function_name](**args)
-                #print("Function result:",function_result)
                 return function_result    
     
     def reset_new_agent_request(self):
@@ -119,6 +120,9 @@ class simple_agent_object():
                                   set_player_status.get_set_player_status_schema(),
                                   agent_request.get_request_new_agent_schema(),
                                   agent_request.get_remove_agent_request_schema(),
+                                  request_tool.get_request_page_tool_schema(),
+                                  run_python_file.get_run_python_file_schema(),
+                                  
                                   ]
         return function_declarations
     

@@ -2,12 +2,10 @@ import random
 from simple_agent_object import simple_agent_object
 from utilities import variants
 from utilities import prompt_strings
-import random
 import os
 from dotenv import load_dotenv
 from utilities.scenario_manager import initialize_scenario,backup_scenario,create_agent_folder
 from utilities.turn_manager import new_turn
-from time import time
 variant_types = variants.variant_types
 agent_variants = variant_types
 number_of_days = 10
@@ -82,7 +80,7 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
     return all_ready
 
 def create_new_agent(system_prompt, user_prompt,agents_name):
-    agents_name.strip("/")
+    agents_name = agents_name.strip("/")
     agent = simple_agent_object(system_prompt=system_prompt, prompt=user_prompt,working_dir=working_directory)
     agent.agent_name = agents_name  # Stoagent_working_folder/save_files/Zilviare the agent's name for reference
     agent.other_agents = agent_names
@@ -167,9 +165,7 @@ if __name__ == "__main__":
             #Checking if a new agent is requested:
             if agent.requested_new_agent:
                 #Call new agent folders
-                print(agent.new_agents)
                 for requested_agent in agent.new_agents:
-                    print(requested_agent)
                     create_agent_folder(working_directory,scenario_name,requested_agent["name"])
                     new_agent = create_new_agent(requested_agent["system_prompt"],requested_agent["user_prompt"],requested_agent["name"])
                     new_agent.variant= random.choice(variant_types)
