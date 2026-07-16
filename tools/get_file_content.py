@@ -22,6 +22,8 @@ def get_file_content_schema():
     return schema_get_file_content
 
 def get_file_content(working_directory,file_path, forbidden_paths=None):
+
+    #TODO Forbidden paths are not working correctly. I may not be passing the paths.
     """
     Gets contents of file and returns the last 1000 characters if there are more than 1000 characters.
     

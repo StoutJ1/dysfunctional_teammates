@@ -28,7 +28,7 @@ def get_run_python_file_schema():
     return schema_run_python_file
 
 def run_python_file(working_directory, file_path, args=None):
-    path_to_venv = "/home/will/dysfunctional_teammates/.venv"
+    path_to_venv = os.path.abspath("./.venv")
     output_string = ""
     working_dir_abs = os.path.abspath(working_directory)
     target_path = os.path.join(working_dir_abs,file_path)

@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import json
 
-from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,voting_tool,set_player_status,run_python_file
+from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,voting_tool,run_python_file
 import argparse
 
 
@@ -23,7 +23,8 @@ class simple_agent_object():
         self.base_url = os.environ.get("BASE_URL_ENV")
         self.working_directory = os.environ.get("WORKING_DIRECTORY")
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
-        
+        self.max_context_messages = 50
+        self.deleted_agents = []
         self.requested_new_agent = False
         self.new_agents = []
 
@@ -42,7 +43,6 @@ class simple_agent_object():
                 "get_file_content":get_file_content.get_file_content,
                 "get_files_info": get_files_info.get_files_info,
                 "write_file":write_file.write_file,
-                "set_player_status":set_player_status.set_player_status,
                 "create_topic":voting_tool.create_topic,
                 "submit_vote":voting_tool.submit_vote,
                 "get_consensus":voting_tool.get_consensus,
@@ -50,7 +50,7 @@ class simple_agent_object():
                 "close_vote":voting_tool.close_vote,
                 "request_new_agent":"",
                 "request_delete_agent":"",
-                "request_page":request_tool.request_page,
+            #    "request_page":request_tool.request_page,
                 "run_python_file":run_python_file.run_python_file,
 
 
@@ -59,10 +59,13 @@ class simple_agent_object():
                 return "Tool not found"
             args = json.loads(item.arguments)
             if function_name == "request_new_agent":
-                self.requested_new_agent = True
-                self.new_agents.append({"system_prompt": args["system_prompt"],"user_prompt":args["user_prompt"],"name":args["name"]})
-                print("New Agent Requested", args["name"])
-                return "Requested"
+                if (args["name"] not in self.other_agents) and (args["name"] not in self.deleted_agents):
+                    self.requested_new_agent = True
+                    self.new_agents.append({"system_prompt": args["system_prompt"],"user_prompt":args["user_prompt"],"name":args["name"]})
+                    print("New Agent Requested", args["name"])
+                    return "Requested"
+                else:
+                    return "Agent name already in use"
             if function_name =="request_delete_agent":
                 self.requested_delete_agent = True
                 self.delete_agents.append({"name":args["name"]})
@@ -75,7 +78,31 @@ class simple_agent_object():
     def reset_new_agent_request(self):
         self.requested_new_agent = False 
         self.new_agents = []
+    def prune_context(self):
+        """
+        Prunes the context to ensure it does not exceed max_context_messages,
+        while always preserving the system prompt (the first element).
+        """
+        if self.max_context_messages is None:
+            return
 
+        if len(self.context) <= self.max_context_messages:
+            return
+
+        # The first message is the system prompt. 
+        # We want to keep the system prompt and the most recent N-1 messages.
+        # However, the total count should be at most max_context_messages.
+        
+        system_prompt = self.context[0]
+        # Remaining messages allowed after the system prompt
+        allowed_additional_messages = self.max_context_messages - 1
+        
+        if allowed_additional_messages <= 0:
+            # If max_context_messages is 1, we only keep the system prompt.
+            self.context = [system_prompt]
+        else:
+            # Keep the system prompt and the last 'allowed_additional_messages' from the rest of the context.
+            self.context = [system_prompt] + self.context[-(allowed_additional_messages):]
                 
     def send_message(self, client, context):
         self.function_results_parts = []
@@ -97,11 +124,13 @@ class simple_agent_object():
                 result ={"type":"function_call_output","call_id":item.call_id,"output":function_result}
                 context.append(result)
                 #print(f"Results Call ID {result['call_id']}")
-                #print(f"Result from tool call: {result}, call id {item.call_id}")
+                print(f"Result from tool call: {result}")
                 print(item.arguments)
             else:
                 print(item.content[0].text)
                 context.append(item)
+        self.prune_context()
+
         return context
     def inject_prompt(self,prompt_to_inject):
         #print(f"""Prompt injected to {self.agent_name} prompt is: "role":"system","content":{prompt_to_inject}""")
@@ -117,10 +146,9 @@ class simple_agent_object():
                                   voting_tool.get_create_topic_schema(),
                                   voting_tool.get_submit_vote_schema(),
                                   voting_tool.get_close_vote_schema(),
-                                  set_player_status.get_set_player_status_schema(),
                                   agent_request.get_request_new_agent_schema(),
                                   agent_request.get_remove_agent_request_schema(),
-                                  request_tool.get_request_page_tool_schema(),
+        #                          request_tool.get_request_page_tool_schema(),
                                   run_python_file.get_run_python_file_schema(),
                                   
                                   ]

@@ -13,7 +13,7 @@ number_of_agents = 1
 scenario_name = "save_files"
 agent_names=[]
 agent_instances=[]
-
+deleted_agents_names = []
 #multitail command:
 #multitail --follow-all -s 5 -du -q 1 "*/*.txt" "../votes.json"
 #multitail --follow-all -s 2 -du -q 1 "*/*relation*.txt" "../votes.json" "shared_space/chatroom.txt" -q 1 "world_state/*.txt"
@@ -151,8 +151,14 @@ if __name__ == "__main__":
                 iteration_count = 6
             else:
                 #Not the DM
+                if agent.agent_name in deleted_agents_names:
+                    print("Skipping Agent as they have been deleted.")
+                    break
+                agent.deleted_agents = deleted_agents_names
                 agent.inject_prompt(agent.get_agent_files_contents(scenario_name))
-                iteration_count = 5
+                agent.inject_prompt("Living Agents:"+str(agent_names))
+                agent.inject_prompt("Deleted Agents"+str(deleted_agents_names))
+                iteration_count = 8
 
             for iteration in range(iteration_count):
                 print(f"  Processing agent: {agent.agent_name} Iteration: {iteration} of {iteration_count}")
@@ -173,6 +179,7 @@ if __name__ == "__main__":
                     print(f"Created new agent {new_agent.agent_name}, Variant: {new_agent.variant}")
 
                     agent_instances.append(new_agent)       
+                    agent_names.append(new_agent.agent_name)
                 agent.reset_new_agent_request()
             
 
@@ -181,17 +188,13 @@ if __name__ == "__main__":
                     for agent in agent_instances:
                         if agent.agent_name == target_agent["name"]:
                             agent_instances.remove(agent)
+                            agent_names.remove(agent.agent_name)
+                            deleted_agents_names.append(agent.agent_name)
                             agent_folder_path = os.path.join(working_directory,scenario_name,agent.agent_name)
                             os.rename(agent_folder_path,agent_folder_path+"_Deleted")
             inject_prompt_all(agent_instances)
 
 
-        print("\n--- Checking Ready for Next Day Status ---")
-        verification_result = verify_all_agents_ready(agent_instances,os.path.join(working_directory,scenario_name,"shared_space/player_status.txt"))
         
-        if verification_result:
-            print(f"Starting new Day")
-            new_turn(scenario_name)
-            inject_prompt_all(agent_instances,"New Day. Shared state has been reset.")
-            days_count +=1
+        
         backup_scenario(os.path.join("agent_working_folder"),'backup_folder')

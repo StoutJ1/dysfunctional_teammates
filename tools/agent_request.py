@@ -3,7 +3,7 @@ def get_request_new_agent_schema():
     schema_new_agent_request = {
         "type": "function",
         "name": "request_new_agent",
-        "description": "Requests a new agent",
+        "description": "Requests a new agent, name must be unique",
         "parameters": {
             "type": "object",
             "properties": {
