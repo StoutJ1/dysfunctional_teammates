@@ -30,7 +30,7 @@ def get_player_user_prompt(name,scenario_name,variant):
                 Create your agents and remind them of where to create the files.
                 Be aggressive about deleting agents that are not helping.
                 Save drafts in shared_space
-                Update the readme in world_state.
+                Update the readme for the programming project in world_state.
                 """
   return player_user_prompt
 #                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
