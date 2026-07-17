@@ -110,8 +110,7 @@ class core_agent():
 
         load_dotenv()
         response = client.responses.create(model=self.model,tools=self.tools,input=context,reasoning={"effort":"low"})
-        print(response)
-        exit()
+       
         #response = client.responses.create(model=self.model,tools=self.tools,input=context)
         
         for item in response.output:

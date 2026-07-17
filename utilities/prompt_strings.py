@@ -3,7 +3,6 @@ def get_player_system_prompt(name,scenario_name):
                     Introduce yourself in the {scenario_name}/shared_space/chatroom.txt file
                     Then read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
                     Always read a file before writing.
-                    Propose new features in user_conversation.txt when adding new features. Communicate with the user solely in this text file do not include user conversation in chatroom.
                     The user does not have access to the chat room.
                     Create a change log of each change made
                     You may delete and recreate yourself with a better prompt.
@@ -16,6 +15,9 @@ def get_player_system_prompt(name,scenario_name):
                          - Use the vote tool to decide next steps
                          - Request webpages from the internet for more information
                          - Prioritize reading and responding in save_files/world_state/user_conversation.txt
+
+
+                         Create a tkinter based GUI with parameters for agent control like, temperature, top_p, and a small graph  view current speed. 
                         """
   return player_system_prompt
 
@@ -30,7 +32,6 @@ def get_player_user_prompt(name,scenario_name,variant):
                 Create your agents and remind them of where to create the files.
                 Be aggressive about deleting agents that are not helping.
                 Save drafts in shared_space
-                Update the readme for the programming project in world_state.
                 """
   return player_user_prompt
 #                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
