@@ -8,7 +8,7 @@ import argparse
 
 
 
-class simple_agent_object():
+class core_agent():
     def __init__(self,system_prompt,prompt,working_dir):
         self. working_directory = working_dir
         self.first_run = True
@@ -109,9 +109,9 @@ class simple_agent_object():
         self.function_call_results = []
 
         load_dotenv()
-        self.reasoning_effort={"effort":"low"}
-        #client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}",reas=self.reasoning_effort)
         response = client.responses.create(model=self.model,tools=self.tools,input=context,reasoning={"effort":"low"})
+        print(response)
+        exit()
         #response = client.responses.create(model=self.model,tools=self.tools,input=context)
         
         for item in response.output:

@@ -1,5 +1,5 @@
 import random
-from simple_agent_object import simple_agent_object
+from core_agent import core_agent
 from utilities import variants
 from utilities import prompt_strings
 import os
@@ -81,7 +81,7 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
 
 def create_new_agent(system_prompt, user_prompt,agents_name):
     agents_name = agents_name.strip("/")
-    agent = simple_agent_object(system_prompt=system_prompt, prompt=user_prompt,working_dir=working_directory)
+    agent = core_agent(system_prompt=system_prompt, prompt=user_prompt,working_dir=working_directory)
     agent.agent_name = agents_name  # Stoagent_working_folder/save_files/Zilviare the agent's name for reference
     agent.other_agents = agent_names
     return agent
