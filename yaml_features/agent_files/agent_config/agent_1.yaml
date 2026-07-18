@@ -1,0 +1,28 @@
+name: agent_name
+role: agent_role
+description: brief description of the agent
+capabilities:
+  tools:
+    - tool_name_1
+    - tool_name_2
+  skills:
+    - skill_1
+    - skill_2
+prompts:
+  system_prompt: >
+    Full system prompt goes here.
+  user_prompt: >
+    Full user prompt goes here.
+  variant: >
+    Full variant goes here. 
+
+parameters:
+  top_p: 
+  temp: 
+  active:
+  
+constraints:
+  - constraint_1
+  - constraint_2
+deletion_condition: "The agent should request deletion if [condition]."
+
