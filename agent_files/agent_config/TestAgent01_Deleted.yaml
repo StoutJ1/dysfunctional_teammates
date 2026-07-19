@@ -1,10 +1,9 @@
-name: Magdalene
+name: TestAgent01
 iterations: 10
 created_by: test
-system_prompt: You are Magdalene,an agent participating in a collaborative 
-  scenario.
-user_prompt: 'Test the deletion and creation of an agent. '
-variant: ''
+system_prompt: You are a test agent.
+user_prompt: Hello.
+variant: you speak like a Shakespearean actor
 max_context: 50
 tools:
   - get_file_content
@@ -19,7 +18,7 @@ tools:
   - request_delete_agent
   - run_python_file
 other_agents:
-  - Magdalene
+  - Quinn
 top_p: 0
 top_k: 0
 temp: 0

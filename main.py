@@ -89,6 +89,8 @@ def create_new_agent(system_prompt, user_prompt,agents_name):
     agent = core_agent(system_prompt=system_prompt, prompt=user_prompt,working_dir=working_directory)
     agent.agent_name = agents_name  # Stoagent_working_folder/save_files/Zilviare the agent's name for reference
     agent.other_agents = agent_names
+    agent.variant= random.choice(variant_types)
+
     create_agent_folders(working_directory,scenario_name,agent.agent_name,agent_context_path)
     yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path=agent_config_path)
 
@@ -131,12 +133,10 @@ def inject_prompt_all(agents,prompt_to_inject=""):
 
             
 def get_agent_instances():
-    print("Getting Yaml Agents")
     agent_instances_return = []
     agent_yamls = []
     active_agents_filenames = [file_item for file_item in os.listdir(agent_config_path) if "_Deleted" not in file_item]
     for agent_file in active_agents_filenames:
-        print(agent_file)
         agent_yamls.append(yaml_parse.get_yaml_file_contents(os.path.join(agent_config_path,agent_file)))
 
     for yaml_doc in agent_yamls:
@@ -195,6 +195,7 @@ if __name__ == "__main__":
                 current_agent_yaml = yaml_parse.get_yaml_file_contents(os.path.join(agent_config_path,agent.agent_name+".yaml"))
                 agent = yaml_parse.set_var_from_yaml(agent_yaml=current_agent_yaml,self=agent)
                 iteration_count = agent.iterations
+                agent.deleted_agents = deleted_agents_names
 
 
                 #each iteration it should check its files.
@@ -206,45 +207,51 @@ if __name__ == "__main__":
                 inject_every_count +=1
             #Checking if a new agent is requested:
                 if agent.requested_new_agent:
-
                     #Call new agent folders
                     for requested_agent in agent.new_agents:
                         create_agent_folders(working_directory,scenario_name,requested_agent["name"],agent_context_path)
                         new_agent = create_new_agent(requested_agent["system_prompt"],requested_agent["user_prompt"],requested_agent["name"])
-                        new_agent.variant= random.choice(variant_types)
 
                         print(f"Created new agent {new_agent.agent_name}, Variant: {new_agent.variant}")
 
                         agent_instances.append(new_agent)       
                         agent_names.append(new_agent.agent_name)
+
+                        agent.other_agents = agent_names
+
                     agent.reset_new_agent_request()
                     agent_instances = get_agent_instances() 
 
 
                 if agent.requested_delete_agent:
                     print("Agent Deletion has been requested. ")
+                    print("Deleted agents:",deleted_agents_names)
                     for target_agent in agent.delete_agents:
-                        for agent in agent_instances:
-                            if agent.agent_name == target_agent["name"]:
-                                agent_instances.remove(agent)
-                                agent_names.remove(agent.agent_name)
-                                deleted_agents_names.append(agent.agent_name)
+                        for to_remove in agent_instances:
+                            if to_remove.agent_name == target_agent["name"]:
+                                agent_instances.remove(to_remove)
+                                agent_names.remove(to_remove.agent_name)
+                                deleted_agents_names.append(to_remove.agent_name)
                                 
-                                agent_folder_path = os.path.join(working_directory,scenario_name,agent.agent_name)
+                                agent_folder_path = os.path.join(working_directory,scenario_name,to_remove.agent_name)
                                 print("Renaming:", agent_folder_path)
                                 os.rename(agent_folder_path,agent_folder_path+"_Deleted")
                                 print("Renamed:", agent_folder_path)
 
 
-                                to_rename_config = os.path.join(agent_config_path,agent.agent_name)
-                                to_rename_context = os.path.join(agent_context_path,agent.agent_name)
-
-                                if os.path.exists(to_rename_config) and os.path.exists(to_rename_context):
+                                to_rename_config = os.path.join(agent_config_path,to_remove.agent_name)
+                                to_rename_context = os.path.join(agent_context_path,to_remove.agent_name)
+                                print("Attempting to rename",to_rename_config)
+                                if os.path.exists(to_rename_config+".yaml") and os.path.exists(to_rename_context):
                                     os.rename(to_rename_config+".yaml",to_rename_config+"_Deleted.yaml")
                                     os.rename(to_rename_context,to_rename_context+"_Deleted")
                                 else:
                                     print("File does not exist")
+                                if to_remove.agent_name == agent.agent_name:
+                                    print("Currently Iterating agent being deleted.")
+                            
                     agent_instances = get_agent_instances() 
+
 
             inject_prompt_all(agent_instances)
 

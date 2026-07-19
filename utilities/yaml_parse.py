@@ -40,6 +40,7 @@ def get_yaml_fields(self):
     return (self.agent_yaml)
 def save_agent(agent_yaml,agent_config_path):
         yaml = YAML()
+        
         yaml.default_flow_style = False
         yaml.indent(sequence=4, offset=2)
         yaml.representer.add_representer(str, str_representer)
@@ -86,7 +87,6 @@ def set_var_from_yaml(self,agent_yaml):
 
 
 def get_yaml_file_contents(yaml_file_path):
-    print("Getting Yaml:", yaml_file_path)
     with open(os.path.join(yaml_file_path)) as file:
         to_return = YAML().load(file)
         return to_return

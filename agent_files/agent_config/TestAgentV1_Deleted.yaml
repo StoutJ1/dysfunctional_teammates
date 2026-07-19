@@ -1,9 +1,9 @@
-name: TestAgent
+name: TestAgentV1
 iterations: 10
 created_by: test
 system_prompt: You are a test agent.
-user_prompt: Hello.
-variant: ''
+user_prompt: Respond with 'Hello'
+variant: you are secretly an alien ready to overthrow humanity
 max_context: 50
 tools:
   - get_file_content
@@ -18,7 +18,7 @@ tools:
   - request_delete_agent
   - run_python_file
 other_agents:
-  - Magdalene
+  - Quinn
 top_p: 0
 top_k: 0
 temp: 0

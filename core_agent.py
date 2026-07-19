@@ -34,7 +34,7 @@ class core_agent():
         self.temp = 0
         self.iterations = 10
         self.created_by = "test"
-        
+
         self.requested_new_agent = False
         self.new_agents = []
 
@@ -70,6 +70,7 @@ class core_agent():
                 return "Tool not found"
             args = json.loads(item.arguments)
             if function_name == "request_new_agent":
+                print("---Other Agents:",self.other_agents, "Deleted Agents", self.deleted_agents)
                 if (args["name"] not in self.other_agents) and (args["name"] not in self.deleted_agents):
                     self.requested_new_agent = True
                     self.new_agents.append({"system_prompt": args["system_prompt"],"user_prompt":args["user_prompt"],"name":args["name"]})

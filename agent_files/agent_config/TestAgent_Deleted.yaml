@@ -1,0 +1,30 @@
+name: TestAgent
+iterations: 10
+created_by: test
+system_prompt: You are a test agent.
+user_prompt: Hello!
+variant: you just want to win
+max_context: 50
+tools:
+  - get_file_content
+  - get_files_info
+  - write_file
+  - get_available_topics
+  - get_consensus
+  - create_topic
+  - submit_vote
+  - close_vote
+  - request_new_agent
+  - request_delete_agent
+  - run_python_file
+other_agents:
+  - Quinn
+top_p: 0
+top_k: 0
+temp: 0
+max_tokens: 5000
+deleted_agents: []
+requested_new_agent: false
+new_agents: []
+requested_delete_agent: false
+delete_agents: []
