@@ -23,7 +23,6 @@ def get_yaml_fields(self):
     'iterations':self.iterations,
     'created_by': self.created_by,
     }
-    print(self.agent_yaml)
     self.save_agent(self.agent_yaml)
 def save_agent(self,agent_yaml):
         with open(os.path.join(agent_config_path, agent_yaml["name"]+".yml"),"w+") as dumpfile:
@@ -60,17 +59,12 @@ def sett(self,agent_yaml):
     self.temp = agent_yaml.get("temp")
     self.iterations = agent_yaml.get("iterations")
 
-    
-gent_config_path = "agent_files/agent_config/"
 
-yaml_agent_list = []
-for agent_file in os.listdir(agent_config_path):
 
-    with open(os.path.join(agent_config_path,agent_file)) as file:
-        yaml_agent_list.append(safe_load(file))
-
-print(yaml_agent_list[1])  
-test = core_agent("test","test","here")
+def get_yaml_file_contents(yaml_file_path):
+    with open(os.path.join(yaml_file_path)) as file:
+        to_return = load(file)
+    return to_return
 
 
 
