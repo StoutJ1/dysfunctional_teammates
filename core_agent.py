@@ -12,7 +12,7 @@ class core_agent():
     def __init__(self,system_prompt,prompt,working_dir):
         self.verbose = False
 
-        self.agent_param={"working_directory":"","agent_name":"","other_agents":[],"deleted_agents":[],"system_prompt":"","user_prompt":""}
+        self.agent_param={"working_directory":"","agent_name":"","deleted_agents":[],"system_prompt":"","user_prompt":""}
         self. working_directory = working_dir
         self.first_run = True
         self.system_prompt = system_prompt
@@ -198,7 +198,6 @@ class core_agent():
 
     def iterate(self):
         load_dotenv()
-        print("Other Agents from agent ", self.other_agents)
         self.tools=self.get_tools()
         if self.first_run:
            self.first_run =False

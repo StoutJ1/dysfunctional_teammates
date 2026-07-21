@@ -15,7 +15,7 @@ def get_yaml_fields(self):
        'iterations':self.iterations,
     'created_by': self.created_by,
        'other_agents': self.other_agents,
-
+    
     'variant': self.variant,
     'max_context_messages': self.max_context_messages,
      'system_prompt': self.system_prompt,
@@ -46,6 +46,8 @@ def save_agent(agent_yaml,agent_config_path):
         yaml.indent(sequence=4, offset=2)
         yaml.representer.add_representer(str, str_representer)
         with open(os.path.join(agent_config_path, agent_yaml["name"]+".yaml"),"w+") as dumpfile:
+            print("SavingAgents as,",dumpfile)
+
             yaml.dump(agent_yaml,dumpfile)
 
 
@@ -61,8 +63,7 @@ def set_var_from_yaml(self,agent_yaml):
 
     self.system_prompt = agent_yaml.get("system_prompt")
     self.user_prompt = agent_yaml.get("user_prompt")
-    
-    self.other_agents = agent_yaml.get("other_agents", [])
+    self.other_agents = agent_yaml.get("other_agents")
 
     self.deleted_agents = agent_yaml.get("deleted_agents", [])
 

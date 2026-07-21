@@ -90,14 +90,14 @@ def create_new_agent(system_prompt, user_prompt,agents_name):
     agents_name = agents_name.strip("/")
     agent = core_agent(system_prompt=system_prompt, prompt=user_prompt,working_dir=working_directory)
     agent.agent_name = agents_name  # Stoagent_working_folder/save_files/Zilviare the agent's name for reference
-    agent.other_agents = agent_names
+    agent.other_agents = get_current_agent_names()
     agent.variant= random.choice(variant_types)
 
     create_agent_folders(working_directory,scenario_name,agent.agent_name,agent_context_path)
     yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path=agent_config_path)
-
+    agent.other_agents = get_current_agent_names()
+    yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path=agent_config_path)
     #Makes new agent here.
-    #TODO Inject new agent names to all yamls.
 
     return agent
 
@@ -154,6 +154,12 @@ def get_agent_instances():
 #test = core_agent("test","test","here")
                 
 
+def get_current_agent_names():
+    active_agent_names = [file_item[:-5] for file_item in os.listdir(os.environ.get("AGENT_CONFIG_PATH")) if ".yaml" in file_item]
+    print("Active Agents:",active_agent_names,"OS List",os.listdir(os.environ.get("AGENT_CONFIG_PATH")))
+    return active_agent_names
+
+
 
 if __name__ == "__main__":
     load_dotenv()
@@ -185,7 +191,7 @@ if __name__ == "__main__":
                 break
             print(agent_names)
             agent.deleted_agents = deleted_agents_names
-            agent.other_agents = [file_item[:-5] for file_item in os.listdir(os.environ.get("AGENT_CONFIG_PATH")) if ".yaml" in file_item]
+            agent.other_agents = get_current_agent_names
 
             agent.inject_prompt(agent.get_agent_files_contents(scenario_name))
             agent.inject_prompt("Living Agents:"+str(agent.other_agents))
@@ -198,10 +204,11 @@ if __name__ == "__main__":
                 current_iter +=1
                 print(f"  Processing agent: {agent.agent_name} Iteration: {current_iter} of {iteration_count}")
                 current_agent_yaml = yaml_parse.get_yaml_file_contents(os.path.join(agent_config_path,agent.agent_name+".yaml"))
-                agent = yaml_parse.set_var_from_yaml(agent_yaml=current_agent_yaml,self=agent)
-                agent.other_agents = [file_item[:-5] for file_item in os.listdir(os.environ.get("AGENT_CONFIG_PATH")) if ".yaml" in file_item]
 
+                agent = yaml_parse.set_var_from_yaml(agent_yaml=current_agent_yaml,self=agent)
                 iteration_count = agent.iterations
+                agent.other_agents = get_current_agent_names()
+
                 agent.deleted_agents = deleted_agents_names
 
 
@@ -212,6 +219,8 @@ if __name__ == "__main__":
                 status = agent.iterate() 
                 if status:
                     print("Model says ending turn early")
+                    agent.other_agents = get_current_agent_names()
+
                     yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path)
 
                     break
@@ -226,16 +235,16 @@ if __name__ == "__main__":
                         print(f"Created new agent {new_agent.agent_name}, Variant: {new_agent.variant}")
 
                         agent_instances.append(new_agent)       
-                        agent_names.append(new_agent.agent_name)
 
                         agent.other_agents = agent_names
                         print("Injecting agent names", agent.other_agents)
                         agent.inject_prompt("Living Agents:"+str(agent.other_agents))
-                        yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path)
 
 
                     agent.reset_new_agent_request()
+
                     agent_instances = get_agent_instances() 
+
 
 
                 if agent.requested_delete_agent:
@@ -266,6 +275,10 @@ if __name__ == "__main__":
                                     print("Currently Iterating agent being deleted.")
                             
                     agent_instances = get_agent_instances() 
+                    agent.other_agents = get_current_agent_names()
+                    yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path)
+
+
 
 
             inject_prompt_all(agent_instances)
