@@ -12,3 +12,4 @@ backup_folder/
 agent_working_folder/
 saved_backups/
 utilities/world_state/
+agent_files/

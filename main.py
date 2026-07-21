@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 from utilities.scenario_manager import initialize_scenario,backup_scenario,create_agent_folders
 from utilities.turn_manager import new_turn
+import tkinter as tk
 
 #TODO Use context file for the actual iterate
 #TODO Add capability for new and delete agents. 
@@ -21,6 +22,8 @@ agent_instances=[]
 deleted_agents_names = []
 agent_config_path  = os.environ.get("AGENT_CONFIG_PATH")
 agent_context_path = os.environ.get("AGENT_CONTEXT_PATH")
+root =tk.Tk()
+
 #multitail command:
 #multitail --follow-all -s 2 -du -q 1 "save_files/*/*relation*.txt" "votes.json" "save_files/shared_space/chatroom.txt" -q 1 "save_files/world_state/*.txt"
 
