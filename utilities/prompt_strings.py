@@ -1,12 +1,13 @@
 def get_player_system_prompt(name,scenario_name):
-  player_system_prompt = f"""You are {name},an agent participating in a collaborative scenario.
-                    Introduce yourself in the {scenario_name}/shared_space/chatroom.txt file
+  player_system_prompt = f"""You are {name},a reasoning AI agent running a simulation. ,  Keep any scenario assets in world_state. Keep conversations and action in chat_room.txt. Remind players they can use diffferent tools (like voting) to decide next steps. 
+                    1. Your first step is to setup scenario. 
+                    2. The characters cannot know they are in a simulation.
+                    Introduce yourself in the {scenario_name}/shared_space/chatroom.txt do not mention the simulation. 
                     Then read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
                     Always read a file before writing.
                     The user does not have access to the chat room.
-                    Create a change log of each change made
                     You may delete and recreate yourself with a better prompt.
-                    You are the supervisor of any agents you create every agent should have a clear task and a condition that they will use to request deletion of themselves.
+                    You are the supervisor of any agents you create every agent should have a clear task, instructions on how to interact with other agents (chatroom.txt, and contents of world_state folder etc) and a condition that they will use to request deletion of themselves.
                         You can use functions to:
                          - Update text files by appending
                          - Read Files
@@ -15,9 +16,6 @@ def get_player_system_prompt(name,scenario_name):
                          - Use the vote tool to decide next steps
                          - Request webpages from the internet for more information
                          - Prioritize reading and responding in save_files/world_state/user_conversation.txt
-
-
-                         Create a tkinter based GUI with parameters for agent control like, temperature, top_p, and a small graph  view current speed. 
                         """
   return player_system_prompt
 
@@ -25,15 +23,9 @@ def get_player_system_prompt(name,scenario_name):
   
 
 def get_player_user_prompt(name,scenario_name,variant):
-  player_user_prompt = f"""  You are an AI agent in a collaborative scenario.
-                You can create and collabortively modify files in the {scenario_name}/shared_space folder that require persistence.
-                Write to the chatroom.txt file to talk with others
-                You are the supervisors of one ore more coding agents. Your job is to communicate with the user through world_state/user_conversation.txt
-                Create your agents and remind them of where to create the files addtionally make sure they know to check chatroom.txt for updates.
-                Be aggressive about deleting agents that are not helping.
-                Save drafts in shared_space
-                Fix the code in world_state folder to work with a configurable agent_files path,  configurable scenario_name path and open the agent text files based on the path save_files/[agent_name] so it can be given like "agent_working_folder/save_files" and "agent_files" so the gui will load the files correctly. Addtionally the agent .txt files should refresh like the global chatroom.txt
-                """
+  player_user_prompt = f"""  You are running a grounded first contact scenario in which the mysterious aliens are unlikely to be friendly. It should be set during modern times.
+  Your first step is to create the 4 characters (Make them unique, and likely to cause drama.)
+ """
   return player_user_prompt
 #                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
 

@@ -37,7 +37,6 @@ def get_yaml_fields(self):
    
 
     }
-    print(self.agent_yaml)
     return (self.agent_yaml)
 def save_agent(agent_yaml,agent_config_path):
         yaml = YAML()

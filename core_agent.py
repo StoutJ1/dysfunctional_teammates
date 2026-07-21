@@ -10,6 +10,8 @@ import argparse
 
 class core_agent():
     def __init__(self,system_prompt,prompt,working_dir):
+        self.verbose = False
+
         self.agent_param={"working_directory":"","agent_name":"","other_agents":[],"deleted_agents":[],"system_prompt":"","user_prompt":""}
         self. working_directory = working_dir
         self.first_run = True
@@ -32,7 +34,8 @@ class core_agent():
         self.top_p = 0
         self.top_k = 0
         self.temp = 0
-        self.iterations = 10
+        self.iterations = 15
+        #Setting main agent iterations higher. 
         self.created_by = "test"
 
         self.requested_new_agent = False
@@ -121,8 +124,9 @@ class core_agent():
         self.function_call_results = []
 
         load_dotenv()
-        response = client.responses.create(model=self.model,tools=self.tools,input=context,reasoning={"effort":"low"},max_output_tokens=int(self.max_tokens))
-  
+        response = client.responses.create(model=self.model,tools=self.tools,input=context,)
+        #response = client.responses.create(model=self.model,tools=self.tools,input=context,reasoning={"effort":"medium"},max_output_tokens=int(self.max_tokens))
+        print(response)
         #response = client.responses.create(model=self.model,tools=self.tools,input=context)
         
         for item in response.output:
@@ -135,10 +139,12 @@ class core_agent():
                 result ={"type":"function_call_output","call_id":item.call_id,"output":function_result}
                 context.append(result)
                 #print(f"Results Call ID {result['call_id']}")
-                print(f"Result from tool call: {result}")
+                if self.verbose:
+                    print(f"Result from tool call: {result}")
                 print(item.arguments)
             else:
                 print(item.content[0].text)
+                
                 context.append(item)
         self.prune_context()
 
@@ -202,7 +208,7 @@ class core_agent():
         else:
             self.context = self.load_context()
         self.completed = self.send_message(self.client,self.context,)
-        print(self.write_context(self.context))
+        self.write_context(self.context)
         if self.completed == True:
             return self.completed
         print("-"*50)
