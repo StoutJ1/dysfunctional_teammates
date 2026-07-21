@@ -10,7 +10,7 @@ import os
 import shutil
 from datetime import datetime
 
-def initialize_scenario(working_directory,scenario_name, agents):
+def initialize_scenario(working_directory,scenario_name, agents,agent_context_path,agent_config_path):
     
     if agents is None:
         agents = []
@@ -20,12 +20,14 @@ def initialize_scenario(working_directory,scenario_name, agents):
     print(f"Checking for {scenario_dir}")
     if os.path.exists(scenario_dir):
         print("Removing Scenario Files")
-        cleanup_scenario(scenario_name)
+        cleanup_scenario(scenario_name,agent_context_path,agent_config_path)
     else: 
         print("No existing scenario")
     
     os.makedirs(scenario_dir, exist_ok=True)
-    
+    os.makedirs(agent_context_path, exist_ok=True)
+    os.makedirs(agent_config_path, exist_ok=True)
+
     # Create world_state directory and world_state.txt file
     world_state_dir = os.path.join(scenario_dir, "world_state")
     os.makedirs(world_state_dir, exist_ok=True)
@@ -41,6 +43,8 @@ def initialize_scenario(working_directory,scenario_name, agents):
     shared_space_dir = os.path.join(scenario_dir, "shared_space")
     os.makedirs(shared_space_dir, exist_ok=True)
     share_space_file = os.path.join(shared_space_dir, "chatroom.txt")
+    #Create agent context
+    os.makedirs(agent_context_path,exist_ok=True)
     with open(share_space_file, 'w+') as f:
         f.write("Chat Room Information\n")
         f.write("========================\n")
@@ -92,7 +96,7 @@ def initialize_scenario(working_directory,scenario_name, agents):
     return structure_info
 
 
-def create_agent_folder(working_dir, scenario_name, agent_name):
+def create_agent_folders(working_dir, scenario_name, agent_name,agent_context_path):
     """
     Create an individual folder for a specific agent in an existing scenario.
     
@@ -105,6 +109,9 @@ def create_agent_folder(working_dir, scenario_name, agent_name):
     """
     agent_dir = os.path.join(working_dir,scenario_name, agent_name)
     os.makedirs(agent_dir, exist_ok=True)
+    
+    os.makedirs(os.path.join(agent_context_path,agent_name), exist_ok=True)
+
     motivations_file = os.path.join(agent_dir, "motivations.txt")
     with open(motivations_file, 'w') as f:
         f.write(f"{agent_name} Motivations\n")
@@ -124,11 +131,11 @@ def create_agent_folder(working_dir, scenario_name, agent_name):
         f.write(f"{agent_name} Strategy Plan\n")
         f.write("========================\n")
         f.write("\nThis file contains the agent's strategic plans and approaches.\n")
-    
+
     return agent_dir
 
 
-def cleanup_scenario(scenario_name="scenario"):
+def cleanup_scenario(scenario_name,agent_context_path,agent_config_path):
     working_directory = os.environ.get("WORKING_DIRECTORY")
 
     """
@@ -137,10 +144,23 @@ def cleanup_scenario(scenario_name="scenario"):
     Args:
         scenario_name (str): Name of the scenario directory to remove (default: "scenario")
     """
+    print(scenario_name,agent_context_path,agent_config_path)
+
     if os.path.exists(os.path.join(working_directory,scenario_name)):
         shutil.rmtree(os.path.join(working_directory,scenario_name))
     else:
-        print("Path does not exist to sencario")
+        print("Path does not exist to scenario")
+
+
+    if os.path.exists(os.path.join(agent_context_path)):
+        shutil.rmtree(os.path.join(agent_context_path))
+    else:
+        print("Path does not exist to context")
+
+    if os.path.exists(os.path.join(agent_config_path)):
+        shutil.rmtree(os.path.join(agent_config_path))
+    else:
+        print("Path does not exist to Config Paths",agent_config_path)
     if os.path.exists(os.path.join(working_directory,"votes.json")):
         os.remove(os.path.join(working_directory,"votes.json"))
     else:

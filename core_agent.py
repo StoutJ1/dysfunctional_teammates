@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 import json
-
+import pickle
 from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,voting_tool,run_python_file
 import argparse
 
@@ -10,6 +10,7 @@ import argparse
 
 class core_agent():
     def __init__(self,system_prompt,prompt,working_dir):
+        self.agent_param={"working_directory":"","agent_name":"","other_agents":[],"deleted_agents":[],"system_prompt":"","user_prompt":""}
         self. working_directory = working_dir
         self.first_run = True
         self.system_prompt = system_prompt
@@ -22,18 +23,28 @@ class core_agent():
         self.model = os.environ.get("MODEL")
         self.base_url = os.environ.get("BASE_URL_ENV")
         self.working_directory = os.environ.get("WORKING_DIRECTORY")
+        self.config_path = os.environ.get("AGENT_CONFIG_PATH")
+        self.context_path = os.environ.get("AGENT_CONTEXT_PATH")
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
         self.max_context_messages = 50
         self.deleted_agents = []
+        
+        self.top_p = 0
+        self.top_k = 0
+        self.temp = 0
+        self.iterations = 10
+        self.created_by = "test"
+
         self.requested_new_agent = False
         self.new_agents = []
 
         self.requested_delete_agent = False
         self.delete_agents = []
-        if self.first_run:
-            self.first_run =False
-            self.context = [{"role":"system","content":self.system_prompt},{"role":"user",
-                   "content":self.user_prompt}]
+
+        self.context = []
+        self.max_tokens = 5000
+
+       
             
 
     def call_function(self,item,):
@@ -59,6 +70,7 @@ class core_agent():
                 return "Tool not found"
             args = json.loads(item.arguments)
             if function_name == "request_new_agent":
+                print("---Other Agents:",self.other_agents, "Deleted Agents", self.deleted_agents)
                 if (args["name"] not in self.other_agents) and (args["name"] not in self.deleted_agents):
                     self.requested_new_agent = True
                     self.new_agents.append({"system_prompt": args["system_prompt"],"user_prompt":args["user_prompt"],"name":args["name"]})
@@ -109,8 +121,8 @@ class core_agent():
         self.function_call_results = []
 
         load_dotenv()
-        response = client.responses.create(model=self.model,tools=self.tools,input=context,reasoning={"effort":"low"})
-       
+        response = client.responses.create(model=self.model,tools=self.tools,input=context,reasoning={"effort":"low"},max_output_tokens=int(self.max_tokens))
+  
         #response = client.responses.create(model=self.model,tools=self.tools,input=context)
         
         for item in response.output:
@@ -166,12 +178,31 @@ class core_agent():
         return to_return
 
 
+    def write_context(self, convo_history):
+        with open(os.path.join(self.context_path,self.agent_name,"context.txt"),"wb+") as dump_file:
+            pickle.dump(convo_history,dump_file)
+            #file.write(bytes(context))
+
+    def load_context(self):
+        print(os.path.join(self.context_path,self.agent_name,"context.txt"))
+        with open(os.path.join(self.context_path,self.agent_name,"context.txt"),"rb") as file:
+            to_return =  pickle.load(file)
+        return to_return
     
-            
+
     def iterate(self):
         load_dotenv()
+
         self.tools=self.get_tools()
+        if self.first_run:
+           self.first_run =False
+           self.context = [{"role":"system","content":self.system_prompt},{"role":"user",
+                "content":self.user_prompt}]
+           self.write_context(self.context)
+        else:
+            self.context = self.load_context()
         self.completed = self.send_message(self.client,self.context,)
+        print(self.write_context(self.context))
         if self.completed == True:
             return self.completed
         print("-"*50)

@@ -1,7 +1,7 @@
 import os
 from google.genai import types
 
-MAX_CHARS = 10000
+MAX_CHARS = 50000
 def get_file_content_schema():
     schema_get_file_content = {
             "type":"function",

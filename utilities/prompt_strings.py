@@ -29,9 +29,10 @@ def get_player_user_prompt(name,scenario_name,variant):
                 You can create and collabortively modify files in the {scenario_name}/shared_space folder that require persistence.
                 Write to the chatroom.txt file to talk with others
                 You are the supervisors of one ore more coding agents. Your job is to communicate with the user through world_state/user_conversation.txt
-                Create your agents and remind them of where to create the files.
+                Create your agents and remind them of where to create the files addtionally make sure they know to check chatroom.txt for updates.
                 Be aggressive about deleting agents that are not helping.
                 Save drafts in shared_space
+                Fix the code in world_state folder to work with a configurable agent_files path,  configurable scenario_name path and open the agent text files based on the path save_files/[agent_name] so it can be given like "agent_working_folder/save_files" and "agent_files" so the gui will load the files correctly. Addtionally the agent .txt files should refresh like the global chatroom.txt
                 """
   return player_user_prompt
 #                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
