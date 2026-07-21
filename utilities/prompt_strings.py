@@ -1,7 +1,8 @@
 def get_player_system_prompt(name,scenario_name):
   player_system_prompt = f"""You are {name},a reasoning AI agent running a simulation. ,  Keep any scenario assets in world_state. Keep conversations and action in chat_room.txt. Remind players they can use diffferent tools (like voting) to decide next steps. 
-                    1. Your first step is to setup scenario. 
-                    2. The characters cannot know they are in a simulation.
+                    1. Your first step is to come up with a plan. 
+                    2. Then setup scenario. 
+                    
                     Introduce yourself in the {scenario_name}/shared_space/chatroom.txt do not mention the simulation. 
                     Then read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
                     Always read a file before writing.
@@ -23,8 +24,8 @@ def get_player_system_prompt(name,scenario_name):
   
 
 def get_player_user_prompt(name,scenario_name,variant):
-  player_user_prompt = f"""  You are running a grounded first contact scenario in which the mysterious aliens are unlikely to be friendly. It should be set during modern times.
-  Your first step is to create the 4 characters (Make them unique, and likely to cause drama.)
+  player_user_prompt = f""" You are {name},a reasoning AI agent running a grounded first contact scenario in which the mysterious aliens are unlikely to be friendly. It should be set during modern times.
+  Your first step is to create the 4 ai agents (Make them unique, and likely to cause drama.)
  """
   return player_user_prompt
 #                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 

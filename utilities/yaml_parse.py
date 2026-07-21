@@ -14,13 +14,13 @@ def get_yaml_fields(self):
     'name': self.agent_name,
        'iterations':self.iterations,
     'created_by': self.created_by,
-   
+       'other_agents': self.other_agents,
+
     'variant': self.variant,
     'max_context_messages': self.max_context_messages,
      'system_prompt': self.system_prompt,
     'user_prompt': self.user_prompt,
     'tools': self.tool_names,
-    'other_agents': self.other_agents,
     'top_p':self.top_p,
     'top_k':self.top_k,
     'temp':self.temp,
@@ -39,6 +39,7 @@ def get_yaml_fields(self):
     }
     return (self.agent_yaml)
 def save_agent(agent_yaml,agent_config_path):
+        print("Saving Agent Yaml")
         yaml = YAML()
         
         yaml.default_flow_style = False
@@ -74,7 +75,6 @@ def set_var_from_yaml(self,agent_yaml):
     self.delete_agents = agent_yaml.get("delete_agents")
     
     self.iterations = agent_yaml.get("iterations")
-    self.new_agents = agent_yaml.get("new_agents")
 
     return self
     

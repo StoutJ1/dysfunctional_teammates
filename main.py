@@ -23,7 +23,6 @@ deleted_agents_names = []
 agent_config_path  = os.environ.get("AGENT_CONFIG_PATH")
 agent_context_path = os.environ.get("AGENT_CONTEXT_PATH")
 root =tk.Tk()
-
 #multitail command:
 #multitail --follow-all -s 2 -du -q 1 "save_files/*/*relation*.txt" "votes.json" "save_files/shared_space/chatroom.txt" -q 1 "save_files/world_state/*.txt"
 
@@ -175,7 +174,6 @@ if __name__ == "__main__":
     print(len(get_agent_instances()))
     while days_count < number_of_days: 
         agent_instances = get_agent_instances() 
-        print(agent_instances)    
         for agent in agent_instances:
             
             print(f"\n--- Starting Agent Iteration Loop, Total Agents: {len(agent_instances)} ---")
@@ -185,9 +183,13 @@ if __name__ == "__main__":
             if agent.agent_name in deleted_agents_names:
                 print("Skipping Agent as they have been deleted.")
                 break
+            print(agent_names)
             agent.deleted_agents = deleted_agents_names
+            agent.other_agents = [file_item[:-5] for file_item in os.listdir(os.environ.get("AGENT_CONFIG_PATH")) if ".yaml" in file_item]
+
             agent.inject_prompt(agent.get_agent_files_contents(scenario_name))
-            agent.inject_prompt("Living Agents:"+str(agent_names))
+            agent.inject_prompt("Living Agents:"+str(agent.other_agents))
+            print("Living Agents:"+str(agent.other_agents))
             agent.inject_prompt("Deleted Agents"+str(deleted_agents_names))
             iteration_count = agent.iterations
             current_iter = 0
@@ -197,15 +199,21 @@ if __name__ == "__main__":
                 print(f"  Processing agent: {agent.agent_name} Iteration: {current_iter} of {iteration_count}")
                 current_agent_yaml = yaml_parse.get_yaml_file_contents(os.path.join(agent_config_path,agent.agent_name+".yaml"))
                 agent = yaml_parse.set_var_from_yaml(agent_yaml=current_agent_yaml,self=agent)
+                agent.other_agents = [file_item[:-5] for file_item in os.listdir(os.environ.get("AGENT_CONFIG_PATH")) if ".yaml" in file_item]
+
                 iteration_count = agent.iterations
                 agent.deleted_agents = deleted_agents_names
 
 
                 #each iteration it should check its files.
-                status = agent.iterate() 
+                
 
+
+                status = agent.iterate() 
                 if status:
                     print("Model says ending turn early")
+                    yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path)
+
                     break
                 inject_every_count +=1
             #Checking if a new agent is requested:
@@ -221,6 +229,10 @@ if __name__ == "__main__":
                         agent_names.append(new_agent.agent_name)
 
                         agent.other_agents = agent_names
+                        print("Injecting agent names", agent.other_agents)
+                        agent.inject_prompt("Living Agents:"+str(agent.other_agents))
+                        yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path)
+
 
                     agent.reset_new_agent_request()
                     agent_instances = get_agent_instances() 

@@ -28,13 +28,13 @@ class core_agent():
         self.config_path = os.environ.get("AGENT_CONFIG_PATH")
         self.context_path = os.environ.get("AGENT_CONTEXT_PATH")
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
-        self.max_context_messages = 50
+        self.max_context_messages = 500
         self.deleted_agents = []
         
         self.top_p = 0
         self.top_k = 0
         self.temp = 0
-        self.iterations = 15
+        self.iterations = 5
         #Setting main agent iterations higher. 
         self.created_by = "test"
 
@@ -198,7 +198,7 @@ class core_agent():
 
     def iterate(self):
         load_dotenv()
-
+        print("Other Agents from agent ", self.other_agents)
         self.tools=self.get_tools()
         if self.first_run:
            self.first_run =False
