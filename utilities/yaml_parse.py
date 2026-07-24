@@ -8,13 +8,13 @@ def str_representer(dumper, data):
     if len(data.splitlines()) > 1:  # check for multiline string
         return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
     return dumper.represent_scalar('tag:yaml.org,2002:str', data)
-def get_yaml_fields(self):
+def get_yaml_fields_from_agent(self):
     self.tool_names = [tool["name"] for tool in self.get_tools()]
     self.agent_yaml = {
     'name': self.agent_name,
        'iterations':self.iterations,
     'created_by': self.created_by,
-       'other_agents': self.other_agents,
+       'all_agents': self.all_agents,
     
     'variant': self.variant,
     'max_context_messages': self.max_context_messages,
@@ -39,15 +39,13 @@ def get_yaml_fields(self):
     }
     return (self.agent_yaml)
 def save_agent(agent_yaml,agent_config_path):
-        print("Saving Agent Yaml")
+        print("Saving Agent Yaml:",agent_yaml["name"])
         yaml = YAML()
         
         yaml.default_flow_style = False
         yaml.indent(sequence=4, offset=2)
         yaml.representer.add_representer(str, str_representer)
         with open(os.path.join(agent_config_path, agent_yaml["name"]+".yaml"),"w+") as dumpfile:
-            print("SavingAgents as,",dumpfile)
-
             yaml.dump(agent_yaml,dumpfile)
 
 
@@ -63,7 +61,7 @@ def set_var_from_yaml(self,agent_yaml):
 
     self.system_prompt = agent_yaml.get("system_prompt")
     self.user_prompt = agent_yaml.get("user_prompt")
-    self.other_agents = agent_yaml.get("other_agents")
+    self.all_agents = agent_yaml.get("all_agents")
 
     self.deleted_agents = agent_yaml.get("deleted_agents", [])
 

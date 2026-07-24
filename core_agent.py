@@ -6,7 +6,8 @@ import pickle
 from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,voting_tool,run_python_file
 import argparse
 
-
+#TODO Why is the initial agent not getting the agent names. I'll just make a update all yaml thing. 
+#Why is 
 
 class core_agent():
     def __init__(self,system_prompt,prompt,working_dir):
@@ -17,7 +18,7 @@ class core_agent():
         self.first_run = True
         self.system_prompt = system_prompt
         self.agent_name = ""
-        self.other_agents = []
+        self.all_agents = []
         self.variant =""
         self.user_prompt=prompt
         self.function_calls=[]
@@ -73,8 +74,8 @@ class core_agent():
                 return "Tool not found"
             args = json.loads(item.arguments)
             if function_name == "request_new_agent":
-                print("---Other Agents:",self.other_agents, "Deleted Agents", self.deleted_agents)
-                if (args["name"] not in self.other_agents) and (args["name"] not in self.deleted_agents):
+                print("---All Agents:",self.all_agents, "Deleted Agents", self.deleted_agents)
+                if (args["name"] not in self.all_agents) and (args["name"] not in self.deleted_agents):
                     self.requested_new_agent = True
                     self.new_agents.append({"system_prompt": args["system_prompt"],"user_prompt":args["user_prompt"],"name":args["name"]})
                     print("New Agent Requested", args["name"])
