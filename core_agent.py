@@ -28,7 +28,7 @@ class core_agent():
         self.config_path = os.environ.get("AGENT_CONFIG_PATH")
         self.context_path = os.environ.get("AGENT_CONTEXT_PATH")
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
-        self.max_context_messages = 500
+        self.max_context_messages = 150
         self.deleted_agents = []
         self.context =[]
         self.top_p = 0

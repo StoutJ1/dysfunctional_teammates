@@ -7,7 +7,9 @@ from dotenv import load_dotenv
 from utilities.scenario_manager import initialize_scenario,backup_scenario,create_agent_folders
 from utilities.turn_manager import new_turn
 import tkinter as tk
+from datetime import datetime,timedelta
 
+time_format = "%H:%M"
 #TODO Use context file for the actual iterate
 #TODO Add capability for new and delete agents. 
 load_dotenv()
@@ -124,7 +126,7 @@ def create_agents_with_prompts(agent_names,scenario_name):
 
 def inject_prompt_all(agents,prompt_to_inject=""):
     for agent in agents:
-        print("Injected to ", agent.agent_name)
+        print("Injected to", agent.agent_name)
         agent.inject_prompt(prompt_strings.get_player_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
 
             
@@ -205,9 +207,16 @@ if __name__ == "__main__":
     inject_every = 1
     inject_every_count = 1
     #print(len(get_agent_instances()))
+    current_time = datetime.now()
+
     while days_count < number_of_days: 
         agent_instances = get_agent_instances() 
         print(agent_instances)
+        
+        current_time = datetime.now()+timedelta(minutes=15)
+        time_format.format(current_time)
+        inject_prompt_all(agent_instances,"Current Time: "+ current_time.strftime(time_format))
+        print("Current Time: "+ current_time.strftime(time_format))
         for agent in agent_instances:
             print(f"\n--- Starting Agent Iteration Loop, Total Agents: {len(agent_instances)} ---")
             if agent.agent_name in deleted_agents_names:
@@ -245,7 +254,7 @@ if __name__ == "__main__":
                     current_iter = iteration_count
                     
                 wrap_up_turn(agent,agent_instances)
-            inject_prompt_all(agent_instances)
+            agent.inject_prompt(prompt_strings.get_player_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
 
             
             #Checking if a new agent is requested:
