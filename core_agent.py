@@ -6,7 +6,8 @@ import pickle
 from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,voting_tool,run_python_file
 import argparse
 
-
+#TODO Why is the initial agent not getting the agent names. I'll just make a update all yaml thing. 
+#Why is 
 
 class core_agent():
     def __init__(self,system_prompt,prompt,working_dir):
@@ -16,7 +17,7 @@ class core_agent():
         self. working_directory = working_dir
         self.system_prompt = system_prompt
         self.agent_name = ""
-        self.other_agents = []
+        self.all_agents = []
         self.variant =""
         self.user_prompt=prompt
         self.function_calls=[]

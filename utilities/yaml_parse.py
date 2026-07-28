@@ -17,7 +17,7 @@ def get_yaml_fields(self):
     'name': self.agent_name,
        'iterations':self.iterations,
     'created_by': self.created_by,
-       'other_agents': self.other_agents,
+       'all_agents': self.all_agents,
     
     'variant': self.variant,
     'max_context_messages': self.max_context_messages,
@@ -65,7 +65,7 @@ def set_var_from_yaml(self,agent_yaml):
 
     self.system_prompt = agent_yaml.get("system_prompt")
     self.user_prompt = agent_yaml.get("user_prompt")
-    self.other_agents = agent_yaml.get("other_agents")
+    self.all_agents = agent_yaml.get("all_agents")
 
     self.deleted_agents = agent_yaml.get("deleted_agents", [])
 
