@@ -34,9 +34,9 @@ class core_agent():
         self.top_p = 0
         self.top_k = 0
         self.temp = 0
-        self.iterations = 2
+        self.iterations = 10
         #Setting main agent iterations higher. 
-        self.created_by = "test"
+        self.created_by = "User"
 
         self.requested_new_agent = False
         self.new_agents = []
@@ -124,25 +124,27 @@ class core_agent():
         self.function_call_results = []
 
         load_dotenv()
-        #response = client.responses.create(model=self.model,tools=self.tools,input=context,max_output_tokens=int(self.max_tokens))
+        response = client.responses.create(model=self.model,tools=self.tools,input=context,max_output_tokens=int(self.max_tokens))
         
-        response = client.responses.create(model=self.model,tools=self.tools,input=context)
+        #response = client.responses.create(model=self.model,tools=self.tools,input=context)
         #print(response)
         #response = client.responses.create(model=self.model,tools=self.tools,input=context)
         
         for item in response.output:
             if item.type=="function_call":
-                context.append(item)
+
                 function_result = self.call_function(item)
                 result ={"type":"function_call_output","call_id":item.call_id,"output":function_result}
-                context.append(result)
-                ##print(f"Results Call ID {result['call_id']}")
-                if self.verbose:
-                    #print(f"Result from tool call: {result}")
-                    context.append(item)
+                 #Append both the function call, and its result.
 
-                #print(item.arguments)
+                context.append(item)
+                context.append(result)
+                if self.verbose:
+                    print(f"Result from tool call: {result}")
             else:
+                #If its not a tool call its a reasoning item
+                #print(" ".join([content_from_item.text for content_from_item in item.content]))
+                
                 context.append(item)
         self.prune_context()
         if response.output_text:
@@ -150,6 +152,7 @@ class core_agent():
             return context,True
         else:
             return context,False
+        
         
     def inject_prompt(self,prompt_to_inject):
         ##print(f"""Prompt injected to {self.agent_name} prompt is: "role":"system","content":{prompt_to_inject}""")
@@ -218,9 +221,5 @@ class core_agent():
 
 
         if self.completed == True:
-            print("Confirmed Self.Completed")
             return self.completed
-        else:
-            print("----------------------Current Context Length:", len(self.context))
-        #print("-"*50)
-    
+        

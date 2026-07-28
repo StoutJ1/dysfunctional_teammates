@@ -13,4 +13,6 @@ variant_types = [
     "you speak like a Shakespearean actor",
     "you think every question is an escape room puzzle",
     "you believe this conversation unlocks a secret ending",
+    "you are drunk",
+    
 ]

@@ -39,7 +39,6 @@ def get_yaml_fields_from_agent(self):
     }
     return (self.agent_yaml)
 def save_agent(agent_yaml,agent_config_path):
-        print("Saving Agent Yaml:",agent_yaml["name"])
         yaml = YAML()
         
         yaml.default_flow_style = False
@@ -52,6 +51,7 @@ def get_yaml_fields(self):
     self.tool_names = [tool["name"] for tool in self.get_tools()]
     self.agent_yaml = {
     'name': self.agent_name,
+    'created_by':self.created_by,
        'iterations':self.iterations,
     'created_by': self.created_by,
        'other_agents': self.other_agents,
@@ -87,7 +87,7 @@ def set_var_from_yaml(self,agent_yaml):
     self.tools = agent_yaml.get("tools", [])
     self.variant = agent_yaml.get("variant")
     self.max_context_messages = agent_yaml.get("max_context_messages")
-
+    self.created_by = agent_yaml.get("created_by")
     self.system_prompt = agent_yaml.get("system_prompt")
     self.user_prompt = agent_yaml.get("user_prompt")
     self.all_agents = agent_yaml.get("all_agents")
@@ -120,7 +120,18 @@ def set_var_from_yaml(self,agent_yaml):
 def get_yaml_file_contents(yaml_file_path):
     with open(os.path.join(yaml_file_path)) as file:
         to_return = YAML().load(file)
-        return to_return
+    return to_return
+
+
+
+
+def get_yaml_file_contents_from_name(agent_config_path,agent_name):
+    print(os.path.join(agent_config_path, agent_name+".yaml"))
+    with open(os.path.join(agent_config_path, agent_name+".yaml"),"r") as file:
+        to_return = YAML().load(file)
+    return to_return
+
+
 
 
 
