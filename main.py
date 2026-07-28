@@ -82,11 +82,13 @@ def create_new_agent(system_prompt, user_prompt,agents_name):
     agents_name = agents_name.strip("/")
     agent = core_agent(system_prompt=system_prompt, prompt=user_prompt,working_dir=working_directory)
     agent.agent_name = agents_name  # Stoagent_working_folder/save_files/Zilviare the agent's name for reference
-    #TODO setting agents name
+    agent.other_agents = get_current_agent_names()
     agent.variant= random.choice(variant_types)
 
     create_agent_folders(working_directory,scenario_name,agent.agent_name,agent_context_path)
-    #TODO review getting agents name
+    yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path=agent_config_path)
+    agent.other_agents = get_current_agent_names()
+    yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path=agent_config_path)
     #Makes new agent here.
     #print("Writing Context",agent.context)
 
@@ -112,16 +114,12 @@ def create_agents_with_prompts(agent_names,scenario_name):
         system_prompt = prompt_strings.get_player_system_prompt(name=name,scenario_name=scenario_name)
         # Create personalized user prompt using the agent's name
         user_prompt = prompt_strings.get_player_user_prompt(name=name,scenario_name=scenario_name,variant=agent_variant)
-
+     
         agent_to_add =create_new_agent(system_prompt=system_prompt,user_prompt=user_prompt,agents_name=name)
         agent_to_add.variant = agent_variant 
         agents.append(agent_to_add)
-        agent_to_add.all_agents = get_current_agent_names()
-        
-        yaml_parse.save_agent(yaml_parse.get_yaml_fields_from_agent(agent_to_add),agent_config_path)
-        #Update the requestor agent with the agent names.
 
-    
+        
     return agents
 
 
@@ -177,10 +175,11 @@ if __name__ == "__main__":
     while days_count < number_of_days: 
         agent_instances = get_agent_instances() 
         for agent in agent_instances:
-            print("Current Values of agent:", agent.agent_name, "All _ Agents",agent.all_agents)
-        for agent in agent_instances:
             
             print(f"\n--- Starting Agent Iteration Loop, Total Agents: {len(agent_instances)} ---")
+
+
+                #Not the DM
             if agent.agent_name in deleted_agents_names:
                 #print("Skipping Agent as they have been deleted.")
                 break

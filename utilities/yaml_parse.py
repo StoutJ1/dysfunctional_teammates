@@ -8,10 +8,7 @@ def str_representer(dumper, data):
     if len(data.splitlines()) > 1:  # check for multiline string
         return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
     return dumper.represent_scalar('tag:yaml.org,2002:str', data)
-
-
-
-def get_yaml_fields(self):
+def get_yaml_fields_from_agent(self):
     self.tool_names = [tool["name"] for tool in self.get_tools()]
     self.agent_yaml = {
     'name': self.agent_name,
@@ -42,17 +39,45 @@ def get_yaml_fields(self):
     }
     return (self.agent_yaml)
 def save_agent(agent_yaml,agent_config_path):
-        #print("Saving Agent Yaml")
+        print("Saving Agent Yaml:",agent_yaml["name"])
         yaml = YAML()
         
         yaml.default_flow_style = False
         yaml.indent(sequence=4, offset=2)
         yaml.representer.add_representer(str, str_representer)
         with open(os.path.join(agent_config_path, agent_yaml["name"]+".yaml"),"w+") as dumpfile:
-            print("         Saving Agents as,",agent_yaml["other_agents"])
             yaml.dump(agent_yaml,dumpfile)
 
+def get_yaml_fields(self):
+    self.tool_names = [tool["name"] for tool in self.get_tools()]
+    self.agent_yaml = {
+    'name': self.agent_name,
+       'iterations':self.iterations,
+    'created_by': self.created_by,
+       'other_agents': self.other_agents,
+    
+    'variant': self.variant,
+    'max_context_messages': self.max_context_messages,
+     'system_prompt': self.system_prompt,
+    'user_prompt': self.user_prompt,
+    'tools': self.tool_names,
+    'top_p':self.top_p,
+    'top_k':self.top_k,
+    'temp':self.temp,
+    'max_tokens':self.max_tokens,
 
+    'deleted_agents':self.deleted_agents,
+
+    'requested_new_agent':self.requested_new_agent,
+    'new_agents':self.new_agents,
+
+    'requested_delete_agent':self.requested_delete_agent,
+    'delete_agents':self.delete_agents,
+    
+   
+
+    }
+    return (self.agent_yaml)
 def set_var_from_yaml(self,agent_yaml):
     self.agent_name = agent_yaml.get("name")
     self.max_tokens = agent_yaml.get("max_tokens")

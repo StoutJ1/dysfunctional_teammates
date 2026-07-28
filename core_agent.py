@@ -195,8 +195,6 @@ class core_agent():
         with open(os.path.join(self.context_path,self.agent_name,"context"),"wb") as write_file:
             pickle.dump(to_write,write_file)
             
-            print("Saving pickle, length:",len(to_write))
-
             
 
 
