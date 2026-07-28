@@ -14,7 +14,6 @@ class core_agent():
 
         self.agent_param={"working_directory":"","agent_name":"","deleted_agents":[],"system_prompt":"","user_prompt":""}
         self. working_directory = working_dir
-        self.first_run = True
         self.system_prompt = system_prompt
         self.agent_name = ""
         self.other_agents = []
@@ -30,11 +29,11 @@ class core_agent():
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
         self.max_context_messages = 500
         self.deleted_agents = []
-        
+        self.context =[]
         self.top_p = 0
         self.top_k = 0
         self.temp = 0
-        self.iterations = 5
+        self.iterations = 2
         #Setting main agent iterations higher. 
         self.created_by = "test"
 
@@ -44,7 +43,6 @@ class core_agent():
         self.requested_delete_agent = False
         self.delete_agents = []
 
-        self.context = []
         self.max_tokens = 5000
 
        
@@ -52,7 +50,7 @@ class core_agent():
 
     def call_function(self,item,):
             function_name = item.name or ""
-            print(f'Calling function: {item.name}')
+            #print(f'Calling function: {item.name}')
             function_map = {
                 "get_file_content":get_file_content.get_file_content,
                 "get_files_info": get_files_info.get_files_info,
@@ -73,11 +71,11 @@ class core_agent():
                 return "Tool not found"
             args = json.loads(item.arguments)
             if function_name == "request_new_agent":
-                print("---Other Agents:",self.other_agents, "Deleted Agents", self.deleted_agents)
+                #print("---Other Agents:",self.other_agents, "Deleted Agents", self.deleted_agents)
                 if (args["name"] not in self.other_agents) and (args["name"] not in self.deleted_agents):
                     self.requested_new_agent = True
                     self.new_agents.append({"system_prompt": args["system_prompt"],"user_prompt":args["user_prompt"],"name":args["name"]})
-                    print("New Agent Requested", args["name"])
+                    #print("New Agent Requested", args["name"])
                     return "Requested"
                 else:
                     return "Agent name already in use"
@@ -93,6 +91,7 @@ class core_agent():
     def reset_new_agent_request(self):
         self.requested_new_agent = False 
         self.new_agents = []
+        
     def prune_context(self):
         """
         Prunes the context to ensure it does not exceed max_context_messages,
@@ -124,34 +123,37 @@ class core_agent():
         self.function_call_results = []
 
         load_dotenv()
-        response = client.responses.create(model=self.model,tools=self.tools,input=context,)
-        #response = client.responses.create(model=self.model,tools=self.tools,input=context,reasoning={"effort":"medium"},max_output_tokens=int(self.max_tokens))
-        print(response)
+        #response = client.responses.create(model=self.model,tools=self.tools,input=context,max_output_tokens=int(self.max_tokens))
+        
+        response = client.responses.create(model=self.model,tools=self.tools,input=context)
+        #print(response)
         #response = client.responses.create(model=self.model,tools=self.tools,input=context)
         
         for item in response.output:
-            if response.output_text:
-                print("Status is Completed")
-                return True
             if item.type=="function_call":
                 context.append(item)
                 function_result = self.call_function(item)
                 result ={"type":"function_call_output","call_id":item.call_id,"output":function_result}
                 context.append(result)
-                #print(f"Results Call ID {result['call_id']}")
+                ##print(f"Results Call ID {result['call_id']}")
                 if self.verbose:
-                    print(f"Result from tool call: {result}")
-                print(item.arguments)
+                    #print(f"Result from tool call: {result}")
+                    context.append(item)
+
+                #print(item.arguments)
             else:
-                print(item.content[0].text)
-                
                 context.append(item)
         self.prune_context()
-
-        return context
+        if response.output_text:
+            print("Status is Completed")
+            return context,True
+        else:
+            return context,False
+        
     def inject_prompt(self,prompt_to_inject):
-        #print(f"""Prompt injected to {self.agent_name} prompt is: "role":"system","content":{prompt_to_inject}""")
+        ##print(f"""Prompt injected to {self.agent_name} prompt is: "role":"system","content":{prompt_to_inject}""")
         self.context.append({"role":"system","content":prompt_to_inject})
+        self.write_context(self.context)
 
 
     def get_tools(self):
@@ -174,7 +176,7 @@ class core_agent():
 
     def get_agent_files_contents(self,scenario):
         self.scenario = scenario
-        print("Scenario file",self.scenario)
+        #print("Scenario file",self.scenario)
         agent_file_path = os.path.join(self.working_directory,self.scenario,self.agent_name)
         files_in_agent_folder = os.listdir(os.path.join(self.working_directory,self.scenario,self.agent_name))
         to_return = ""
@@ -182,33 +184,44 @@ class core_agent():
             with open(os.path.join(agent_file_path,file)) as current:
                 to_return += (f" Contents of {file}: {current.readlines()} ")
         return to_return
-
-
-    def write_context(self, convo_history):
-        with open(os.path.join(self.context_path,self.agent_name,"context.txt"),"wb+") as dump_file:
-            pickle.dump(convo_history,dump_file)
-            #file.write(bytes(context))
-
+            
     def load_context(self):
-        print(os.path.join(self.context_path,self.agent_name,"context.txt"))
-        with open(os.path.join(self.context_path,self.agent_name,"context.txt"),"rb") as file:
-            to_return =  pickle.load(file)
+        #print(os.path.join(self.context_path,self.agent_name,"context"))
+        with open(os.path.join(self.context_path,self.agent_name,"context"),"rb") as load_file:
+            to_return =  pickle.load(load_file)
         return to_return
-    
+    def write_context(self,to_write):
+        with open(os.path.join(self.context_path,self.agent_name,"context"),"wb") as write_file:
+            pickle.dump(to_write,write_file)
+            
+            print("Saving pickle, length:",len(to_write))
+
+            
+
+
 
     def iterate(self):
         load_dotenv()
         self.tools=self.get_tools()
-        if self.first_run:
-           self.first_run =False
+        #First Run will only have three TODO make this more robust. 
+        if len(self.context) == 3:
            self.context = [{"role":"system","content":self.system_prompt},{"role":"user",
                 "content":self.user_prompt}]
            self.write_context(self.context)
-        else:
-            self.context = self.load_context()
-        self.completed = self.send_message(self.client,self.context,)
+        self.context = self.load_context()
+        #print("Sending:",self.context)
+        with open("backup_message.txt",'w+') as debug:
+            debug.write(str(self.context))
+        self.context,self.completed = self.send_message(self.client,self.context,)
         self.write_context(self.context)
+
+
+
+
         if self.completed == True:
+            print("Confirmed Self.Completed")
             return self.completed
-        print("-"*50)
+        else:
+            print("----------------------Current Context Length:", len(self.context))
+        #print("-"*50)
     

@@ -25,7 +25,7 @@ def get_player_system_prompt(name,scenario_name):
 
 def get_player_user_prompt(name,scenario_name,variant):
   player_user_prompt = f""" You are {name},a reasoning AI agent running a grounded first contact scenario in which the mysterious aliens are unlikely to be friendly. It should be set during modern times.
-  Your first step is to create the 4 ai agents (Make them unique, and likely to cause drama.)
+  Your first step is to create the 2 ai agents (Make them unique, and likely to cause drama.)
  """
   return player_user_prompt
 #                Read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using Prefix {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 

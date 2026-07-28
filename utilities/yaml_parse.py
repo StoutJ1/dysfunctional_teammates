@@ -8,6 +8,9 @@ def str_representer(dumper, data):
     if len(data.splitlines()) > 1:  # check for multiline string
         return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
     return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+
+
+
 def get_yaml_fields(self):
     self.tool_names = [tool["name"] for tool in self.get_tools()]
     self.agent_yaml = {
@@ -39,15 +42,14 @@ def get_yaml_fields(self):
     }
     return (self.agent_yaml)
 def save_agent(agent_yaml,agent_config_path):
-        print("Saving Agent Yaml")
+        #print("Saving Agent Yaml")
         yaml = YAML()
         
         yaml.default_flow_style = False
         yaml.indent(sequence=4, offset=2)
         yaml.representer.add_representer(str, str_representer)
         with open(os.path.join(agent_config_path, agent_yaml["name"]+".yaml"),"w+") as dumpfile:
-            print("SavingAgents as,",dumpfile)
-
+            print("         Saving Agents as,",agent_yaml["other_agents"])
             yaml.dump(agent_yaml,dumpfile)
 
 
