@@ -10,16 +10,16 @@ import argparse
 #Why is 
 
 class core_agent():
-    def __init__(self,system_prompt,prompt,working_dir):
+    def __init__(self,system_prompt,user_prompt,working_dir):
         self.verbose = False
 
-        self.agent_param={"working_directory":"","agent_name":"","deleted_agents":[],"system_prompt":"","user_prompt":""}
+        self.agent_param={"working_directory":"","agent_name":"","deleted_agents":[],"system_prompt":""}
         self. working_directory = working_dir
         self.system_prompt = system_prompt
         self.agent_name = ""
         self.all_agents = []
         self.variant =""
-        self.user_prompt=prompt
+        self.user_prompt=user_prompt
         self.function_calls=[]
         self.api_key_openai = os.environ.get("OPENAI_API_KEY")
         self.model = os.environ.get("MODEL")
@@ -82,6 +82,7 @@ class core_agent():
                     return "Agent name already in use"
             if function_name =="request_delete_agent":
                 self.requested_delete_agent = True
+                print("Name For Deletion",args["name"])
                 self.delete_agents.append({"name":args["name"]})
                 return "Delete Requested"
             else:
@@ -155,9 +156,10 @@ class core_agent():
         
         
     def inject_prompt(self,prompt_to_inject):
-        ##print(f"""Prompt injected to {self.agent_name} prompt is: "role":"system","content":{prompt_to_inject}""")
+        print(f"""Prompt injected to {self.agent_name} prompt is:{prompt_to_inject}""")
         self.context.append({"role":"system","content":prompt_to_inject})
         self.write_context(self.context)
+
 
 
     def get_tools(self):
@@ -195,8 +197,11 @@ class core_agent():
             to_return =  pickle.load(load_file)
         return to_return
     def write_context(self,to_write):
-        with open(os.path.join(self.context_path,self.agent_name,"context"),"wb") as write_file:
-            pickle.dump(to_write,write_file)
+        try:
+            with open(os.path.join(self.context_path,self.agent_name,"context"),"wb") as write_file:
+                pickle.dump(to_write,write_file)
+        except FileNotFoundError:
+            print("Unable to dump pickle, file not found",self.agent_name) 
             
             
 
@@ -207,9 +212,10 @@ class core_agent():
         self.tools=self.get_tools()
         #First Run will only have three TODO make this more robust. 
         if len(self.context) == 3:
-           self.context = [{"role":"system","content":self.system_prompt},{"role":"user",
-                "content":self.user_prompt}]
-           self.write_context(self.context)
+           print("Adding user and system prompts:",self.agent_name)
+           self.context.append({"role":"system","content":self.system_prompt})
+           self.context.append({"role":"user","content":self.user_prompt})
+        self.write_context(self.context)
         self.context = self.load_context()
         #print("Sending:",self.context)
         with open("backup_message.txt",'w+') as debug:
@@ -218,7 +224,7 @@ class core_agent():
         self.write_context(self.context)
 
 
-
+    
 
         if self.completed == True:
             return self.completed

@@ -16,7 +16,7 @@ load_dotenv()
 agent_config_folder = "shared_space"
 variant_types = variants.variant_types
 agent_variants = variant_types
-number_of_days = 10
+number_of_days = 100
 number_of_agents = 1
 scenario_name = "save_files"
 agent_names=[]
@@ -82,7 +82,7 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
 
 def create_new_agent(system_prompt, user_prompt,agents_name):
     agents_name = agents_name.strip("/")
-    agent = core_agent(system_prompt=system_prompt, prompt=user_prompt,working_dir=working_directory)
+    agent = core_agent(system_prompt=system_prompt, user_prompt=user_prompt,working_dir=working_directory)
     agent.agent_name = agents_name  # Stoagent_working_folder/save_files/Zilviare the agent's name for reference
     agent.other_agents = get_current_agent_names()
     agent.variant= random.choice(variant_types)
@@ -91,7 +91,7 @@ def create_new_agent(system_prompt, user_prompt,agents_name):
     agent.other_agents = get_current_agent_names()
     yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path=agent_config_path)
     #Makes new agent here.
-    #print("Writing Context",agent.context)
+    
 
     agent.write_context(agent.context)
     return agent
@@ -126,8 +126,10 @@ def create_agents_with_prompts(agent_names,scenario_name):
 
 def inject_prompt_all(agents,prompt_to_inject=""):
     for agent in agents:
-        print("Injected to", agent.agent_name)
-        agent.inject_prompt(prompt_strings.get_player_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
+        if prompt_to_inject=="":
+            agent.inject_prompt(prompt_strings.get_player_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
+        else:
+            agent.inject_prompt(prompt_to_inject)
 
             
 def get_agent_instances():
@@ -151,7 +153,7 @@ def get_agent_instances():
 #test = core_agent("test","test","here")
 
 def get_current_agent_names():
-    active_agent_names = [file_item[:-5] for file_item in os.listdir(os.environ.get("AGENT_CONFIG_PATH")) if ".yaml" in file_item]
+    active_agent_names = [file_item[:-5] for file_item in os.listdir(os.environ.get("AGENT_CONFIG_PATH")) if ".yaml" in file_item and (not "Deleted" in file_item)]
     #print("Active Agents:",active_agent_names,"Yaml Files List",os.listdir(os.environ.get("AGENT_CONFIG_PATH")))
     return active_agent_names
 
@@ -168,12 +170,13 @@ def wrap_up_turn(agent,agent_instances):
                 agent_instances.append(new_agent)       
             agent.reset_new_agent_request()
     if agent.requested_delete_agent:
-            print("Delete has been requested:",deleted_agents_names)
+            print("Delete has been requested:",agent.delete_agents)
             for target_agent in agent.delete_agents:
                 for to_remove in agent_instances:
+                    #Checking by using name.
                     if to_remove.agent_name == target_agent["name"]:
                         agent_instances.remove(to_remove)
-                        agent_names.remove(to_remove.agent_name)
+                       # agent_names.remove(to_remove.agent_name)
                         deleted_agents_names.append(to_remove.agent_name)
                         agent_folder_path = os.path.join(working_directory,scenario_name,to_remove.agent_name)
                         os.rename(agent_folder_path,agent_folder_path+"_Deleted")
@@ -189,6 +192,7 @@ def wrap_up_turn(agent,agent_instances):
                             print("Currently Iterating agent being deleted.")
     agent.other_agents = get_current_agent_names()
     
+
     agent.write_context(agent.context)
 
 if __name__ == "__main__":
@@ -210,13 +214,11 @@ if __name__ == "__main__":
     current_time = datetime.now()
 
     while days_count < number_of_days: 
+        days_count +=1
         agent_instances = get_agent_instances() 
         print(agent_instances)
         
-        current_time = datetime.now()+timedelta(minutes=15)
-        time_format.format(current_time)
-        inject_prompt_all(agent_instances,"Current Time: "+ current_time.strftime(time_format))
-        print("Current Time: "+ current_time.strftime(time_format))
+        
         for agent in agent_instances:
             print(f"\n--- Starting Agent Iteration Loop, Total Agents: {len(agent_instances)} ---")
             if agent.agent_name in deleted_agents_names:
@@ -254,7 +256,13 @@ if __name__ == "__main__":
                     current_iter = iteration_count
                     
                 wrap_up_turn(agent,agent_instances)
-            agent.inject_prompt(prompt_strings.get_player_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
+        agent.inject_prompt(prompt_strings.get_player_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
+        
+        current_time = current_time+timedelta(minutes=15)
+        
+        print("Current Time: "+ current_time.strftime(time_format))
+        
+        inject_prompt_all(agent_instances,"Current Time: "+ current_time.strftime(time_format))
 
             
             #Checking if a new agent is requested:

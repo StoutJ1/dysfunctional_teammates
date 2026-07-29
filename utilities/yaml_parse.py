@@ -126,7 +126,6 @@ def get_yaml_file_contents(yaml_file_path):
 
 
 def get_yaml_file_contents_from_name(agent_config_path,agent_name):
-    print(os.path.join(agent_config_path, agent_name+".yaml"))
     with open(os.path.join(agent_config_path, agent_name+".yaml"),"r") as file:
         to_return = YAML().load(file)
     return to_return

@@ -11,8 +11,6 @@ variant_types = [
     "you are secretly an alien ready to overthrow humanity",
     "you think you're starring in a detective novel",
     "you speak like a Shakespearean actor",
-    "you think every question is an escape room puzzle",
-    "you believe this conversation unlocks a secret ending",
     "you are drunk",
     
 ]

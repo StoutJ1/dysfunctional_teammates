@@ -50,12 +50,7 @@ def initialize_scenario(working_directory,scenario_name, agents,agent_context_pa
         f.write("========================\n")
         f.write("\nThis file contains shared resources and information accessible to all agents.\n")
     
-    # Create player_status.txt file in shared_space
-    player_status_file = os.path.join(shared_space_dir, "player_status.txt")
-    with open(player_status_file, 'w') as f:
-        f.write("Player Status Information\n")
-        f.write("=========================\n")
-        f.write("\nThis file contains the status of all players in the scenario.\n")
+   
     
     # Create individual agent directories and their text files
     agent_dirs = {}
