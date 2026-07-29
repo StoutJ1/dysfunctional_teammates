@@ -44,8 +44,11 @@ def save_agent(agent_yaml,agent_config_path):
         yaml.default_flow_style = False
         yaml.indent(sequence=4, offset=2)
         yaml.representer.add_representer(str, str_representer)
-        with open(os.path.join(agent_config_path, agent_yaml["name"]+".yaml"),"w+") as dumpfile:
-            yaml.dump(agent_yaml,dumpfile)
+        try:
+            with open(os.path.join(agent_config_path, agent_yaml["name"]+".yaml"),"w+") as dumpfile:
+                yaml.dump(agent_yaml,dumpfile)
+        except FileNotFoundError:
+            print("File Not Found, unable to save agent",agent_yaml["name"])
 
 def get_yaml_fields(self):
     self.tool_names = [tool["name"] for tool in self.get_tools()]
@@ -79,32 +82,37 @@ def get_yaml_fields(self):
     }
     return (self.agent_yaml)
 def set_var_from_yaml(self,agent_yaml):
-    self.agent_name = agent_yaml.get("name")
-    self.max_tokens = agent_yaml.get("max_tokens")
-    self.top_p = agent_yaml.get("top_p")
-    self.top_k = agent_yaml.get("top_k")
-    self.temp = agent_yaml.get("temp")
-    self.tools = agent_yaml.get("tools", [])
-    self.variant = agent_yaml.get("variant")
-    self.max_context_messages = agent_yaml.get("max_context_messages")
-    self.created_by = agent_yaml.get("created_by")
-    self.system_prompt = agent_yaml.get("system_prompt")
-    self.user_prompt = agent_yaml.get("user_prompt")
-    self.all_agents = agent_yaml.get("all_agents")
+    try:
+        
+        self.agent_name = agent_yaml.get("name")
+        self.max_tokens = agent_yaml.get("max_tokens")
+        self.top_p = agent_yaml.get("top_p")
+        self.top_k = agent_yaml.get("top_k")
+        self.temp = agent_yaml.get("temp")
+        self.tools = agent_yaml.get("tools", [])
+        self.variant = agent_yaml.get("variant")
+        self.max_context_messages = agent_yaml.get("max_context_messages")
+        self.created_by = agent_yaml.get("created_by")
+        self.system_prompt = agent_yaml.get("system_prompt")
+        self.user_prompt = agent_yaml.get("user_prompt")
+        self.all_agents = agent_yaml.get("all_agents")
 
-    self.deleted_agents = agent_yaml.get("deleted_agents", [])
+        self.deleted_agents = agent_yaml.get("deleted_agents", [])
 
-    
+        
 
-    self.requested_new_agent = agent_yaml.get("requested_new_agent")
-    self.new_agents = agent_yaml.get("new_agents")
+        self.requested_new_agent = agent_yaml.get("requested_new_agent")
+        self.new_agents = agent_yaml.get("new_agents")
 
-    self.requested_delete_agent = agent_yaml.get("requested_delete_agent")
-    self.delete_agents = agent_yaml.get("delete_agents")
-    
-    self.iterations = agent_yaml.get("iterations")
+        self.requested_delete_agent = agent_yaml.get("requested_delete_agent")
+        self.delete_agents = agent_yaml.get("delete_agents")
+        
+        self.iterations = agent_yaml.get("iterations")
 
+    except AttributeError:
+        print("Unable to set attributes.")
     return self
+
     
 #yaml_agent_list = []
 #for agent_file in os.listdir(agent_config_path):
@@ -118,16 +126,24 @@ def set_var_from_yaml(self,agent_yaml):
 
 
 def get_yaml_file_contents(yaml_file_path):
-    with open(os.path.join(yaml_file_path)) as file:
-        to_return = YAML().load(file)
+    to_return = ""
+    try:
+        with open(os.path.join(yaml_file_path)) as file:
+            to_return = YAML().load(file)
+    except FileNotFoundError:
+        print("File Not Found:",yaml_file_path)
     return to_return
 
 
 
 
 def get_yaml_file_contents_from_name(agent_config_path,agent_name):
-    with open(os.path.join(agent_config_path, agent_name+".yaml"),"r") as file:
-        to_return = YAML().load(file)
+    to_return = ""
+    try:
+        with open(os.path.join(agent_config_path, agent_name+".yaml"),"r") as file:
+            to_return = YAML().load(file)
+    except FileNotFoundError:
+        print("File not found",agent_name+".yaml")
     return to_return
 
 

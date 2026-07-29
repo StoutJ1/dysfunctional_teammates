@@ -28,7 +28,7 @@ class core_agent():
         self.config_path = os.environ.get("AGENT_CONFIG_PATH")
         self.context_path = os.environ.get("AGENT_CONTEXT_PATH")
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
-        self.max_context_messages = 150
+        self.max_context_messages = 50
         self.deleted_agents = []
         self.context =[]
         self.top_p = 0
@@ -70,7 +70,9 @@ class core_agent():
             }
             if function_name not in function_map:
                 return "Tool not found"
+            print(item)
             args = json.loads(item.arguments)
+            
             if function_name == "request_new_agent":
                 #print("---Other Agents:",self.other_agents, "Deleted Agents", self.deleted_agents)
                 if (args["name"] not in self.other_agents) and (args["name"] not in self.deleted_agents):
@@ -130,29 +132,31 @@ class core_agent():
         #response = client.responses.create(model=self.model,tools=self.tools,input=context)
         #print(response)
         #response = client.responses.create(model=self.model,tools=self.tools,input=context)
-        
-        for item in response.output:
-            if item.type=="function_call":
+        try: 
+            for item in response.output:
+                if item.type=="function_call":
 
-                function_result = self.call_function(item)
-                result ={"type":"function_call_output","call_id":item.call_id,"output":function_result}
-                 #Append both the function call, and its result.
+                    function_result = self.call_function(item)
+                    result ={"type":"function_call_output","call_id":item.call_id,"output":function_result}
+                    #Append both the function call, and its result.
 
-                context.append(item)
-                context.append(result)
-                if self.verbose:
-                    print(f"Result from tool call: {result}")
+                    context.append(item)
+                    context.append(result)
+                    if self.verbose:
+                        print(f"Result from tool call: {result}")
+                else:
+                    #If its not a tool call its a reasoning item
+                    #print(" ".join([content_from_item.text for content_from_item in item.content]))
+                    
+                    context.append(item)
+            self.prune_context()
+            if response.output_text:
+                print("Status is Completed")
+                return context,True
             else:
-                #If its not a tool call its a reasoning item
-                #print(" ".join([content_from_item.text for content_from_item in item.content]))
-                
-                context.append(item)
-        self.prune_context()
-        if response.output_text:
-            print("Status is Completed")
-            return context,True
-        else:
-            return context,False
+                return context,False
+        except AttributeError:
+            print("Failed to add items to context")
         
         
     def inject_prompt(self,prompt_to_inject):
@@ -192,9 +196,13 @@ class core_agent():
         return to_return
             
     def load_context(self):
+        to_return = ""
         #print(os.path.join(self.context_path,self.agent_name,"context"))
-        with open(os.path.join(self.context_path,self.agent_name,"context"),"rb") as load_file:
-            to_return =  pickle.load(load_file)
+        try:
+            with open(os.path.join(self.context_path,self.agent_name,"context"),"rb") as load_file:
+                to_return =  pickle.load(load_file)
+        except FileNotFoundError: 
+            print("Failed to find file")
         return to_return
     def write_context(self,to_write):
         try:
@@ -220,9 +228,11 @@ class core_agent():
         #print("Sending:",self.context)
         with open("backup_message.txt",'w+') as debug:
             debug.write(str(self.context))
-        self.context,self.completed = self.send_message(self.client,self.context,)
-        self.write_context(self.context)
-
+        try:
+            self.context,self.completed = self.send_message(self.client,self.context,)
+            self.write_context(self.context)
+        except TypeError:
+            print("Type Error unable to send")
 
     
 

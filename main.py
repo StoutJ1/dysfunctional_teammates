@@ -190,6 +190,7 @@ def wrap_up_turn(agent,agent_instances):
                             print("File does not exist")
                         if to_remove.agent_name == agent.agent_name:
                             print("Currently Iterating agent being deleted.")
+                            break
     agent.other_agents = get_current_agent_names()
     
 
@@ -240,14 +241,19 @@ if __name__ == "__main__":
                 current_iter +=1
                 
                 print(f"Processing agent: {agent.agent_name} Iteration: {current_iter} of {iteration_count}")
-
+                
                 yaml_parse.set_var_from_yaml(agent,yaml_parse.get_yaml_file_contents_from_name(agent_config_path,agent.agent_name))
                 
                 iteration_count = agent.iterations
                 agent.other_agents = get_current_agent_names()
                 
                 agent.deleted_agents = deleted_agents_names 
-                status = agent.iterate() 
+                try:
+                    status = agent.iterate() 
+                except AttributeError:
+                    print("Failed to iterate, deleted agent.")
+                    break
+                
 
                 if status:
                     print("Model Ending turn early")
