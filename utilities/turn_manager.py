@@ -1,6 +1,6 @@
 import os
-def new_turn(scenario_name: str = "scenario"):
-    shared_space_path = os.path.join("agent_working_folder",scenario_name, 'shared_space')
+def new_turn(working_directory,scenario_name: str = "scenario"):
+    shared_space_path = os.path.join(working_directory,scenario_name, 'shared_space')
     
     if not os.path.exists(shared_space_path):
         print(f"Error: shared_space directory not found at {shared_space_path}")

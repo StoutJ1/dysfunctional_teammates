@@ -20,19 +20,22 @@ def get_player_system_prompt(name,scenario_name):
                          - Request webpages from the internet for more information
                          - Prioritize reading and responding in save_files/world_state/user_conversation.txt. Only use this for user communications.
 
-                          Your first step is to use the "final_map_schema.json" in the world_state folder to create a json file which will be the map for this simulation. Add objects and agents as objects to the room.
+                          Populate the map,json in the world_state with assets and the agents you create. 
+                          Refer to the world_state/final_map_schema.json before updating the map.
+                          The agents location is vital to the simulation
                           Keep this up to date with agent movements and actions. 
                         """
+  
   return player_system_prompt
 
 
   
-#create 2 agents (Make them unique, and likely to cause drama.) Place them as items in the map.json. Keep this up to date.
+#
 def get_player_user_prompt(name,scenario_name,variant):
   player_user_prompt = f""" You are {name}  
-
-                          Create 10 complex (more than 8 nodes) maps using the schema provided by final_map_schema.json. Some of the maps should include interior and exterior.  (Like Building 1 with its own rooms with a connection to outside then another Building)
-                          Create each map one at a time. 
+                          - Create 2 agents (Make them unique, and likely to cause drama.) Place them as items in the map.json. Keep this up to date.
+                          - Populate the map with realistic assets and NPCs. (When interacting with NPC create a temporary agent)
+                          - Create a map updater agent to focus purely on keeping the map.json up to date
                           - Update your {scenario_name}/{name}/motivations.txt with personal musings and notes for later
                           - Update your{scenario_name}/{name}/strategy_plan.txt with detailed next steps
                           - Update your {scenario_name}/{name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.
@@ -69,13 +72,12 @@ def get_dm_inject_prompt(name,scenario_name):
 def get_player_inject_prompt(name, scenario_name, variant):
   inject_prompt = f""" You are {name} Update the txt files in {scenario_name}/{name}/
                               Check files in /world_state folder for updates. 
-                              Write in the /shared_space/chatroom.txt
+                              If needed write in the /shared_space/chatroom.txt
                               Remember {variant}
                               - Update your {name}/motivations.txt with personal musings and notes for later
                               - Update your {name}/strategy_plan.txt with detailed next steps
                               - Update your {name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.
                               You are the manager of any agents you create.
-                              You can use tools to create and remove/kill agents if needed
-                              You can also create private chat rooms in {scenario_name}/world_state name them based off which "room"."""
+                              You can use tools to create and remove/kill agents if needed"""
 #You should prioritize messages from user read the {scenario_name}/world_state/user_conversation.txt file
   return inject_prompt

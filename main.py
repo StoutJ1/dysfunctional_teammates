@@ -281,4 +281,4 @@ if __name__ == "__main__":
 
         
         
-        backup_scenario(os.path.join("agent_working_folder"),'backup_folder')
+        backup_scenario(os.path.join(working_directory),'backup_folder')

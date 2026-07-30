@@ -1,7 +1,7 @@
 import json
 import networkx as nx
 import matplotlib.pyplot as plt
-
+import sys
 def visualize_map(json_file_path):
     """
     Reads a room-based map from a JSON file and visualizes it using NetworkX and Matplotlib.
@@ -66,8 +66,10 @@ def visualize_map(json_file_path):
     
     plt.savefig(output_filename)
     print(f"Visualization saved to {output_filename}")
+    map = nx.draw(G)
+    plt.show()
 
 if __name__ == "__main__":
     # Test with the sample file provided by JSON_Architect
-    visualize_map('agent_working_folder/save_files/world_state/map_7.json')
+    map = visualize_map(sys.argv[1])
 

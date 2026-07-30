@@ -172,8 +172,7 @@ def backup_scenario(path, backup_dir=None):
         backup_dir (str): The destination directory for backups. 
                          Defaults to 'save_files/backups' if not provided.
     """
-    if backup_dir is None:
-        backup_dir = 'agent_working_folder/save_files/backups'
+  
     
     # Create backup directory if it doesn't exist
     os.makedirs(backup_dir, exist_ok=True)
