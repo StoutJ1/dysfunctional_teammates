@@ -268,7 +268,7 @@ if __name__ == "__main__":
         
         print("Current Time: "+ current_time.strftime(time_format))
         
-        inject_prompt_all(agent_instances,"Current Time: "+ current_time.strftime(time_format))
+        inject_prompt_all(agent_instances,"Current Time: "+ current_time.strftime(time_format)+" files have been upated. Check for changes")
 
             
             #Checking if a new agent is requested:
