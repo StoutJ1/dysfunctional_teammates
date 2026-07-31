@@ -28,14 +28,14 @@ class core_agent():
         self.config_path = os.environ.get("AGENT_CONFIG_PATH")
         self.context_path = os.environ.get("AGENT_CONTEXT_PATH")
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
-        self.max_context_messages = 50
+        self.max_context_messages = 10
         self.deleted_agents = []
         self.context =[]
         self.top_p = 0
         self.top_k = 0
         self.temp = 0
-        self.iterations = 10
-        #Setting main agent iterations higher. 
+        self.iterations = 7
+        
         self.created_by = "User"
 
         self.requested_new_agent = False
@@ -186,15 +186,19 @@ class core_agent():
 
     def get_agent_files_contents(self,scenario):
         self.scenario = scenario
+        to_return = ""
         #print("Scenario file",self.scenario)
         agent_file_path = os.path.join(self.working_directory,self.scenario,self.agent_name)
         files_in_agent_folder = os.listdir(os.path.join(self.working_directory,self.scenario,self.agent_name))
         to_return = ""
-        for file in files_in_agent_folder:
-            with open(os.path.join(agent_file_path,file)) as current:
-                to_return += (f" Contents of {file}: {current.readlines()} ")
+        try:
+            for file in files_in_agent_folder:
+                with open(os.path.join(agent_file_path,file)) as current:
+                    to_return += (f" Contents of {file}: {current.readlines()} ")
+        except UnicodeDecodeError:
+            print("Unable to read files for:", self.agent_name)
         return to_return
-            
+
     def load_context(self):
         to_return = ""
         #print(os.path.join(self.context_path,self.agent_name,"context"))

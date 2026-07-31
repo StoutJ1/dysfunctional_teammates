@@ -110,7 +110,7 @@ def visualize_map(json_file_path):
     except Exception as e:
         pos = nx.spring_layout(G, k=2.0)
 
-    nx.draw_networkx_edges(G, pos, width=2, edge_color=edge_colors, alpha=0.5, arrowsize=20)
+    nx.draw_networkx_edges(G, pos, width=2, edge_color=edge_colors, arrowsize=20)
 
     simple_G = nx.Graph(G)
     edge_labels_simple = {}
@@ -123,7 +123,7 @@ def visualize_map(json_file_path):
 
     x_nodes = [pos[n][0] for n in node_list]
     y_nodes = [pos[n][1] for n in node_list]
-    plt.scatter(x_nodes, y_nodes, s=12000, c=colors, alpha=0.9, edgecolors='none', zorder=1)
+    plt.scatter(x_nodes, y_nodes, s=15000, c=colors, alpha=0.9, edgecolors='none', zorder=1)
     nx.draw_networkx_labels(G, pos, labels=node_labels, font_size=9, font_weight='bold')
 
     env_name = metadata.get('environment_name', 'Unknown Environment')
@@ -148,5 +148,5 @@ if __name__ == "__main__":
         arg_agents = sys.argv[2] if len(sys.argv) > 2 else None
         visualize_map(arg_map)
     else:
-        print("Usage: python visualizer.py <path_to_json_map> [agent_names_comma_separated]")
+        print("Usage: python visualizer.py <path_to_json_map>")
 
