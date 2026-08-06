@@ -31,6 +31,8 @@ class core_agent():
         self.max_context_messages = 10
         self.deleted_agents = []
         self.context =[]
+        self.context.append({"role":"system","content":self.system_prompt})
+        self.context.append({"role":"user","content":self.user_prompt})
         self.top_p = 0
         self.top_k = 0
         self.temp = 0
@@ -160,10 +162,13 @@ class core_agent():
         
         
     def inject_prompt(self,prompt_to_inject):
-        print(f"""Prompt injected to {self.agent_name} prompt is:{prompt_to_inject}""")
-        self.context.append({"role":"system","content":prompt_to_inject})
-        self.write_context(self.context)
-
+        try:
+            print(f"""Prompt injected to {self.agent_name} prompt is:{prompt_to_inject}""")
+            print(f"Current context: {self.context}")
+            self.context.append({"role":"system","content":prompt_to_inject})
+            self.write_context(self.context)
+        except AttributeError:
+            print("Attribute Error")
 
 
     def get_tools(self):
@@ -222,11 +227,7 @@ class core_agent():
     def iterate(self):
         load_dotenv()
         self.tools=self.get_tools()
-        #First Run will only have three TODO make this more robust. 
-        if len(self.context) == 3:
-           print("Adding user and system prompts:",self.agent_name)
-           self.context.append({"role":"system","content":self.system_prompt})
-           self.context.append({"role":"user","content":self.user_prompt})
+        
         self.write_context(self.context)
         self.context = self.load_context()
         #print("Sending:",self.context)

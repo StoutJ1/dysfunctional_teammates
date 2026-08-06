@@ -79,11 +79,11 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
     # 4. Log issues
 
   
-
+#TODO I'm not sure created agents are saving their prompts, maybe they are being truncated?
 def create_new_agent(system_prompt, user_prompt,agents_name):
     agents_name = agents_name.strip("/")
     agent = core_agent(system_prompt=system_prompt, user_prompt=user_prompt,working_dir=working_directory)
-    agent.agent_name = agents_name  # Stoagent_working_folder/save_files/Zilviare the agent's name for reference
+    agent.agent_name = agents_name  
     agent.other_agents = get_current_agent_names()
     agent.variant= random.choice(variant_types)
 
@@ -94,6 +94,7 @@ def create_new_agent(system_prompt, user_prompt,agents_name):
     
 
     agent.write_context(agent.context)
+    print("New Agent Context",agent.context)
     return agent
 
 def terminate_agent(target_agent_name):
