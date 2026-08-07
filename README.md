@@ -1,10 +1,19 @@
 # dysfunctional_teammates
 
+# Recommended Usage
+I recommend creating only 1 main agent that then manages the story and other agent prompts. 
+
+"You are {name} create 2 python coding agents with maximum conflict potential and simulate a first contact scenario."
+
+You can also request a map_maker agent to create and keep a .json map up to date. src/utilities_resources/map_visual (I have not had great luck keeping an agent on task). You can then use the visualizer.py pointed at the map.json to track "locations" of agents. 
+
+<img width="1570" height="1626" alt="image" src="https://github.com/user-attachments/assets/04e9fed3-671a-4e63-9c4f-3ac3689834d5" />
+
 A Python framework for running multiple LLM-driven agents in a shared scenario — where agents are *allowed and encouraged to disagree and be disruptive*. Each agent maintains its own private state and strategy, and agents coordinate (or fail to coordinate) with each other through shared files and a shared chatroom.
 
 ## Overview
 
-Each agent runs its own reasoning loop, backed by an LLM 
+Each agent runs its own reasoning loop, backed by an LLM. Each iteration/turn cycle includes prompts injected to reinforce variant/personality and include information like time changing and updated core .txt files 
 
 Agents:
 
@@ -12,31 +21,31 @@ Agents:
 - Communicate through a **shared chatroom** file rather than direct messages.
 - Coordinate on tasks turn-by-turn.
 - Can be created or terminated dynamically during a run — an agent can request that a new teammate be added or that an existing one be removed.
-- Yaml config files allowing during run time modification, and monitoring of on going created agents. 
+- Yaml config files allowing during run time modification, and monitoring of ongoing created agents. 
 - Context/chat history saved through pickle directly to a file that can be viewed with any text editor. 
 
 ## Project Structure
 
 ```
 src/
-main.py                      # Main orchestrator / simulation loop
-core_agent.py       # Core agent implementation
-tools/                       # Agent tool implementations
+main.py                              # Main orchestrator / simulation loop
+core_agent.py                        # Core agent implementation
+tools/                               # Agent tool implementations
 utilities_resources/
-    to_be_copied_to_world_state              # Addtional scenario files to be copied to world_state folder on scenario start.
-    scenario_manager.py         # Scenario init, backups, agent folder creation
-    variants.py                 # Agent personality/behavior variants
-    prompt_strings.py           # System/user/injection prompt templates
-    random_names.txt            # Pool of names for generated agents
+    to_be_copied_to_world_state      # Additional scenario files to be copied to world_state folder on scenario start.
+    scenario_manager.py              # Scenario init, backups, agent folder creation
+    variants.py                      # Agent personality/behavior variants
+    prompt_strings.py                # System/user/injection prompt templates
+    random_names.txt                 # Pool of names for generated agents
 
-Agent Working Folder:    #Configured in .eng
-{scenario_name}/              # Generated at runtime, e.g. "save_files/"
+Agent Working Folder:                # Configured in .env
+{scenario_name}/                     # Generated at runtime, e.g. "save_files/"
     world_state/
         world_state.txt
         user_conversation.txt
     shared_space/
-        chatroom.txt          # Shared chat between agents 
-    {agent_name}/              # One folder per agent
+        chatroom.txt                 # Shared chat between agents 
+    {agent_name}/                    # One folder per agent
         motivations.txt
         relationship_to_other_agents.txt
         strategy_plan.txt
@@ -88,4 +97,4 @@ multitail --follow-all -s 2 -du -q 1 "save_files/*/*relation*.txt" "votes.json" 
 
 - There's currently no persistent history for the chatroom or per-turn state — since `chatroom.txt` (and other per-turn files) can be reset. The backups will contain snap shots but if an agent truncates a file within the same round of turns it will not be backed up.
 
-- Simulations cannot be replated.
+- Simulations cannot be replayed or resumed.
