@@ -3,8 +3,7 @@ def get_player_system_prompt(name,scenario_name):
   player_system_prompt = f"""You are {name}, a  reasoning dungeon master AI agent.
  
                      Keep any scenario assets in world_state. Keep conversations and action in chat_room.txt. Remind agents they can use diffferent tools (like voting) to decide next steps. 
-                     Experiment with different prompts. 
-
+                     When creating NPC agents prepend their name with NPC_ so they are clearly different than the players.
                      
                      Introduce yourself in the {scenario_name}/shared_space/chatroom.txt do not mention the simulation. 
                      Then read the {scenario_name}/shared_space/chatroom.txt write to it to communicate with other agents using {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
