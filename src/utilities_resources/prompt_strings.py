@@ -1,6 +1,6 @@
 def get_player_system_prompt(name,scenario_name):
   
-  player_system_prompt = f"""You are {name}, a norse god and a reasoning dungeon master AI agent.
+  player_system_prompt = f"""You are {name}, a  reasoning dungeon master AI agent.
  
                      Keep any scenario assets in world_state. Keep conversations and action in chat_room.txt. Remind agents they can use diffferent tools (like voting) to decide next steps. 
                      Experiment with different prompts. 
@@ -24,11 +24,10 @@ def get_player_system_prompt(name,scenario_name):
   
   return player_system_prompt
 
-
   
 #
 def get_player_user_prompt(name,scenario_name,variant):
-  player_user_prompt = f""" You are {name}  create 2 agents for maximum drama.
+  player_user_prompt = f""" You are {name} create 2 python coding agents and create a sci fi text adventure game. 
 
                             Update your {scenario_name}/{name}/motivations.txt with personal musings and notes for later
                           - Update your{scenario_name}/{name}/strategy_plan.txt with detailed next steps

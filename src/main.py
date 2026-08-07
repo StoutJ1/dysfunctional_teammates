@@ -264,7 +264,7 @@ if __name__ == "__main__":
                 wrap_up_turn(agent,agent_instances)
         agent.inject_prompt(prompt_strings.get_player_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
         
-        current_time = current_time+timedelta(minutes=15)
+        current_time = current_time+timedelta(minutes=45)
         
         print("Current Time: "+ current_time.strftime(time_format))
         
