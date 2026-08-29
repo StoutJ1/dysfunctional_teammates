@@ -72,6 +72,7 @@ class core_agent():
             if function_name not in function_map:
                 return "Tool not found"
             print(item)
+            
             args = json.loads(item.arguments)
             
             if function_name == "request_new_agent":
@@ -128,8 +129,10 @@ class core_agent():
         self.function_call_results = []
 
         load_dotenv()
-        response = client.responses.create(model=self.model,tools=self.tools,input=context,max_output_tokens=int(self.max_tokens))
-        
+        try:
+            response = client.responses.create(model=self.model,tools=self.tools,input=context,max_output_tokens=int(self.max_tokens))
+        except:
+            print("Failed to send or process output")
         #response = client.responses.create(model=self.model,tools=self.tools,input=context)
         #print(response)
         #response = client.responses.create(model=self.model,tools=self.tools,input=context)
@@ -230,12 +233,10 @@ class core_agent():
         self.write_context(self.context)
         self.context = self.load_context()
         #print("Sending:",self.context)
-        try:
-            self.context,self.completed = self.send_message(self.client,self.context,)
-            self.write_context(self.context)
-        except TypeError:
-            print("Type Error unable to send")
-
+        
+        self.context,self.completed = self.send_message(self.client,self.context,)
+        self.write_context(self.context)
+        
     
 
         if self.completed == True:

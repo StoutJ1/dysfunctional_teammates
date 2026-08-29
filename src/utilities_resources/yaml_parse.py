@@ -21,9 +21,7 @@ def get_yaml_fields_from_agent(self):
      'system_prompt': self.system_prompt,
     'user_prompt': self.user_prompt,
     'tools': self.tool_names,
-    'top_p':self.top_p,
-    'top_k':self.top_k,
-    'temp':self.temp,
+   
     'max_tokens':self.max_tokens,
 
     'deleted_agents':self.deleted_agents,
@@ -64,9 +62,6 @@ def get_yaml_fields(self):
      'system_prompt': self.system_prompt,
     'user_prompt': self.user_prompt,
     'tools': self.tool_names,
-    'top_p':self.top_p,
-    'top_k':self.top_k,
-    'temp':self.temp,
     'max_tokens':self.max_tokens,
 
     'deleted_agents':self.deleted_agents,
@@ -86,15 +81,16 @@ def set_var_from_yaml(self,agent_yaml):
         
         self.agent_name = agent_yaml.get("name")
         self.max_tokens = agent_yaml.get("max_tokens")
-        self.top_p = agent_yaml.get("top_p")
-        self.top_k = agent_yaml.get("top_k")
-        self.temp = agent_yaml.get("temp")
+      
         self.tools = agent_yaml.get("tools", [])
         self.variant = agent_yaml.get("variant")
         self.max_context_messages = agent_yaml.get("max_context_messages")
         self.created_by = agent_yaml.get("created_by")
+
         self.system_prompt = agent_yaml.get("system_prompt")
         self.user_prompt = agent_yaml.get("user_prompt")
+        print("**************",self.context[0]['content'])
+        self.context[0]['content'] = self.system_prompt
         self.all_agents = agent_yaml.get("all_agents")
 
         self.deleted_agents = agent_yaml.get("deleted_agents", [])
