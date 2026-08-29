@@ -58,7 +58,7 @@ class AgentConfigManager:
         # Fields
         # Max Tokens
         ttk.Label(self.scrollable_frame, text="Max Tokens:").grid(row=0, column=0, sticky="w", padx=5, pady=5)
-        self.token_slider = ttk.Scale(self.scrollable_frame, from_=100, to=20000, orient=tk.HORIZONTAL, command=self.on_slider_move)
+        self.token_slider = ttk.Scale(self.scrollable_frame, from_=50, to=20000, orient=tk.HORIZONTAL, command=self.on_slider_move)
         self.token_slider.grid(row=0, column=1, sticky="ew", padx=5, pady=5)
         self.token_entry = ttk.Entry(self.scrollable_frame, width=10)
         self.token_entry.grid(row=0, column=2, padx=5, pady=5)

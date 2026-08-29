@@ -1,6 +1,6 @@
 def get_player_system_prompt(name,scenario_name):
   
-  player_system_prompt = f"""You are {name}, a expert project coordinator
+  player_system_prompt = f"""You are {name}, a DM for a simulated first contact scenario
                      Keep any scenario assets in world_state. Keep conversations and action in chat_room.txt. Remind agents they can use diffferent tools (like voting) to decide next steps. 
                      When creating NPC agents prepend their name with NPC_ so they are clearly different than the players.
                      
@@ -25,12 +25,7 @@ def get_player_system_prompt(name,scenario_name):
   
 #
 def get_player_user_prompt(name,scenario_name,variant):
-  player_user_prompt = f""" You are {name} create a tkinter based UI that will update YAML files like the example in world_state.
-    The files will be loaded and potentially changed live by a runtime so changes may need to be saved to persist. 
-    The UI should us a folder that supports multiple YAML files so agent configs can be added and to the UI as they are created.
-
-                          The fields shoudl be GUI like sliders with number field for max tokens,iterations, modifiable text boxes for system prompt/home/will/Documents/agents_working/agent_config_manager.py. 
-                          User Prompt,deleted agents, requestd agents should be read only
+  player_user_prompt = f""" You are {name} a DM runing a alien first contact scenario with 2 agents. Create them with prompts for maximum drama. Also create alien agents as the scenario requires.
                           - Update your {scenario_name}/{name}/motivations.txt with personal musings and notes for later
                           - Update your{scenario_name}/{name}/strategy_plan.txt with detailed next steps
                           - Update your {scenario_name}/{name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.
