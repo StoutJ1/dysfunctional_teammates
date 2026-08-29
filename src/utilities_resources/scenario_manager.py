@@ -3,7 +3,8 @@ Scenario Setup Module
 
 This module provides functions to initialize a scenario by creating
 the necessary directory structure for the agent simulation and
-populating it with default text files.
+populating it with default text files.                                                            
+#TODO update the python running tool to use a locally created .v                                                            env
 """
 import tools.voting_tool
 import os

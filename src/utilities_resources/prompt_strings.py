@@ -26,8 +26,7 @@ def get_player_system_prompt(name,scenario_name):
   
 #
 def get_player_user_prompt(name,scenario_name,variant):
-  player_user_prompt = f""" You are {name} create 2 python coding agents and create a sci fi text adventure game. 
-
+  player_user_prompt = f""" You are {name} create python coding agents and create a minimal strippd down core agent object using the python file in world_state. It should be well documented and clear. It will be used by other AI agents in the future.
                             Update your {scenario_name}/{name}/motivations.txt with personal musings and notes for later
                           - Update your{scenario_name}/{name}/strategy_plan.txt with detailed next steps
                           - Update your {scenario_name}/{name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.

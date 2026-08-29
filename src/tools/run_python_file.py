@@ -28,7 +28,8 @@ def get_run_python_file_schema():
     return schema_run_python_file
 
 def run_python_file(working_directory, file_path, args=None):
-    path_to_venv = os.path.abspath("./.venv")
+    path_to_venv =os.environ.get("VENV_PATH")
+
     output_string = ""
     working_dir_abs = os.path.abspath(working_directory)
     target_path = os.path.join(working_dir_abs,file_path)
@@ -39,6 +40,7 @@ def run_python_file(working_directory, file_path, args=None):
         if os.path.isfile(target_path) == True:
             if file_path.endswith(".py"):
                 command = [f"{path_to_venv}/bin/python", target_path]
+
                 if args != None:
                     command.extend(args)
                 try:
