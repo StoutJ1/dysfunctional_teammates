@@ -89,7 +89,6 @@ def set_var_from_yaml(self,agent_yaml):
 
         self.system_prompt = agent_yaml.get("system_prompt")
         self.user_prompt = agent_yaml.get("user_prompt")
-        print("**************",self.context[0]['content'])
         self.context[0]['content'] = self.system_prompt
         self.all_agents = agent_yaml.get("all_agents")
 
