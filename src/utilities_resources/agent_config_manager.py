@@ -76,25 +76,34 @@ class AgentConfigManager:
         ttk.Label(self.scrollable_frame, text="System Prompt:").grid(row=2, column=0, sticky="nw", padx=5, pady=5)
         self.system_text = tk.Text(self.scrollable_frame, height=15, width=50)
         self.system_text.grid(row=2, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
+
+        #Pending Injection
+        ttk.Label(self.scrollable_frame, text="Pending Inject Prompt:").grid(row=3, column=0, sticky="nw", padx=5, pady=5)
+        self.pending_inject = tk.Text(self.scrollable_frame, height=1, width=50)
+        self.pending_inject.grid(row=3, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
+
+        #Variant
+        ttk.Label(self.scrollable_frame, text="Variant:").grid(row=4, column=0, sticky="nw", padx=5, pady=5)
+        self.variant = tk.Text(self.scrollable_frame, height=1, width=50)
+        self.variant.grid(row=4, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
         
-        ttk.Label(self.scrollable_frame, text="Pending Inject Prompt:").grid(row=4, column=0, sticky="nw", padx=5, pady=5)
-        self.pending_inject = tk.Text(self.scrollable_frame, height=15, width=50)
-        self.pending_inject.grid(row=4, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
         
         # User Prompt (Read Only)
-        ttk.Label(self.scrollable_frame, text="User Prompt:").grid(row=3, column=0, sticky="w", padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="User Prompt:").grid(row=5, column=0, sticky="w", padx=5, pady=5)
         self.user_prompt_entry = ttk.Entry(self.scrollable_frame, state="readonly")
-        self.user_prompt_entry.grid(row=3, column=1, columnspan=2, sticky="ew", padx=5, pady=5)
+        self.user_prompt_entry.grid(row=5, column=1, columnspan=2, sticky="ew", padx=5, pady=5)
+
+
 
         # Deleted Agents (Read Only)
-        ttk.Label(self.scrollable_frame, text="Deleted Agents:").grid(row=5, column=0, sticky="w", padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Deleted Agents:").grid(row=6, column=0, sticky="w", padx=5, pady=5)
         self.deleted_agents_entry = ttk.Entry(self.scrollable_frame, state="readonly")
-        self.deleted_agents_entry.grid(row=5, column=1, columnspan=2, sticky="ew", padx=5, pady=5)
+        self.deleted_agents_entry.grid(row=6, column=1, columnspan=2, sticky="ew", padx=5, pady=5)
 
         
         # Save Button
         self.save_button = ttk.Button(self.scrollable_frame, text="SAVE CHANGES", command=self.save_changes)
-        self.save_button.grid(row=6, column=0, columnspan=3, pady=20)
+        self.save_button.grid(row=7, column=0, columnspan=3, pady=20)
 
         # Configure columns
         self.scrollable_frame.columnconfigure(1, weight=1)
@@ -139,6 +148,10 @@ class AgentConfigManager:
         self.system_text.delete("1.0", tk.END)
         self.system_text.insert("1.0", self.current_data.get('system_prompt', ''))
 
+        #Variant
+        self.variant.delete("1.0",tk.END)
+        self.variant.insert("1.0",self.current_data.get('variant',''))
+
         self.pending_inject.delete("1.0",tk.END)
         self.pending_inject.insert("1.0", self.current_data.get('pending_inject_prompt', ''))
                 
@@ -158,10 +171,6 @@ class AgentConfigManager:
         if 'token' in str(self.token_slider.cget('command')): # This is a bit hacky, but for simplicity
              pass # Handled by specific methods
         
-        # Since we don't know which slider triggered from the callback easily without checking, 
-        # we'll use a more robust way or just update entries separately.
-        # For this simple UI, we'll just let the slider update the entry if we can identify it.
-        # Actually, in Tkinter Scale, 'val' is passed to the callback.
         pass 
 
     # Overriding to handle slider updates more cleanly
@@ -203,6 +212,7 @@ class AgentConfigManager:
             new_data['iterations'] = int(self.iter_entry.get())
             new_data['system_prompt'] = self.system_text.get("1.0", tk.END).strip()
             new_data['pending_inject_prompt'] = self.pending_inject.get("1.0",tk.END).strip()
+            new_data['variant'] = self.variant.get("1.0",tk.END).strip()
             with open(self.current_file, 'w') as f:
                 yaml.dump(new_data, f, default_flow_style=False)
             
