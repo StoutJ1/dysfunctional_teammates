@@ -56,7 +56,7 @@ def get_yaml_fields(self):
        'iterations':self.iterations,
     'created_by': self.created_by,
        'other_agents': self.other_agents,
-    
+    'pending_inject_prompt':self.pending_inject_prompt,
     'variant': self.variant,
     'max_context_messages': self.max_context_messages,
      'system_prompt': self.system_prompt,
@@ -86,6 +86,7 @@ def set_var_from_yaml(self,agent_yaml):
         self.variant = agent_yaml.get("variant")
         self.max_context_messages = agent_yaml.get("max_context_messages")
         self.created_by = agent_yaml.get("created_by")
+        self.pending_inject_prompt = agent_yaml.get("pending_inject_prompt")
 
         self.system_prompt = agent_yaml.get("system_prompt")
         self.user_prompt = agent_yaml.get("user_prompt")
