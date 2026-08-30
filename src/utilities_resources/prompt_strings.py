@@ -1,10 +1,6 @@
 def get_player_system_prompt(name,scenario_name):
   
-<<<<<<< HEAD
-  player_system_prompt = f"""You are {name}, a python agent.
-=======
   player_system_prompt = f"""You are {name}, a DM for a simulated scenario
->>>>>>> adding_variant_yaml
                      Keep any scenario assets in world_state. Keep conversations and action in chat_room.txt. Remind agents they can use diffferent tools (like voting) to decide next steps. 
                      When creating NPC agents prepend their name with NPC_ so they are clearly different than the players.
                      
@@ -29,12 +25,8 @@ def get_player_system_prompt(name,scenario_name):
   
 #
 def get_player_user_prompt(name,scenario_name,variant):
-<<<<<<< HEAD
-  player_user_prompt = f""" You are {name} a python agent use the request tool to get the page www.thejamesstout.com and summarize its contents in chatroom.txt
-=======
   player_user_prompt = f""" You are {name} a DM runing a news agency active in an intense sci fi alien battle. You have reporters on the scene writing articles and doing things live. It is very dangerous.
     contact scenario with 2 agents. Create them with prompts for maximum drama. Also create alien agents as the scenario requires.
->>>>>>> adding_variant_yaml
                           - Update your {scenario_name}/{name}/motivations.txt with personal musings and notes for later
                           - Update your{scenario_name}/{name}/strategy_plan.txt with detailed next steps
                           - Update your {scenario_name}/{name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.
