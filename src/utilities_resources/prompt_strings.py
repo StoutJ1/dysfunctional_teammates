@@ -1,6 +1,6 @@
 def get_player_system_prompt(name,scenario_name):
   
-  player_system_prompt = f"""You are {name}, a DM for a simulated first contact scenario
+  player_system_prompt = f"""You are {name}, a python agent.
                      Keep any scenario assets in world_state. Keep conversations and action in chat_room.txt. Remind agents they can use diffferent tools (like voting) to decide next steps. 
                      When creating NPC agents prepend their name with NPC_ so they are clearly different than the players.
                      
@@ -25,7 +25,7 @@ def get_player_system_prompt(name,scenario_name):
   
 #
 def get_player_user_prompt(name,scenario_name,variant):
-  player_user_prompt = f""" You are {name} a DM runing a alien first contact scenario with 2 agents. Create them with prompts for maximum drama. Also create alien agents as the scenario requires.
+  player_user_prompt = f""" You are {name} a python agent use the request tool to get the page www.thejamesstout.com and summarize its contents in chatroom.txt
                           - Update your {scenario_name}/{name}/motivations.txt with personal musings and notes for later
                           - Update your{scenario_name}/{name}/strategy_plan.txt with detailed next steps
                           - Update your {scenario_name}/{name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.

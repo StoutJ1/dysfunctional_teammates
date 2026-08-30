@@ -22,12 +22,13 @@ class AgentConfigManager:
         self.left_frame = ttk.Frame(self.paned_window)
         self.paned_window.add(self.left_frame, weight=1)
 
-        self.file_listbox = tk.Listbox(self.left_frame)
-        self.file_listbox.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        self.file_listbox.bind('<<ListboxSelect>>', self.on_file_select)
 
+        self.file_listbox = tk.Listbox(self.left_frame)
+        self.file_listbox.pack(fill=tk.BOTH, expand=True ,padx=5, pady=5)
+        self.file_listbox.bind('<<ListboxSelect>>', self.on_file_select)
+        
         self.refresh_button = ttk.Button(self.left_frame, text="Refresh Files", command=self.refresh_file_list)
-        self.refresh_button.pack(fill=tk.X, padx=5, pady=5)
+        self.refresh_button.pack(fill=tk.X, padx=2, pady=2)
 
         # Right Frame: Editor
         self.right_frame = ttk.Frame(self.paned_window)
@@ -56,41 +57,45 @@ class AgentConfigManager:
         self.scrollbar.pack(side="right", fill="y")
 
         # Fields
+
+        # User Prompt (Read Only)
+        ttk.Label(self.scrollable_frame, text="User Prompt (Read Only):").grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        self.user_prompt_entry = tk.Text(self.scrollable_frame, state="disabled",height=10,background='light gray')
+        self.user_prompt_entry.grid(row=0, column=1, columnspan=2, sticky="ew", padx=5, pady=5)
+
         # Max Tokens
-        ttk.Label(self.scrollable_frame, text="Max Tokens:").grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Max Tokens:").grid(row=1, column=0, sticky="w", padx=5, pady=5)
         self.token_slider = ttk.Scale(self.scrollable_frame, from_=50, to=20000, orient=tk.HORIZONTAL, command=self.on_slider_move)
-        self.token_slider.grid(row=0, column=1, sticky="ew", padx=5, pady=5)
+        self.token_slider.grid(row=1, column=1, sticky="ew", padx=5, pady=5)
         self.token_entry = ttk.Entry(self.scrollable_frame, width=10)
-        self.token_entry.grid(row=0, column=2, padx=5, pady=5)
+        self.token_entry.grid(row=1, column=2, padx=5, pady=5)
         self.token_entry.bind("<Return>", lambda e: self.on_entry_move())
 
         # Iterations
-        ttk.Label(self.scrollable_frame, text="Iterations:").grid(row=1, column=0, sticky="w", padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Iterations:").grid(row=2, column=0, sticky="w", padx=5, pady=5)
         self.iter_slider = ttk.Scale(self.scrollable_frame, from_=1, to=100, orient=tk.HORIZONTAL, command=self.on_slider_move)
-        self.iter_slider.grid(row=1, column=1, sticky="ew", padx=5, pady=5)
+        self.iter_slider.grid(row=2, column=1, sticky="ew", padx=5, pady=5)
         self.iter_entry = ttk.Entry(self.scrollable_frame, width=10)
-        self.iter_entry.grid(row=1, column=2, padx=5, pady=5)
+        self.iter_entry.grid(row=2, column=2, padx=5, pady=5)
         self.iter_entry.bind("<Return>", lambda e: self.on_entry_move())
 
         # System Prompt
-        ttk.Label(self.scrollable_frame, text="System Prompt:").grid(row=2, column=0, sticky="nw", padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="System Prompt:").grid(row=3, column=0, sticky="nw", padx=5, pady=5)
         self.system_text = tk.Text(self.scrollable_frame, height=15, width=50)
-        self.system_text.grid(row=2, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
-        
+        self.system_text.grid(row=3, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
+
+        # Pending Inject
         ttk.Label(self.scrollable_frame, text="Pending Inject Prompt:").grid(row=4, column=0, sticky="nw", padx=5, pady=5)
-        self.pending_inject = tk.Text(self.scrollable_frame, height=15, width=50)
+        self.pending_inject = tk.Text(self.scrollable_frame, height=1, width=50)
         self.pending_inject.grid(row=4, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
+
         
-        # User Prompt (Read Only)
-        ttk.Label(self.scrollable_frame, text="User Prompt:").grid(row=3, column=0, sticky="w", padx=5, pady=5)
-        self.user_prompt_entry = ttk.Entry(self.scrollable_frame, state="readonly")
-        self.user_prompt_entry.grid(row=3, column=1, columnspan=2, sticky="ew", padx=5, pady=5)
-
-        # Deleted Agents (Read Only)
-        ttk.Label(self.scrollable_frame, text="Deleted Agents:").grid(row=5, column=0, sticky="w", padx=5, pady=5)
-        self.deleted_agents_entry = ttk.Entry(self.scrollable_frame, state="readonly")
-        self.deleted_agents_entry.grid(row=5, column=1, columnspan=2, sticky="ew", padx=5, pady=5)
-
+        # Pending Inject
+        ttk.Label(self.scrollable_frame, text="Variant:").grid(row=5, column=0, sticky="nw", padx=5, pady=5)
+        self.variant = tk.Text(self.scrollable_frame, height=1, width=50)
+        self.variant.grid(row=5, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
+        
+   
         
         # Save Button
         self.save_button = ttk.Button(self.scrollable_frame, text="SAVE CHANGES", command=self.save_changes)
@@ -142,15 +147,17 @@ class AgentConfigManager:
         self.pending_inject.delete("1.0",tk.END)
         self.pending_inject.insert("1.0", self.current_data.get('pending_inject_prompt', ''))
                 
+        self.variant.delete("1.0",tk.END)
+        self.variant.insert("1.0", self.current_data.get('variant', ''))
+                
         # Read only fields
         self._update_readonly_field(self.user_prompt_entry, self.current_data.get('user_prompt', ''))
-        self._update_readonly_field(self.deleted_agents_entry, str(self.current_data.get('deleted_agents', [])))
         
     def _update_readonly_field(self, widget, value):
         widget.config(state="normal")
-        widget.delete(0, tk.END)
-        widget.insert(0, value)
-        widget.config(state="readonly")
+        widget.delete("1.0", tk.END)
+        widget.insert("1.0", value)
+        widget.config(state="disabled")
 
     def on_slider_move(self, val):
         # Update the entry field when slider moves
@@ -203,6 +210,7 @@ class AgentConfigManager:
             new_data['iterations'] = int(self.iter_entry.get())
             new_data['system_prompt'] = self.system_text.get("1.0", tk.END).strip()
             new_data['pending_inject_prompt'] = self.pending_inject.get("1.0",tk.END).strip()
+            new_data['variant'] = self.variant.get("1.0",tk.END).strip()
             with open(self.current_file, 'w') as f:
                 yaml.dump(new_data, f, default_flow_style=False)
             
@@ -213,6 +221,7 @@ class AgentConfigManager:
 if __name__ == "__main__":
     # Re-mapping the slider commands correctly
     root = tk.Tk()
+    root.resizable
     test_venv = load_dotenv("/home/will/dysfunctional_teammates/.env")
 
     print(str(os.environ.get("AGENT_CONFIG_PATH"))+"/")
