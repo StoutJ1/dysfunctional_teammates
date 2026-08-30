@@ -108,11 +108,7 @@ class core_agent():
 
         if len(self.context) <= self.max_context_messages:
             return
-
-        # The first message is the system prompt. 
-        # We want to keep the system prompt and the most recent N-1 messages.
-        # However, the total count should be at most max_context_messages.
-        
+        #Keep system prompt
         system_prompt = self.context[0]
         # Remaining messages allowed after the system prompt
         allowed_additional_messages = self.max_context_messages - 1
