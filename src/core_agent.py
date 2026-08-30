@@ -13,6 +13,7 @@ class core_agent():
 
         self.agent_param={"working_directory":"","agent_name":"","deleted_agents":[],"system_prompt":""}
         self. working_directory = working_dir
+        self.pending_inject_prompt = ""
         self.system_prompt = system_prompt
         self.agent_name = ""
         self.all_agents = []
@@ -128,10 +129,7 @@ class core_agent():
         self.function_call_results = []
 
         load_dotenv()
-        try:
-            response = client.responses.create(model=self.model,tools=self.tools,input=context,max_output_tokens=int(self.max_tokens))
-        except:
-            print("Failed to send or process output")
+        response = client.responses.create(model=self.model,tools=self.tools,input=context,max_output_tokens=int(self.max_tokens))
         #response = client.responses.create(model=self.model,tools=self.tools,input=context)
         #print(response)
         #response = client.responses.create(model=self.model,tools=self.tools,input=context)
@@ -226,18 +224,21 @@ class core_agent():
 
 
     def iterate(self):
-        load_dotenv()
-        self.tools=self.get_tools()
+        try:
+            load_dotenv()
+            self.tools=self.get_tools()
+            
+            self.write_context(self.context)
+            self.context = self.load_context()
+            #print("Sending:",self.context)
+            
+            self.context,self.completed = self.send_message(self.client,self.context,)
+            self.write_context(self.context)
+            
         
-        self.write_context(self.context)
-        self.context = self.load_context()
-        #print("Sending:",self.context)
-        
-        self.context,self.completed = self.send_message(self.client,self.context,)
-        self.write_context(self.context)
-        
-    
 
-        if self.completed == True:
-            return self.completed
-        
+            if self.completed == True:
+                return self.completed
+        except Exception as e:
+            print("-- Exception while iterating --", e)
+            

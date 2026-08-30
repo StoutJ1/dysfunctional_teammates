@@ -159,6 +159,12 @@ def get_current_agent_names():
     return active_agent_names
 
 def wrap_up_turn(agent,agent_instances):
+    if agent.pending_inject_prompt != "":
+        agent.inject_prompt(agent.pending_inject_prompt)
+        agent.pending_inject_prompt = ""
+        #I'm not doing a lot of writing back to the yaml so hopefully this won't break things.
+        yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path=agent_config_path)
+
     if agent.requested_new_agent:
             #Call new agent folders
             for requested_agent in agent.new_agents:
@@ -192,8 +198,6 @@ def wrap_up_turn(agent,agent_instances):
                             print("Currently Iterating agent being deleted.")
                             break
     agent.other_agents = get_current_agent_names()
-    
-
     agent.write_context(agent.context)
 
 if __name__ == "__main__":
