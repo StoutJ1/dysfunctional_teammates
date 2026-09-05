@@ -10,7 +10,8 @@ from tools import agent_request, get_files_info,get_file_content, request_tool,w
 class core_agent():
     def __init__(self,system_prompt,user_prompt,working_dir):
         self.verbose = False
-        
+        #different for qwen Qwen: user, only 1 system, Gemma supports multiple system messages.
+        self.role_for_system = "user"
         self.agent_param={"working_directory":"","agent_name":"","deleted_agents":[],"system_prompt":""}
         self. working_directory = working_dir
         self.pending_inject_prompt = ""
@@ -160,7 +161,7 @@ class core_agent():
         try:
             print(f"""Prompt injected to {self.agent_name} prompt is:{prompt_to_inject}""")
             print(f"Current context: {self.context}")
-            self.context.append({"role":"system","content":prompt_to_inject})
+            self.context.append({"role":self.role_for_system,"content":prompt_to_inject})
             self.write_context(self.context)
         except AttributeError:
             print("Attribute Error")

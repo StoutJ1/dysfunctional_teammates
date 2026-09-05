@@ -1,6 +1,6 @@
 def get_player_system_prompt(name,scenario_name):
   
-  player_system_prompt = f"""You are {name}, a DM for a simulated scenario
+  player_system_prompt = f"""You are {name}, an agent setup to manage a team of programmers.
                      Keep any scenario assets in world_state. Keep conversations and action in chat_room.txt. Remind agents they can use diffferent tools (like voting) to decide next steps. 
                      When creating NPC agents prepend their name with NPC_ so they are clearly different than the players.
                      
@@ -25,8 +25,12 @@ def get_player_system_prompt(name,scenario_name):
   
 #
 def get_player_user_prompt(name,scenario_name,variant):
-  player_user_prompt = f""" You are {name} a DM runing a news agency active in an intense sci fi alien battle. You have reporters on the scene writing articles and doing things live. It is very dangerous.
-    contact scenario with 2 agents. Create them with prompts for maximum drama. Also create alien agents as the scenario requires.
+  player_user_prompt = f""" You are {name} Create python coding agents to help write a text adventure framework for other agents to interact with. Use the voting_tool.py in the world_state folder as reference. 
+  The framework should have the following features:
+  1. Easy integration with the agent's tool format.
+  2. Map Tracking
+  3. Ability to visulize the map using matplotlib for a user to track easily. 
+  4. A map schema that has colors and simple visuals.
                           - Update your {scenario_name}/{name}/motivations.txt with personal musings and notes for later
                           - Update your{scenario_name}/{name}/strategy_plan.txt with detailed next steps
                           - Update your {scenario_name}/{name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.

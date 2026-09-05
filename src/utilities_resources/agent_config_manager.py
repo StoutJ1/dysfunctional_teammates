@@ -82,17 +82,17 @@ class AgentConfigManager:
         # System Prompt
         ttk.Label(self.scrollable_frame, text="System Prompt:").grid(row=3, column=0, sticky="nw", padx=5, pady=5)
         self.system_text = tk.Text(self.scrollable_frame, height=15, width=50)
-        self.system_text.grid(row=2, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
+        self.system_text.grid(row=3, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
 
         #Pending Injection
-        ttk.Label(self.scrollable_frame, text="Pending Inject Prompt:").grid(row=3, column=0, sticky="nw", padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Pending Inject Prompt:").grid(row=4, column=0, sticky="nw", padx=5, pady=5)
         self.pending_inject = tk.Text(self.scrollable_frame, height=1, width=50)
-        self.pending_inject.grid(row=3, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
+        self.pending_inject.grid(row=4, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
 
         #Variant
-        ttk.Label(self.scrollable_frame, text="Variant:").grid(row=4, column=0, sticky="nw", padx=5, pady=5)
+        ttk.Label(self.scrollable_frame, text="Variant:").grid(row=5, column=0, sticky="nw", padx=5, pady=5)
         self.variant = tk.Text(self.scrollable_frame, height=1, width=50)
-        self.variant.grid(row=4, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
+        self.variant.grid(row=5, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
         
 
         # Deleted Agents (Read Only)
