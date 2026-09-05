@@ -64,7 +64,7 @@ class core_agent():
                 "close_vote":voting_tool.close_vote,
                 "request_new_agent":"",
                 "request_delete_agent":"",
-            #    "request_page":request_tool.request_page,
+                "request_page":request_tool.request_page,
                 "run_python_file":run_python_file.run_python_file,
 
 
@@ -177,7 +177,7 @@ class core_agent():
                                   voting_tool.get_close_vote_schema(),
                                   agent_request.get_request_new_agent_schema(),
                                   agent_request.get_remove_agent_request_schema(),
-        #                          request_tool.get_request_page_tool_schema(),
+                                  request_tool.get_request_page_tool_schema(),
                                   run_python_file.get_run_python_file_schema(),
                                   
                                   ]

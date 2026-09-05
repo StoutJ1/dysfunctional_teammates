@@ -60,9 +60,9 @@ class AgentConfigManager:
 
         # User Prompt (Read Only)
         ttk.Label(self.scrollable_frame, text="User Prompt (Read Only):").grid(row=0, column=0, sticky="w", padx=5, pady=5)
-        self.user_prompt_entry = tk.Text(self.scrollable_frame, state="disabled",height=10,background='light gray')
+        self.user_prompt_entry = tk.Text(self.scrollable_frame, height=10,background='light gray')
         self.user_prompt_entry.grid(row=0, column=1, columnspan=2, sticky="ew", padx=5, pady=5)
-
+        
         # Max Tokens
         ttk.Label(self.scrollable_frame, text="Max Tokens:").grid(row=1, column=0, sticky="w", padx=5, pady=5)
         self.token_slider = ttk.Scale(self.scrollable_frame, from_=50, to=20000, orient=tk.HORIZONTAL, command=self.on_slider_move)
@@ -94,13 +94,6 @@ class AgentConfigManager:
         self.variant = tk.Text(self.scrollable_frame, height=1, width=50)
         self.variant.grid(row=4, column=1, columnspan=2, sticky="nsew", padx=5, pady=5)
         
-        
-        # User Prompt (Read Only)
-        ttk.Label(self.scrollable_frame, text="User Prompt:").grid(row=5, column=0, sticky="w", padx=5, pady=5)
-        self.user_prompt_entry = ttk.Entry(self.scrollable_frame, state="readonly")
-        self.user_prompt_entry.grid(row=5, column=1, columnspan=2, sticky="ew", padx=5, pady=5)
-
-
 
         # Deleted Agents (Read Only)
         ttk.Label(self.scrollable_frame, text="Deleted Agents:").grid(row=6, column=0, sticky="w", padx=5, pady=5)
@@ -136,7 +129,7 @@ class AgentConfigManager:
             self.current_file = filepath
             self.load_data_to_ui()
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to load YAML: {e}")
+            messagebox.showerror("Error", f"Failed to load YAML to UI: {e}")
 
     def load_data_to_ui(self):
         # Max Tokens
@@ -166,6 +159,7 @@ class AgentConfigManager:
         self.variant.insert("1.0", self.current_data.get('variant', ''))
                 
         # Read only fields
+       
         self._update_readonly_field(self.user_prompt_entry, self.current_data.get('user_prompt', ''))
         
     def _update_readonly_field(self, widget, value):
