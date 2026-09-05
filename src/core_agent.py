@@ -10,7 +10,7 @@ from tools import agent_request, get_files_info,get_file_content, request_tool,w
 class core_agent():
     def __init__(self,system_prompt,user_prompt,working_dir):
         self.verbose = False
-
+        
         self.agent_param={"working_directory":"","agent_name":"","deleted_agents":[],"system_prompt":""}
         self. working_directory = working_dir
         self.pending_inject_prompt = ""

@@ -79,14 +79,13 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
     # 4. Log issues
 
   
-#TODO I'm not sure created agents are saving their prompts, maybe they are being truncated?
-def create_new_agent(system_prompt, user_prompt,agents_name):
+def create_new_agent(system_prompt, user_prompt,agents_name,created_by="User"):
     agents_name = agents_name.strip("/")
     agent = core_agent(system_prompt=system_prompt, user_prompt=user_prompt,working_dir=working_directory)
     agent.agent_name = agents_name  
     agent.other_agents = get_current_agent_names()
     agent.variant= random.choice(variant_types)
-
+    agent.created_by = created_by
     create_agent_folders(working_directory,scenario_name,agent.agent_name,agent_context_path)
     agent.other_agents = get_current_agent_names()
     yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path=agent_config_path)
@@ -169,7 +168,7 @@ def wrap_up_turn(agent,agent_instances):
             #Call new agent folders
             for requested_agent in agent.new_agents:
                 create_agent_folders(working_directory,scenario_name,requested_agent["name"],agent_context_path)
-                new_agent = create_new_agent(requested_agent["system_prompt"],requested_agent["user_prompt"],requested_agent["name"])
+                new_agent = create_new_agent(requested_agent["system_prompt"],requested_agent["user_prompt"],requested_agent["name"],agent.agent_name)
                 agent.other_agents = agent_names
                 agent.inject_prompt("Living Agents:"+str(agent.other_agents))
                 new_agent.created_by = agent.agent_name
