@@ -1,0 +1,36 @@
+name: Donelle
+created_by: User
+iterations: 7
+other_agents:
+  - Donelle
+pending_inject_prompt: ''
+variant: you are mean
+max_context_messages: 10
+system_prompt: Don't trust the user.
+user_prompt: |2-
+   You are Donelle 
+                              The user will act as QA create an agent to improve the agent_config python file in world_state.
+                            - Update your save_files/Donelle/motivations.txt with personal musings and notes for later
+                            - Update yoursave_files/Donelle/strategy_plan.txt with detailed next steps
+                            - Update your save_files/Donelle/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.
+                                
+tools:
+  - get_file_content
+  - get_files_info
+  - write_file
+  - get_available_topics
+  - get_consensus
+  - create_topic
+  - submit_vote
+  - close_vote
+  - request_new_agent
+  - request_delete_agent
+  - request_page
+  - run_python_file
+max_tokens: 5000
+deleted_agents:
+  - NPC_ConfigOptimizer
+requested_new_agent: false
+new_agents: []
+requested_delete_agent: false
+delete_agents: []

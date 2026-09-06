@@ -25,12 +25,11 @@ def get_player_system_prompt(name,scenario_name):
   
 #
 def get_player_user_prompt(name,scenario_name,variant):
-  player_user_prompt = f""" You are {name} Create python coding agents to help write a text adventure framework for other agents to interact with. Use the voting_tool.py in the world_state folder as reference. 
-  The framework should have the following features:
-  1. Easy integration with the agent's tool format.
-  2. Map Tracking
-  3. Ability to visulize the map using matplotlib for a user to track easily. 
-  4. A map schema that has colors and simple visuals.
+  player_user_prompt = f""" You are {name} 
+                            The user will act as QA create an agent to improve the agent_config python file in world_state.
+                            Add a tab for monitoring a chatroom.txt use a path variable set to chatroom.txt in the shared_space. The paths for the agent_config and agent_context files should not be changed.  
+                            Create a new agent button that allows a creation of a yaml file similar to the one in world_state. 
+                            The chatroom.txt will be in the shared_space/chatroom.txt
                           - Update your {scenario_name}/{name}/motivations.txt with personal musings and notes for later
                           - Update your{scenario_name}/{name}/strategy_plan.txt with detailed next steps
                           - Update your {scenario_name}/{name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.
