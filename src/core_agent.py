@@ -82,7 +82,7 @@ class core_agent():
                     self.requested_new_agent = True
                     self.new_agents.append({"system_prompt": args["system_prompt"],"user_prompt":args["user_prompt"],"name":args["name"]})
                     #print("New Agent Requested", args["name"])
-                    return "Requested"
+                    return "Agent Requested, they will be started next turn"
                 else:
                     return "Agent name already in use"
             if function_name =="request_delete_agent":
