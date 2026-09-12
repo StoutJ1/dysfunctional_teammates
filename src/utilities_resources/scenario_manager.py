@@ -10,7 +10,7 @@ import tools.voting_tool
 import os
 import shutil
 from datetime import datetime
-
+from shutil import ignore_patterns
 def initialize_scenario(working_directory,scenario_name, agents,agent_context_path,agent_config_path):
     
     if agents is None:
@@ -29,18 +29,12 @@ def initialize_scenario(working_directory,scenario_name, agents,agent_context_pa
     os.makedirs(agent_context_path, exist_ok=True)
     os.makedirs(agent_config_path, exist_ok=True)
 
-    # Create world_state directory and world_state.txt file
-    world_state_dir = os.path.join(scenario_dir, "world_state")
+    world_state_dir = os.path.join(scenario_dir, "Assets")
     os.makedirs(world_state_dir, exist_ok=True)
-    util_dir = os.path.join("utilities_resources","to_be_copied_to_world_state")
+    util_dir = os.path.join("utilities_resources","to_be_copied_to_assets")
     if len(os.listdir(util_dir)) > 0:
         print("Copying Files")
         shutil.copytree(util_dir+"/",world_state_dir+"/",dirs_exist_ok=True)
-    world_state_file = os.path.join(world_state_dir, "user_conversation.txt")
-    with open(world_state_file, 'w') as f:
-        f.write("Conversation or Questions for User\n")
-        #Initial instructions can be placed here.    
-    # Create shared_space directory and share_space.txt file
     shared_space_dir = os.path.join(scenario_dir, "shared_space")
     os.makedirs(shared_space_dir, exist_ok=True)
     share_space_file = os.path.join(shared_space_dir, "chatroom.txt")
@@ -174,7 +168,6 @@ def backup_scenario(path, backup_dir=None):
                          Defaults to 'save_files/backups' if not provided.
     """
   
-    
     # Create backup directory if it doesn't exist
     os.makedirs(backup_dir, exist_ok=True)
     
@@ -184,7 +177,9 @@ def backup_scenario(path, backup_dir=None):
     backup_folder_path = os.path.join(backup_dir, backup_folder_name)
     
     # Copy the entire directory tree
-    shutil.copytree(path, backup_folder_path)
+    #Skip .env its taking wayyyy to much space
+
+    shutil.copytree(path, backup_folder_path,ignore=ignore_patterns('.venv'))
     
     print(f"Backup created successfully: {backup_folder_path}")
     return backup_folder_path

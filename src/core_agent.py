@@ -106,13 +106,12 @@ class core_agent():
         """
         if self.max_context_messages is None:
             return
-
+        return
         if len(self.context) <= self.max_context_messages:
-            return
-        #Keep system prompt
-        system_prompt = self.context[0]
-        # Remaining messages allowed after the system prompt
-        allowed_additional_messages = self.max_context_messages - 1
+            #Keep system prompt
+            system_prompt = self.context[0]
+            # Remaining messages allowed after the system prompt
+            allowed_additional_messages = self.max_context_messages - 1
         
         if allowed_additional_messages <= 0:
             # If max_context_messages is 1, we only keep the system prompt.
@@ -216,9 +215,7 @@ class core_agent():
         except FileNotFoundError:
             print("Unable to dump pickle, file not found",self.agent_name) 
             
-            
-
-
+        
 
     def iterate(self):
         try:

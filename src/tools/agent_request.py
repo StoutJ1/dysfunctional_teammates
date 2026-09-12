@@ -27,7 +27,6 @@ def get_request_new_agent_schema():
         },
         "strict":True
     }
-
     return schema_new_agent_request
 #logic for this tool will be primarily in the agent file
 

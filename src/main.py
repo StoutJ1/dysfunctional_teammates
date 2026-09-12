@@ -6,7 +6,6 @@ import os
 from dotenv import load_dotenv
 from utilities_resources.scenario_manager import initialize_scenario,backup_scenario,create_agent_folders
 from utilities_resources.turn_manager import new_turn
-import tkinter as tk
 from datetime import datetime,timedelta
 
 time_format = "%H:%M"
@@ -25,8 +24,6 @@ deleted_agents_names = []
 agent_config_path  = os.environ.get("AGENT_CONFIG_PATH")
 agent_context_path = os.environ.get("AGENT_CONTEXT_PATH")
 working_directory = os.environ.get("WORKING_DIRECTORY")
-
-root =tk.Tk()
 #multitail command:
 #multitail --follow-all -s 2 -du -q 1 "save_files/*/*relation*.txt" "votes.json" "save_files/shared_space/chatroom.txt" -q 1 "save_files/world_state/*.txt"
 
@@ -76,7 +73,6 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
         elif not status_data[agent_name]:
             not_ready_agents.append(agent_name)
 
-    # 4. Log issues
 
   
 def create_new_agent(system_prompt, user_prompt,agents_name,created_by="User"):
@@ -206,15 +202,13 @@ if __name__ == "__main__":
     agent_names = random.sample(name_list,number_of_agents)
     structure_info = initialize_scenario(working_directory,scenario_name=scenario_name, agents=agent_names,agent_context_path=agent_context_path,agent_config_path=agent_config_path)
     
-    #create agents
-    #print("\n--- Creating Agents---")
     
-
     create_agents_with_prompts(agent_names=agent_names,scenario_name=scenario_name)
+    #TODO Need to intermittently inject
     days_count = 0
     inject_every = 1
     inject_every_count = 1
-    #print(len(get_agent_instances()))
+
     current_time = datetime.now()
 
     while days_count < number_of_days: 
@@ -238,7 +232,6 @@ if __name__ == "__main__":
             
             iteration_count = agent.iterations
             current_iter = 0
-            
 
             while current_iter < iteration_count:
                 current_iter +=1
@@ -272,16 +265,5 @@ if __name__ == "__main__":
         print("Current Time: "+ current_time.strftime(time_format))
         
         inject_prompt_all(agent_instances,"Current Time: "+ current_time.strftime(time_format)+" files have been upated. Check for changes")
-
-            
-            #Checking if a new agent is requested:
-            
-
-
-
-
-
-
-        
         
         backup_scenario(os.path.join(working_directory),'backup_folder')
