@@ -184,12 +184,11 @@ class core_agent():
         return function_declarations
     
 
-    def get_agent_files_contents(self,scenario):
-        self.scenario = scenario
+    def get_agent_files_contents(self):
         to_return = ""
         #print("Scenario file",self.scenario)
-        agent_file_path = os.path.join(self.working_directory,self.scenario,self.agent_name)
-        files_in_agent_folder = os.listdir(os.path.join(self.working_directory,self.scenario,self.agent_name))
+        agent_file_path = os.path.join(self.working_directory,self.agent_name)
+        files_in_agent_folder = os.listdir(os.path.join(self.working_directory,self.agent_name))
         to_return = ""
         try:
             for file in files_in_agent_folder:

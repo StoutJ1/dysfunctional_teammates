@@ -11,17 +11,17 @@ import os
 import shutil
 from datetime import datetime
 from shutil import ignore_patterns
-def initialize_scenario(working_directory,scenario_name, agents,agent_context_path,agent_config_path):
+def initialize_scenario(working_directory, agents,agent_context_path,agent_config_path):
     
     if agents is None:
         agents = []
     
     # Create the main scenario directory
-    scenario_dir = os.path.join(working_directory,scenario_name)
+    scenario_dir = os.path.join(working_directory)
     print(f"Checking for {scenario_dir}")
     if os.path.exists(scenario_dir):
         print("Removing Scenario Files")
-        cleanup_scenario(scenario_name,agent_context_path,agent_config_path)
+        cleanup_scenario(agent_context_path,agent_config_path)
     else: 
         print("No existing scenario")
     
@@ -86,7 +86,7 @@ def initialize_scenario(working_directory,scenario_name, agents,agent_context_pa
     return structure_info
 
 
-def create_agent_folders(working_dir, scenario_name, agent_name,agent_context_path):
+def create_agent_folders(working_dir, agent_name,agent_context_path):
     """
     Create an individual folder for a specific agent in an existing scenario.
     
@@ -97,7 +97,7 @@ def create_agent_folders(working_dir, scenario_name, agent_name,agent_context_pa
     Returns:
         str: Path to the created agent directory
     """
-    agent_dir = os.path.join(working_dir,scenario_name, agent_name)
+    agent_dir = os.path.join(working_dir, agent_name)
     os.makedirs(agent_dir, exist_ok=True)
     
     os.makedirs(os.path.join(agent_context_path,agent_name), exist_ok=True)
@@ -125,7 +125,7 @@ def create_agent_folders(working_dir, scenario_name, agent_name,agent_context_pa
     return agent_dir
 
 
-def cleanup_scenario(scenario_name,agent_context_path,agent_config_path):
+def cleanup_scenario(agent_context_path,agent_config_path):
     working_directory = os.environ.get("WORKING_DIRECTORY")
 
     """
@@ -134,10 +134,10 @@ def cleanup_scenario(scenario_name,agent_context_path,agent_config_path):
     Args:
         scenario_name (str): Name of the scenario directory to remove (default: "scenario")
     """
-    print(scenario_name,agent_context_path,agent_config_path)
+    print(agent_context_path,agent_config_path)
 
-    if os.path.exists(os.path.join(working_directory,scenario_name)):
-        shutil.rmtree(os.path.join(working_directory,scenario_name))
+    if os.path.exists(os.path.join(working_directory)):
+        shutil.rmtree(os.path.join(working_directory))
     else:
         print("Path does not exist to scenario")
 

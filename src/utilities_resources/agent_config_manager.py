@@ -12,7 +12,7 @@ class AgentConfigManager:
         self.directory = directory
         self.current_file = None
         self.current_data = {}
-        self.chatroom_path = os.environ.get("WORKING_DIRECTORY")+'save_files/shared_space/chatroom.txt'
+        self.chatroom_path = os.environ.get("WORKING_DIRECTORY")+'shared_space/chatroom.txt'
 
         # Main Notebook for tabs
         self.notebook = ttk.Notebook(root)

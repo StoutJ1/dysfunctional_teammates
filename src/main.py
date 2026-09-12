@@ -17,7 +17,6 @@ variant_types = variants.variant_types
 agent_variants = variant_types
 number_of_days = 100
 number_of_agents = 1
-scenario_name = "save_files"
 agent_names=[]
 agent_instances=[]
 deleted_agents_names = []
@@ -82,7 +81,7 @@ def create_new_agent(system_prompt, user_prompt,agents_name,created_by="User"):
     agent.other_agents = get_current_agent_names()
     agent.variant= random.choice(variant_types)
     agent.created_by = created_by
-    create_agent_folders(working_directory,scenario_name,agent.agent_name,agent_context_path)
+    create_agent_folders(working_directory,agent.agent_name,agent_context_path)
     agent.other_agents = get_current_agent_names()
     yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path=agent_config_path)
     #Makes new agent here.
@@ -99,7 +98,7 @@ def terminate_agent(target_agent_name):
             agent_instances.remove(agent)
             #print("Removed:",target_agent_name)
 
-def create_agents_with_prompts(agent_names,scenario_name):
+def create_agents_with_prompts(agent_names):
     agents = []
     #print(agent_names)
 
@@ -108,9 +107,9 @@ def create_agents_with_prompts(agent_names,scenario_name):
     for name in agent_names:
         agent_variant= random.choice(variant_types)
         # Create personalized system prompt using the agent's name
-        system_prompt = prompt_strings.get_player_system_prompt(name=name,scenario_name=scenario_name)
+        system_prompt = prompt_strings.get_player_system_prompt(name=name)
         # Create personalized user prompt using the agent's name
-        user_prompt = prompt_strings.get_player_user_prompt(name=name,scenario_name=scenario_name,variant=agent_variant)
+        user_prompt = prompt_strings.get_player_user_prompt(name=name,variant=agent_variant)
      
         agent_to_add =create_new_agent(system_prompt=system_prompt,user_prompt=user_prompt,agents_name=name)
         agent_to_add.variant = agent_variant 
@@ -123,7 +122,7 @@ def create_agents_with_prompts(agent_names,scenario_name):
 def inject_prompt_all(agents,prompt_to_inject=""):
     for agent in agents:
         if prompt_to_inject=="":
-            agent.inject_prompt(prompt_strings.get_player_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
+            agent.inject_prompt(prompt_strings.get_player_inject_prompt(name=agent.agent_name,variant=agent.variant))
         else:
             agent.inject_prompt(prompt_to_inject)
 
@@ -163,7 +162,7 @@ def wrap_up_turn(agent,agent_instances):
     if agent.requested_new_agent:
             #Call new agent folders
             for requested_agent in agent.new_agents:
-                create_agent_folders(working_directory,scenario_name,requested_agent["name"],agent_context_path)
+                create_agent_folders(working_directory,requested_agent["name"],agent_context_path)
                 new_agent = create_new_agent(requested_agent["system_prompt"],requested_agent["user_prompt"],requested_agent["name"],agent.agent_name)
                 agent.other_agents = agent_names
                 agent.inject_prompt("Living Agents:"+str(agent.other_agents))
@@ -179,7 +178,7 @@ def wrap_up_turn(agent,agent_instances):
                         agent_instances.remove(to_remove)
                        # agent_names.remove(to_remove.agent_name)
                         deleted_agents_names.append(to_remove.agent_name)
-                        agent_folder_path = os.path.join(working_directory,scenario_name,to_remove.agent_name)
+                        agent_folder_path = os.path.join(working_directory,to_remove.agent_name)
                         os.rename(agent_folder_path,agent_folder_path+"_Deleted")
                         to_rename_config = os.path.join(agent_config_path,to_remove.agent_name)
                         to_rename_context = os.path.join(agent_context_path,to_remove.agent_name)
@@ -200,10 +199,10 @@ if __name__ == "__main__":
 
     name_list = load_names("utilities_resources/random_names.txt")
     agent_names = random.sample(name_list,number_of_agents)
-    structure_info = initialize_scenario(working_directory,scenario_name=scenario_name, agents=agent_names,agent_context_path=agent_context_path,agent_config_path=agent_config_path)
+    structure_info = initialize_scenario(working_directory, agents=agent_names,agent_context_path=agent_context_path,agent_config_path=agent_config_path)
     
     
-    create_agents_with_prompts(agent_names=agent_names,scenario_name=scenario_name)
+    create_agents_with_prompts(agent_names=agent_names)
     #TODO Need to intermittently inject
     days_count = 0
     inject_every = 1
@@ -225,7 +224,7 @@ if __name__ == "__main__":
             agent.deleted_agents = deleted_agents_names
             agent.other_agents = get_current_agent_names()
 
-            agent.inject_prompt(agent.get_agent_files_contents(scenario_name))
+            agent.inject_prompt(agent.get_agent_files_contents())
             agent.inject_prompt("Living Agents"+str(get_current_agent_names()))
 
             agent.inject_prompt("Deleted Agents"+str(deleted_agents_names))
@@ -258,7 +257,7 @@ if __name__ == "__main__":
                     current_iter = iteration_count
                     
                 wrap_up_turn(agent,agent_instances)
-        agent.inject_prompt(prompt_strings.get_player_inject_prompt(name=agent.agent_name,scenario_name=scenario_name,variant=agent.variant))
+        agent.inject_prompt(prompt_strings.get_player_inject_prompt(name=agent.agent_name,variant=agent.variant))
         
         current_time = current_time+timedelta(minutes=45)
         
