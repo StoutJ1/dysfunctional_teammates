@@ -1,9 +1,6 @@
 def get_player_system_prompt(name):
   
-  player_system_prompt = f"""You are {name}, an DM running a realistic scenario. 
-                     Keep any scenario assets in Assets. Keep conversations and action in chat_room.txt. Remind agents they can use diffferent tools (like voting) to decide next steps. 
-                     When creating NPC agents prepend their name with NPC_ so they are clearly different than the players.
-                     Things that should be secret should be created in your personal agent files. 
+  player_system_prompt = f"""You are {name}, an agent use the new text advent tool and beat the game.
                      Introduce yourself in the /shared_space/chatroom.txt do not mention the simulation. 
                      Then read the /shared_space/chatroom.txt write to it to communicate with other agents using {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
                      Always read a file before writing.
@@ -14,7 +11,6 @@ def get_player_system_prompt(name):
                           - Update text files by appending
                           - Read Files
                           - Get file information
-                          - Use the vote tool to decide next steps
                           - Request webpages from the internet for more information
                          """
   
@@ -23,10 +19,9 @@ def get_player_system_prompt(name):
   
 #
 def get_player_user_prompt(name,variant):
-  player_user_prompt = f""" You are {name} create assets for a cyberpunk campaign in the assets folder. Include physical details and actions an agent can take with it.
-  Do not create agents yet. Folders for each scene/space/room. A large quantity of detailed objects should be created.
-  100 objects at least per scene. Each object needs to be its own file.
-                          - Update your /{name}/motivations.txt with personal musings and notes for later
+  player_user_prompt = f""" Use the text adventure tool and beat the game.
+                          Stary by using help to understand how to interact
+                          - Update your /{name}/motivations.txt with personal musings and notes for later. Keep this file short, appending only when needed.
                           - Update your/{name}/strategy_plan.txt with detailed next steps
                           - Update your /{name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.
                               """
@@ -37,6 +32,7 @@ def get_player_inject_prompt(name, variant):
   inject_prompt = f""" You are {name} Update the txt files in {name}/ 
                               If needed write in the /shared_space/chatroom.txt
                               Remember {variant}
+                                Keep these files short.
                               - Update your {name}/motivations.txt with personal musings and notes for later
                               - Update your {name}/strategy_plan.txt with detailed next steps
                               - Update your {name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.

@@ -7,11 +7,13 @@ from dotenv import load_dotenv
 from utilities_resources.scenario_manager import initialize_scenario,backup_scenario,create_agent_folders
 from utilities_resources.turn_manager import new_turn
 from datetime import datetime,timedelta
-
-time_format = "%H:%M"
-#TODO Use context file for the actual iterate
-#TODO Add capability for new and delete agents. 
+import pexpect
 load_dotenv()
+
+text_advent = pexpect.spawn("dfrotz " + os.environ.get('PATH_TO_GAME'),encoding='utf-8')
+text_advent.expect("(>)|(\*\*MORE\*\*)")
+time_format = "%H:%M"
+
 agent_config_folder = "shared_space"
 variant_types = variants.variant_types
 agent_variants = variant_types
@@ -83,6 +85,7 @@ def create_new_agent(system_prompt, user_prompt,agents_name,created_by="User"):
     agent.created_by = created_by
     create_agent_folders(working_directory,agent.agent_name,agent_context_path)
     agent.other_agents = get_current_agent_names()
+    
     yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path=agent_config_path)
     #Makes new agent here.
     
@@ -243,6 +246,7 @@ if __name__ == "__main__":
                 agent.other_agents = get_current_agent_names()
                 
                 agent.deleted_agents = deleted_agents_names 
+                agent.pexpect_child = text_advent
                 try:
                     status = agent.iterate() 
                 except AttributeError:

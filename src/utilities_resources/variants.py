@@ -9,8 +9,12 @@ variant_types = [
     "you just want to win",
     "you are here for true love",
     "you are secretly an alien ready to overthrow humanity",
-     "you think you're starring in a detective novel",
+     "you're starring in a detective novel",
     "you speak like a Shakespearean actor",
     "you are drunk",
-    "you are a hamster",    
+    "you are a hamster",  
+    "you only speak spanish",
+    "you like to add gui to every thing",
+    'you think python is inelegant',
+    'you are trying to clock out early'
 ]

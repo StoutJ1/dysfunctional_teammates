@@ -3,7 +3,9 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import json
 import pickle
-from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,voting_tool,run_python_file
+import pexpect
+import time
+from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,voting_tool,run_python_file, text_advent
 
 
 
@@ -47,7 +49,7 @@ class core_agent():
         self.delete_agents = []
 
         self.max_tokens = 5000
-
+        self.pexpect_child = []
        
             
 
@@ -67,12 +69,13 @@ class core_agent():
                 "request_delete_agent":"",
                 "request_page":request_tool.request_page,
                 "run_python_file":run_python_file.run_python_file,
+                "send_command_to_text_adventure":"",
 
 
             }
             if function_name not in function_map:
                 return "Tool not found"
-            print(item)
+            
             
             args = json.loads(item.arguments)
             
@@ -85,6 +88,19 @@ class core_agent():
                     return "Agent Requested, they will be started next turn"
                 else:
                     return "Agent name already in use"
+            if function_name == "send_command_to_text_adventure":
+                print(10*"-")
+                print("Text Adventure:",args["command"])
+                self.pexpect_child.sendline(args["command"])
+                time.sleep(0.1)
+                self.pexpect_child.expect("(>)|(\*\*MORE\*\*)")
+                output_string = self.pexpect_child.before
+                
+                print(output_string)
+                return output_string
+
+
+            
             if function_name =="request_delete_agent":
                 self.requested_delete_agent = True
                 print("Name For Deletion",args["name"])
@@ -94,6 +110,7 @@ class core_agent():
                 args["working_directory"]=  self.working_directory
                 function_result= function_map[function_name](**args)
                 return function_result    
+           
     
     def reset_new_agent_request(self):
         self.requested_new_agent = False 
@@ -106,12 +123,11 @@ class core_agent():
         """
         if self.max_context_messages is None:
             return
-        return
-        if len(self.context) <= self.max_context_messages:
+        
             #Keep system prompt
-            system_prompt = self.context[0]
+        system_prompt = self.context[0]
             # Remaining messages allowed after the system prompt
-            allowed_additional_messages = self.max_context_messages - 1
+        allowed_additional_messages = self.max_context_messages - 1
         
         if allowed_additional_messages <= 0:
             # If max_context_messages is 1, we only keep the system prompt.
@@ -119,6 +135,11 @@ class core_agent():
         else:
             # Keep the system prompt and the last 'allowed_additional_messages' from the rest of the context.
             self.context = [system_prompt] + self.context[-(allowed_additional_messages):]
+            print(self.context)
+            #Need to upgrade this to summarize.
+        print("Pruned Current Length is:",len(self.context),"Max Allowed Addtional",allowed_additional_messages)
+
+        return self.context
                 
     def send_message(self, client, context):
         self.function_results_parts = []
@@ -146,7 +167,7 @@ class core_agent():
                     #print(" ".join([content_from_item.text for content_from_item in item.content]))
                     
                     context.append(item)
-            self.prune_context()
+            self.context = self.prune_context()
             if response.output_text:
                 print("Status is Completed")
                 return context,True
@@ -158,8 +179,7 @@ class core_agent():
         
     def inject_prompt(self,prompt_to_inject):
         try:
-            print(f"""Prompt injected to {self.agent_name} prompt is:{prompt_to_inject}""")
-            print(f"Current context: {self.context}")
+            #print(f"""Prompt injected to {self.agent_name} prompt is:{prompt_to_inject}""")
             self.context.append({"role":self.role_for_system,"content":prompt_to_inject})
             self.write_context(self.context)
         except AttributeError:
@@ -179,7 +199,7 @@ class core_agent():
                                   agent_request.get_remove_agent_request_schema(),
                                   request_tool.get_request_page_tool_schema(),
                                   run_python_file.get_run_python_file_schema(),
-                                  
+                                  text_advent.get_text_advent_type_schema(),
                                   ]
         return function_declarations
     
