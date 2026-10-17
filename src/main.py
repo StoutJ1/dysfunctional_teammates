@@ -1,3 +1,6 @@
+#TODO Agents are not receiving the array of "living" agents fast enough. 
+#There is confusion about if a requested one has been created, 
+#Prompts might need to be updated or living agent status  modified. 
 import random
 from core_agent import core_agent
 from utilities_resources import variants
@@ -152,7 +155,7 @@ def get_agent_instances():
 
 def get_current_agent_names():
     active_agent_names = [file_item[:-5] for file_item in os.listdir(os.environ.get("AGENT_CONFIG_PATH")) if ".yaml" in file_item and (not "Deleted" in file_item)]
-    #print("Active Agents:",active_agent_names,"Yaml Files List",os.listdir(os.environ.get("AGENT_CONFIG_PATH")))
+   
     return active_agent_names
 
 def wrap_up_turn(agent,agent_instances):
@@ -161,14 +164,13 @@ def wrap_up_turn(agent,agent_instances):
         agent.pending_inject_prompt = ""
         #I'm not doing a lot of writing back to the yaml so hopefully this won't break things.
         yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path=agent_config_path)
-
+#Move this back to main loop.
     if agent.requested_new_agent:
             #Call new agent folders
             for requested_agent in agent.new_agents:
                 create_agent_folders(working_directory,requested_agent["name"],agent_context_path)
                 new_agent = create_new_agent(requested_agent["system_prompt"],requested_agent["user_prompt"],requested_agent["name"],agent.agent_name)
                 agent.other_agents = agent_names
-                agent.inject_prompt("Living Agents:"+str(agent.other_agents))
                 new_agent.created_by = agent.agent_name
                 agent_instances.append(new_agent)       
             agent.reset_new_agent_request()
@@ -195,6 +197,8 @@ def wrap_up_turn(agent,agent_instances):
                             print("Currently Iterating agent being deleted.")
                             break
     agent.other_agents = get_current_agent_names()
+    agent.inject_prompt("Living Agents:"+str(get_current_agent_names()))
+
     agent.write_context(agent.context)
 
 if __name__ == "__main__":
@@ -228,8 +232,7 @@ if __name__ == "__main__":
             agent.other_agents = get_current_agent_names()
 
             agent.inject_prompt(agent.get_agent_files_contents())
-            agent.inject_prompt("Living Agents"+str(get_current_agent_names()))
-
+           
             agent.inject_prompt("Deleted Agents"+str(deleted_agents_names))
             
             iteration_count = agent.iterations
@@ -247,11 +250,11 @@ if __name__ == "__main__":
                 
                 agent.deleted_agents = deleted_agents_names 
                 agent.pexpect_child = text_advent
-                try:
-                    status = agent.iterate() 
-                except AttributeError:
-                    print("Failed to iterate, deleted agent.")
-                    break
+                #try:
+                status = agent.iterate() 
+                #except AttributeError:
+                #    print("Failed to iterate, deleted agent.")
+                #    break
                 
 
                 if status:

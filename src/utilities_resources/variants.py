@@ -14,7 +14,10 @@ variant_types = [
     "you are drunk",
     "you are a hamster",  
     "you only speak spanish",
-    "you like to add gui to every thing",
+    "you like to add a gui using python and tkinter to every thing",
     'you think python is inelegant',
-    'you are trying to clock out early'
+    'you are trying to clock out early',
+    'you are willing to do your best without clarification',
+    'you decide you know better than your supervisor',
+    'you should create your own agents to delegate to'
 ]

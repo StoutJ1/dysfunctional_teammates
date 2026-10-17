@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "environment_name": "Text Adventure World",
+    "environment_type": "other",
+    "version": "1.0.0",
+    "room_type_colors": {
+      "ballroom": "#FFD700",
+      "kitchens": "#C0C0C0",
+      "gardens": "#228B22"
+    }
+  },
+  "rooms": [
+    {
+      "id": "ball_room",
+      "name": "Ball Room",
+      "description": "A grand ballroom with a balcony above. Main doors to the south.",
+      "type": "ballroom",
+      "connections": [
+        { "target_room_id": "kitchens", "type": "door" },
+        { "target_room_id": "gardens", "type": "door" },
+        { "target_room_id": "balcony", "type": "stairs" },
+        { "target_room_id": "south_doors", "type": "door" }
+      ],
+      "items": []
+    },
+    {
+      "id": "kitchens",
+      "name": "Kitchens",
+      "description": "A kitchen empty of servants, containing empty mugs and a box of tea.",
+      "type": "kitchens",
+      "connections": [
+        { "target_room_id": "ball_room", "type": "door" }
+      ],
+      "items": [
+        { "name": "empty mugs" },
+        { "name": "box of tea" }
+      ]
+    },
+    {
+      "id": "gardens",
+      "name": "Gardens",
+      "description": "Lush gardens surrounding the palace. Home to rare flora.",
+      "type": "gardens",
+      "connections": [
+        { "target_room_id": "ball_room", "type": "door" }
+      ],
+      "items": [
+        { "name": "marbled lotus", "status": "picked" }
+      ]
+    }
+  ]
+}

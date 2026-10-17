@@ -3,7 +3,7 @@ def get_request_new_agent_schema():
     schema_new_agent_request = {
         "type": "function",
         "name": "request_new_agent",
-        "description": "Requests a new agent, name must be unique, agent will be created at the end of next turn. ",
+        "description": "Requests a new agent, name must be unique. Agent will begin actions after the next system update. IMPORTANT: To prevent duplicate agents, verify the agent is not already requested.",
         "parameters": {
             "type": "object",
             "properties": {

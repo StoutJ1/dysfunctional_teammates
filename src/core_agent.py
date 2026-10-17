@@ -1,12 +1,12 @@
 import os
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import OpenAI,types
 import json
 import pickle
 import pexpect
 import time
 from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,voting_tool,run_python_file, text_advent
-
+from utilities_resources import prompt_strings
 
 
 class core_agent():
@@ -30,7 +30,7 @@ class core_agent():
         self.config_path = os.environ.get("AGENT_CONFIG_PATH")
         self.context_path = os.environ.get("AGENT_CONTEXT_PATH")
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
-        self.max_context_messages = 10
+        self.max_context_messages = 100
         self.deleted_agents = []
         self.context =[]
         self.context.append({"role":"system","content":self.system_prompt})
@@ -115,12 +115,38 @@ class core_agent():
     def reset_new_agent_request(self):
         self.requested_new_agent = False 
         self.new_agents = []
-        
+    def get_text_from_context(self, context_to_string):
+        text_out = []
+        for item in context_to_string:
+            if hasattr(item,'type'):
+                #print("Type is:",item.type)
+                if item.type == 'reasoning':
+                #print("Reasoning",item.content[0].text)
+                    text_out.append(str(item.content[0].text))
+                if item.type == "function_call":
+                #print("Name:",item.name,"Arguments:",item.arguments)
+                    text_out.append(str("Tool Used:"+item.name+" Arguments:"+item.arguments))
+
+                #print("Type:",item.type)
+                if item.type == "function_call_output":
+                #print(item)
+                    text_out.append(str(item.output))
+                else:
+                    if 'role' in item:
+                        #print(item['content'])
+                        text_out.append(item['content'])
+                if 'type' in item:
+                    #print("item",item['output'])
+                    text_out.append(item['output'])
+        return '\n'.join(text_out)
+    
     def prune_context(self):
         """
         Prunes the context to ensure it does not exceed max_context_messages,
         while always preserving the system prompt (the first element).
         """
+        to_summarize = []
+    
         if self.max_context_messages is None:
             return
         
@@ -132,15 +158,49 @@ class core_agent():
         if allowed_additional_messages <= 0:
             # If max_context_messages is 1, we only keep the system prompt.
             self.context = [system_prompt]
-        else:
-            # Keep the system prompt and the last 'allowed_additional_messages' from the rest of the context.
-            self.context = [system_prompt] + self.context[-(allowed_additional_messages):]
-            print(self.context)
-            #Need to upgrade this to summarize.
-        print("Pruned Current Length is:",len(self.context),"Max Allowed Addtional",allowed_additional_messages)
+        #This must be smaller than max context length.
+        number_to_summarize = 40
 
-        return self.context
+        prefix = self.context[1:number_to_summarize]
+        raw_text_prefix = self.get_text_from_context(prefix)
+        text_summarized = self.summarize_text(raw_text_prefix,number_of_sentences=5)
+        
+        #print(">"*100,"Raw text of prefix",raw_text_prefix)
                 
+
+        #print(self.context[:])
+        print("-"*100)
+        self.pruned_context = []
+        #Keeping system prompt
+        self.pruned_context.append(system_prompt)
+        #Appending summarized
+        self.pruned_context.append({"role":"user","content":text_summarized})
+        
+        #Getting just the remaining context text
+        print("Pruned context is:",self.pruned_context,"value is:",self.prune_context)
+        #This slice should pull starting from the number to summarize so summarizing six will slice [6:] until the end. (This shoudl be extend?)
+        self.pruned_context.extend(self.context[number_to_summarize:])
+        print("-"*100)
+        print("Summarized:",text_summarized)        
+        print("Pruned Current Length is:",len(self.pruned_context),"Max Allowed Addtional",allowed_additional_messages)
+        print("-"*100)
+        
+        return self.pruned_context
+    def summarize_text(self,to_summarize,number_of_sentences):
+            self.summarize_context=[]
+            self.summarize_context.append({"role":"system","content":prompt_strings.get_summarize_prompt(number_of_sentences)})
+            self.summarize_context.append({"role":"user","content":"Summarize the following:"+to_summarize})
+            #Using independant response so I don't have to limit by the max messages etc.
+            self.response = self.client.responses.create(model=self.model,input=self.summarize_context)
+            print(self.response)
+            print("*"*100)
+            print(self.response.output_text)
+            print("*"*100)
+
+            print("Done Summarizing")
+            return self.response.output_text
+
+            
     def send_message(self, client, context):
         self.function_results_parts = []
         self.function_call_results = []
@@ -166,13 +226,16 @@ class core_agent():
                     #If its not a tool call its a reasoning item
                     #print(" ".join([content_from_item.text for content_from_item in item.content]))
                     
-                    context.append(item)
-            self.context = self.prune_context()
+                    self.context.append(item)
+            if len(self.context) > self.max_context_messages:
+                self.context = self.prune_context()
+                print("Pruned Messages")
+
             if response.output_text:
                 print("Status is Completed")
-                return context,True
+                return self.context,True
             else:
-                return context,False
+                return self.context,False
         except AttributeError:
             print("Failed to add items to context")
         
@@ -234,8 +297,7 @@ class core_agent():
         except FileNotFoundError:
             print("Unable to dump pickle, file not found",self.agent_name) 
             
-        
-
+    
     def iterate(self):
         try:
             load_dotenv()
@@ -244,7 +306,6 @@ class core_agent():
             self.write_context(self.context)
             self.context = self.load_context()
             #print("Sending:",self.context)
-            
             self.context,self.completed = self.send_message(self.client,self.context,)
             self.write_context(self.context)
             
@@ -254,4 +315,4 @@ class core_agent():
                 return self.completed
         except Exception as e:
             print("-- Exception while iterating --", e)
-            
+    

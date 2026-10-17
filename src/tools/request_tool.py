@@ -29,7 +29,7 @@ def request_page(working_directory,url_path, file_name):
     output_string = ""
     working_dir_abs = os.path.abspath(working_directory)
 
-    target_path = os.path.join(working_dir_abs,"save_files","shared_space/pages")
+    target_path = os.path.join(working_dir_abs,"pages")
 
     target_path = os.path.normpath(target_path)
     #return(f"Checking if {working_dir_abs} exists",os.path.commonpath([working_dir_abs,target_path]))
