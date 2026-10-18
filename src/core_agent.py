@@ -106,11 +106,19 @@ class core_agent():
                 print("Name For Deletion",args["name"])
                 self.delete_agents.append({"name":args["name"]})
                 return "Delete Requested"
-            else:
-                args["working_directory"]=  self.working_directory
-                function_result= function_map[function_name](**args)
-                return function_result    
-           
+
+            if function_name == "get_file_content":
+
+                args['forbidden_paths'] = self.other_agents
+                args['current_agent'] = self.agent_name
+                print(args)            
+
+            args["working_directory"]=  self.working_directory
+            #The rest are handled here
+            function_result= function_map[function_name](**args)
+            return function_result    
+                       
+                
     
     def reset_new_agent_request(self):
         self.requested_new_agent = False 

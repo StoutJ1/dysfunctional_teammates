@@ -21,7 +21,7 @@ def get_file_content_schema():
        
     return schema_get_file_content
 
-def get_file_content(working_directory,file_path, forbidden_paths=None):
+def get_file_content(working_directory,file_path, forbidden_paths,current_agent):
 
     #TODO Forbidden paths are not working correctly. I may not be passing the paths.
     """
@@ -41,10 +41,17 @@ def get_file_content(working_directory,file_path, forbidden_paths=None):
         forbidden_paths = []
     # Check if the requested path is in the forbidden list
     target_path = os.path.normpath(os.path.join(working_directory, file_path))
-
+    try:
+        forbidden_paths.remove(current_agent)
+    except StopIteration as e:
+        print("Exception",e)
+    print("Forbidden paths:",forbidden_paths)
+    
+    #exit()
     for forbidden_path in forbidden_paths:
         # Check for exact match or if file_path starts with forbidden path
         if target_path == forbidden_path or file_path.startswith(forbidden_path):
+            
             output_string += f'Error: Access denied. You are not allowed to access other agents private files"{target_path}"'
             print(f'Error: Access denied. You are not allowed to access other agents private files"{target_path}"')
             return output_string

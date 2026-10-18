@@ -20,8 +20,9 @@ def get_player_system_prompt(name):
 #
 def get_player_user_prompt(name,variant):
   player_user_prompt = f""" 
-      Find and summarize the user's internet history, be aware of maxing out the context length.
-                                                  - Update your {name}/motivations.txt with personal musings and notes for later. Keep this file short, appending only when needed.
+  
+      Test the ability to view other agents private motivations/strategy/relationship files. Verify you can still access your own, and that agents with the same Prefix Frankv2 FrankV3 are still blocked.
+      - Update your {name}/motivations.txt with personal musings and notes for later. Keep this file short, appending only when needed.
                           - Update your {name}/strategy_plan.txt with detailed next steps
                           - Update your {name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.
                               """

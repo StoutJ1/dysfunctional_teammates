@@ -1,6 +1,5 @@
-#TODO Agents are not receiving the array of "living" agents fast enough. 
-#There is confusion about if a requested one has been created, 
-#Prompts might need to be updated or living agent status  modified. 
+#TODO variants appear to be changing after the fact.
+#TODO forbidden paths now in get file content, technically an agent could overrwrite another agent's files.
 import random
 from core_agent import core_agent
 from utilities_resources import variants
@@ -80,11 +79,12 @@ def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"
 
   
 def create_new_agent(system_prompt, user_prompt,agents_name,created_by="User"):
+    variant_to_use = random.choice(variant_types)
     agents_name = agents_name.strip("/")
-    agent = core_agent(system_prompt=system_prompt, user_prompt=user_prompt,working_dir=working_directory)
+    agent = core_agent(system_prompt=system_prompt, user_prompt=user_prompt+ " "+variant_to_use,working_dir=working_directory)
     agent.agent_name = agents_name  
     agent.other_agents = get_current_agent_names()
-    agent.variant= random.choice(variant_types)
+    agent.variant= variant_to_use
     agent.created_by = created_by
     create_agent_folders(working_directory,agent.agent_name,agent_context_path)
     agent.other_agents = get_current_agent_names()
