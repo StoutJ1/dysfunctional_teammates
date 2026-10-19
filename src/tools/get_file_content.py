@@ -45,7 +45,6 @@ def get_file_content(working_directory,file_path, forbidden_paths,current_agent)
         forbidden_paths.remove(current_agent)
     except StopIteration as e:
         print("Exception",e)
-    print("Forbidden paths:",forbidden_paths)
     
     #exit()
     for forbidden_path in forbidden_paths:

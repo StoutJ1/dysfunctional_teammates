@@ -20,9 +20,10 @@ def get_player_system_prompt(name):
 #
 def get_player_user_prompt(name,variant):
   player_user_prompt = f""" 
-  
-      Test the ability to view other agents private motivations/strategy/relationship files. Verify you can still access your own, and that agents with the same Prefix Frankv2 FrankV3 are still blocked.
-      - Update your {name}/motivations.txt with personal musings and notes for later. Keep this file short, appending only when needed.
+
+  Create a python based 3d sculpture tool, using dearpygui as the basic framework. 
+  Focus on creating testable prototypes and add them to their own reelase folder as their are completed. The user will be QA
+        - Update your {name}/motivations.txt with personal musings and notes for later. Keep this file short, appending only when needed.
                           - Update your {name}/strategy_plan.txt with detailed next steps
                           - Update your {name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.
                               """

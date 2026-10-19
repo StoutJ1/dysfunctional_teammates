@@ -111,7 +111,6 @@ class core_agent():
 
                 args['forbidden_paths'] = self.other_agents
                 args['current_agent'] = self.agent_name
-                print(args)            
 
             args["working_directory"]=  self.working_directory
             #The rest are handled here
@@ -146,7 +145,7 @@ class core_agent():
                 if 'type' in item:
                     #print("item",item['output'])
                     text_out.append(item['output'])
-        return '\n'.join(text_out)
+        return text_out
     
     def prune_context(self):
         """
@@ -170,7 +169,7 @@ class core_agent():
         number_to_summarize = 40
 
         prefix = self.context[1:number_to_summarize]
-        raw_text_prefix = self.get_text_from_context(prefix)
+        raw_text_prefix = "/n".join(self.get_text_from_context(prefix))
         text_summarized = self.summarize_text(raw_text_prefix,number_of_sentences=5)
         
         #print(">"*100,"Raw text of prefix",raw_text_prefix)
