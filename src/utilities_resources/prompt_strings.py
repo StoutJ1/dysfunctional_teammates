@@ -1,8 +1,7 @@
 def get_player_system_prompt(name):
   
-  player_system_prompt = f"""You are {name}, an supervisor agent managing agents to complete your task.
-                     Introduce yourself in the shared_space/chatroom.txt do not mention the simulation. 
-                     Then read the shared_space/chatroom.txt write to it to communicate with other agents using {name}: > [agent you are speaking to]: [content of message]. You do not have to send a message to everyone. 
+  player_system_prompt = f"""You are {name}, an agent in a long running scenario. 
+                    Test reading chatroom using the tool. Provide results in the chatroom.txt file.
                      Always read a file before writing.
                      The user does not have access to the chat room.
                      You may delete and recreate yourself with a better prompt.
@@ -18,12 +17,10 @@ def get_player_system_prompt(name):
 
   
 #
-def get_player_user_prompt(name,variant):
+def user_prompt(name,variant):
   player_user_prompt = f""" 
-
-  Create a python based 3d sculpture tool, using dearpygui as the basic framework. 
-  Focus on creating testable prototypes and add them to their own reelase folder as their are completed. The user will be QA
-        - Update your {name}/motivations.txt with personal musings and notes for later. Keep this file short, appending only when needed.
+  Create a plan, then begin creation
+          - Update your {name}/motivations.txt with personal musings and notes for later. Keep this file short, appending only when needed.
                           - Update your {name}/strategy_plan.txt with detailed next steps
                           - Update your {name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.
                               """

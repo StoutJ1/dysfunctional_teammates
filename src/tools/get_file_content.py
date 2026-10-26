@@ -43,8 +43,9 @@ def get_file_content(working_directory,file_path, forbidden_paths,current_agent)
     target_path = os.path.normpath(os.path.join(working_directory, file_path))
     try:
         forbidden_paths.remove(current_agent)
-    except StopIteration as e:
+    except Exception as e:
         print("Exception",e)
+        print(forbidden_paths)
     
     #exit()
     for forbidden_path in forbidden_paths:

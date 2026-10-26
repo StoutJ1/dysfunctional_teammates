@@ -5,7 +5,7 @@ import json
 import pickle
 import pexpect
 import time
-from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,voting_tool,run_python_file, text_advent
+from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,voting_tool,run_python_file, text_advent,chatroom_managent
 from utilities_resources import prompt_strings
 
 
@@ -30,7 +30,7 @@ class core_agent():
         self.config_path = os.environ.get("AGENT_CONFIG_PATH")
         self.context_path = os.environ.get("AGENT_CONTEXT_PATH")
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
-        self.max_context_messages = 100
+        self.max_context_messages = 50
         self.deleted_agents = []
         self.context =[]
         self.context.append({"role":"system","content":self.system_prompt})
@@ -69,7 +69,8 @@ class core_agent():
                 "request_delete_agent":"",
                 "request_page":request_tool.request_page,
                 "run_python_file":run_python_file.run_python_file,
-                "send_command_to_text_adventure":"",
+                "get_chatroom_content_tool":chatroom_managent.get_chatroom_content_tool,
+                #"send_command_to_text_adventure":"",
 
 
             }
@@ -175,7 +176,6 @@ class core_agent():
         #print(">"*100,"Raw text of prefix",raw_text_prefix)
                 
 
-        #print(self.context[:])
         print("-"*100)
         self.pruned_context = []
         #Keeping system prompt
@@ -269,7 +269,8 @@ class core_agent():
                                   agent_request.get_remove_agent_request_schema(),
                                   request_tool.get_request_page_tool_schema(),
                                   run_python_file.get_run_python_file_schema(),
-                                  text_advent.get_text_advent_type_schema(),
+                                  chatroom_managent.get_chatroom_content_schema(),
+                         #         text_advent.get_text_advent_type_schema(),
                                   ]
         return function_declarations
     
@@ -312,7 +313,6 @@ class core_agent():
             
             self.write_context(self.context)
             self.context = self.load_context()
-            #print("Sending:",self.context)
             self.context,self.completed = self.send_message(self.client,self.context,)
             self.write_context(self.context)
             

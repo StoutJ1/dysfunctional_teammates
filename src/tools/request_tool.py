@@ -2,7 +2,8 @@ import os
 import subprocess
 import requests
 def get_request_page_tool_schema():
-    schema_curl_tool = {        "type": "function",
+    schema_curl_tool = { 
+    "type": "function",
         "name": "request_page",
         "description": "Download page to shared_space/pages folder",
         "parameters": {

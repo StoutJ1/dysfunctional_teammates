@@ -115,7 +115,7 @@ def create_agents_with_prompts(agent_names):
         # Create personalized system prompt using the agent's name
         system_prompt = prompt_strings.get_player_system_prompt(name=name)
         # Create personalized user prompt using the agent's name
-        user_prompt = prompt_strings.get_player_user_prompt(name=name,variant=agent_variant)
+        user_prompt = prompt_strings.user_prompt(name=name,variant=agent_variant)
      
         agent_to_add =create_new_agent(system_prompt=system_prompt,user_prompt=user_prompt,agents_name=name)
         agent_to_add.variant = agent_variant 
@@ -216,7 +216,7 @@ if __name__ == "__main__":
     inject_every_count = 1
 
     current_time = datetime.now()
-
+    
     while days_count < number_of_days: 
         days_count +=1
         agent_instances = get_agent_instances() 
@@ -251,11 +251,12 @@ if __name__ == "__main__":
                 agent.deleted_agents = deleted_agents_names 
                 agent.pexpect_child = text_advent
                 #try:
+                start_timer = datetime.now()
                 status = agent.iterate() 
                 #except AttributeError:
                 #    print("Failed to iterate, deleted agent.")
                 #    break
-                
+                total_time = start_timer-datetime.now()
 
                 if status:
                     print("Model Ending turn early")

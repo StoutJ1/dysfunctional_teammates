@@ -39,7 +39,6 @@ def write_file(working_directory, file_path, content,append):
     target_path = os.path.normpath(target_path)
  
     if os.path.commonpath([working_dir_abs,target_path]) == working_dir_abs:
-        print("valid Path",target_path)
         if os.path.exists(target_path) == False:
            os.makedirs(os.path.dirname(target_path),exist_ok=True)
         if append:
@@ -53,7 +52,7 @@ def write_file(working_directory, file_path, content,append):
             if mode == "w+":
                 contents = file.write(content+"\n")
             
-            print("Writing")
+            print("Writing:",target_path)
             return (f'Successfully wrote to "{file_path}" ({len(content)} characters written)')
                 
 
