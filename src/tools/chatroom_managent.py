@@ -3,7 +3,7 @@ def get_chatroom_content_schema():
     schema_chatroom_content = {
         "type": "function",
                "name": "get_chatroom_content_tool",
-               "description": "Requests a new agent, name must be unique. Agent will begin actions after the next system update. IMPORTANT: To prevent duplicate agents, verify the agent is not already requested.",
+               "description": "Request last x lines of chatroom.txt. If reading for first time request 50 lines",
           "parameters": {
             "type": "object",
             "properties": {
@@ -12,7 +12,6 @@ def get_chatroom_content_schema():
                     "description": "Number of lines to read"
                     },
                 },
-                                   "required": ["line_count"]
                
                        },
                        "strict":True
