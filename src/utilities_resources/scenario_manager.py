@@ -29,14 +29,15 @@ def initialize_scenario(working_directory, agents,agent_context_path,agent_confi
     os.makedirs(agent_context_path, exist_ok=True)
     os.makedirs(agent_config_path, exist_ok=True)
 
-    world_state_dir = os.path.join(scenario_dir, "Assets")
-    os.makedirs(world_state_dir, exist_ok=True)
-    util_dir = os.path.join("utilities_resources","to_be_copied_to_assets")
+
+    shared_space_dir = os.path.join(scenario_dir, "shared_space")
+    
+    os.makedirs(shared_space_dir, exist_ok=True)
+    util_dir = os.path.join("utilities_resources","to_be_copied_to_shared_space")
     if len(os.listdir(util_dir)) > 0:
         print("Copying Files")
-        shutil.copytree(util_dir+"/",world_state_dir+"/",dirs_exist_ok=True)
-    shared_space_dir = os.path.join(scenario_dir, "shared_space")
-    os.makedirs(shared_space_dir, exist_ok=True)
+        shutil.copytree(util_dir+"/",shared_space_dir+"/",dirs_exist_ok=True)
+        
     share_space_file = os.path.join(shared_space_dir, "chatroom.txt")
     #Create agent context
     os.makedirs(agent_context_path,exist_ok=True)
@@ -78,7 +79,6 @@ def initialize_scenario(working_directory, agents,agent_context_path,agent_confi
     # Return structure information
     structure_info = {
         "scenario_dir": scenario_dir,
-        "world_state_dir": world_state_dir,
         "shared_space_dir": shared_space_dir,
         "agent_dirs": agent_dirs
     }

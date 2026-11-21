@@ -28,6 +28,8 @@ def get_run_python_file_schema():
     return schema_run_python_file
 
 def run_python_file(working_directory, file_path, args=None):
+    print("Agent wants to run a python file")
+    input("Pausing before continuing")
     path_to_venv =os.environ.get("VENV_PATH")
 
     output_string = ""

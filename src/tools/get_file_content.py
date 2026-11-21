@@ -21,7 +21,7 @@ def get_file_content_schema():
        
     return schema_get_file_content
 
-def get_file_content(working_directory,file_path, forbidden_paths,current_agent):
+def get_file_content(working_directory,file_path, forbidden_paths=None,current_agent=""):
 
     #TODO Forbidden paths are not working correctly. I may not be passing the paths.
     """
@@ -41,11 +41,8 @@ def get_file_content(working_directory,file_path, forbidden_paths,current_agent)
         forbidden_paths = []
     # Check if the requested path is in the forbidden list
     target_path = os.path.normpath(os.path.join(working_directory, file_path))
-    try:
+    if current_agent in forbidden_paths:
         forbidden_paths.remove(current_agent)
-    except Exception as e:
-        print("Exception",e)
-        print(forbidden_paths)
     
     #exit()
     for forbidden_path in forbidden_paths:

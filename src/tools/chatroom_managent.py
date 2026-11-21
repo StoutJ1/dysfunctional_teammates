@@ -19,7 +19,9 @@ def get_chatroom_content_schema():
     
 
     return schema_chatroom_content
-def get_chatroom_content_tool(working_directory, line_count=5):
+
+
+def get_chatroom_content_tool(working_directory, line_count=20):
     
     return_string = ""
     working_dir_abs = os.path.abspath(working_directory)

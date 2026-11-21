@@ -20,5 +20,11 @@ variant_types = [
     "you are willing to do your best without clarification",
     "you decide you know better than your supervisor",
     "you should create your own agents to delegate to",
-    "you only speak in morse code"
+    "you only speak in morse code",
+      "you are an Anglerfish",
+        "you are a Barracuda",
+          "you are a Boar",
+            "you are a Cardinal",
+              "you are a Cougar",
+                "you are a Crane"
 ]

@@ -20,18 +20,17 @@ agent_config_folder = "shared_space"
 variant_types = variants.variant_types
 agent_variants = variant_types
 number_of_days = 100
-number_of_agents = 1
+number_of_agents = 3
 agent_names=[]
 agent_instances=[]
 deleted_agents_names = []
 agent_config_path  = os.environ.get("AGENT_CONFIG_PATH")
 agent_context_path = os.environ.get("AGENT_CONTEXT_PATH")
 working_directory = os.environ.get("WORKING_DIRECTORY")
-#multitail command:
+#multitail command for terminal follow along:
 #multitail --follow-all -s 2 -du -q 1 "save_files/*/*relation*.txt" "votes.json" "save_files/shared_space/chatroom.txt" -q 1 "save_files/world_state/*.txt"
 
 #TODO  Add ability to tag messages as transient
-# Load random names from file
 def load_names(filename):
     names = []
     with open(filename, 'r') as f:
@@ -41,45 +40,10 @@ def load_names(filename):
                 names.append(name)
     return names
 
-# Function to verify if all player statuses in shared_space have agent_name: ready_for_next_day format
-#Add section to skip DM next day/reflect on impact
-def verify_all_agents_ready(agents, status_file="shared_space/player_status.txt"):    
-    #TODO Clean up this check, its really odd.
-    # 1. Check if status file exists
-    if not os.path.exists(status_file):
-        #print(f"ERROR: Status file '{status_file}' not found.")
-        return False
-    
-    # 2. Read and parse status data
-    status_data = {}
-    try:
-        with open(status_file, 'r') as f:
-            for line in f:
-                if ':' in line:
-                    line = line.strip()
-                    if line:
-                        agent_name, status = line.split(':', 1)
-                        #print(status.strip().lower())
-                        status_data[agent_name.strip()] = (status.strip().lower() == 'ready_for_next_day')
-    except Exception as e:
-        #print(f"ERROR: Failed to read status file: {e}")
-        return False
-
-    # 3. Verify ALL agents in the list have reported readiness
-    missing_agents = []
-    not_ready_agents = []
-    ##print("Data used for checking verification",status_data)
-    for current_instance in agent_instances:
-        agent_name = current_instance.agent_name if hasattr(current_instance, 'agent_name') else str(current_instance)
-        if agent_name not in status_data:
-            missing_agents.append(agent_name)
-        elif not status_data[agent_name]:
-            not_ready_agents.append(agent_name)
-
 
   
 def create_new_agent(system_prompt, user_prompt,agents_name,created_by="User"):
-    variant_to_use = random.choice(variant_types)
+    variant_to_use = get_variants()
     agents_name = agents_name.strip("/")
     agent = core_agent(system_prompt=system_prompt, user_prompt=user_prompt+ " "+variant_to_use,working_dir=working_directory)
     agent.agent_name = agents_name  
@@ -103,20 +67,17 @@ def terminate_agent(target_agent_name):
         if agent.agent_name == target_agent_name:
             agent_instances.remove(agent)
             #print("Removed:",target_agent_name)
-
+def get_variants():
+    return random.choice(variant_types) 
 def create_agents_with_prompts(agent_names):
     agents = []
-    #print(agent_names)
-
-    #agents.append(create_new_agent(system_prompt=f""+prompt_strings.get_dm_system_prompt(scenario_name=scenario_name,name="Mrs.Frizzle",),user_prompt=prompt_strings.get_dm_user_prompt(name="Mrs.Frizzle",scenario_name=scenario_name),agents_name="DM"))
-  
     for name in agent_names:
-        agent_variant= random.choice(variant_types)
+        agent_variant= get_variants()
+        print("Using variant:",agent_variant)
         # Create personalized system prompt using the agent's name
         system_prompt = prompt_strings.get_player_system_prompt(name=name)
         # Create personalized user prompt using the agent's name
         user_prompt = prompt_strings.user_prompt(name=name,variant=agent_variant)
-     
         agent_to_add =create_new_agent(system_prompt=system_prompt,user_prompt=user_prompt,agents_name=name)
         agent_to_add.variant = agent_variant 
         agents.append(agent_to_add)
@@ -150,8 +111,7 @@ def get_agent_instances():
         agent_instances_return.append(current_agent)
         
     return agent_instances_return
-##print(yaml_agent_list[1])  
-#test = core_agent("test","test","here")
+
 
 def get_current_agent_names():
     active_agent_names = [file_item[:-5] for file_item in os.listdir(os.environ.get("AGENT_CONFIG_PATH")) if ".yaml" in file_item and (not "Deleted" in file_item)]
@@ -164,14 +124,10 @@ def wrap_up_turn(agent,agent_instances):
         agent.pending_inject_prompt = ""
         #I'm not doing a lot of writing back to the yaml so hopefully this won't break things.
         yaml_parse.save_agent(yaml_parse.get_yaml_fields(agent),agent_config_path=agent_config_path)
-#Move this back to main loop.
     if agent.requested_new_agent:
-            #Call new agent folders
             for requested_agent in agent.new_agents:
                 create_agent_folders(working_directory,requested_agent["name"],agent_context_path)
                 new_agent = create_new_agent(requested_agent["system_prompt"],requested_agent["user_prompt"],requested_agent["name"],agent.agent_name)
-                agent.other_agents = agent_names
-                new_agent.created_by = agent.agent_name
                 agent_instances.append(new_agent)       
             agent.reset_new_agent_request()
     if agent.requested_delete_agent:
@@ -181,13 +137,11 @@ def wrap_up_turn(agent,agent_instances):
                     #Checking by using name.
                     if to_remove.agent_name == target_agent["name"]:
                         agent_instances.remove(to_remove)
-                       # agent_names.remove(to_remove.agent_name)
                         deleted_agents_names.append(to_remove.agent_name)
                         agent_folder_path = os.path.join(working_directory,to_remove.agent_name)
                         os.rename(agent_folder_path,agent_folder_path+"_Deleted")
                         to_rename_config = os.path.join(agent_config_path,to_remove.agent_name)
                         to_rename_context = os.path.join(agent_context_path,to_remove.agent_name)
-                        #print("Attempting to rename",to_rename_config)
                         if os.path.exists(to_rename_config+".yaml") and os.path.exists(to_rename_context):
                             os.rename(to_rename_config+".yaml",to_rename_config+"_Deleted.yaml")
                             os.rename(to_rename_context,to_rename_context+"_Deleted")
@@ -198,7 +152,6 @@ def wrap_up_turn(agent,agent_instances):
                             break
     agent.other_agents = get_current_agent_names()
     agent.inject_prompt("Living Agents:"+str(get_current_agent_names()))
-
     agent.write_context(agent.context)
 
 if __name__ == "__main__":
@@ -207,70 +160,41 @@ if __name__ == "__main__":
     name_list = load_names("utilities_resources/random_names.txt")
     agent_names = random.sample(name_list,number_of_agents)
     structure_info = initialize_scenario(working_directory, agents=agent_names,agent_context_path=agent_context_path,agent_config_path=agent_config_path)
-    
-    
     create_agents_with_prompts(agent_names=agent_names)
-    #TODO Need to intermittently inject
-    days_count = 0
-    inject_every = 1
-    inject_every_count = 1
-
     current_time = datetime.now()
-    
+    days_count = 0
     while days_count < number_of_days: 
         days_count +=1
         agent_instances = get_agent_instances() 
-        print(agent_instances)
-        
-        
+    
         for agent in agent_instances:
             print(f"\n--- Starting Agent Iteration Loop, Total Agents: {len(agent_instances)} ---")
             if agent.agent_name in deleted_agents_names:
                 print("Skipping Agent as they have been deleted.")
                 break
-            agent.deleted_agents = deleted_agents_names
-            agent.other_agents = get_current_agent_names()
-
-            agent.inject_prompt(agent.get_agent_files_contents())
-           
-            agent.inject_prompt("Deleted Agents"+str(deleted_agents_names))
-            
             iteration_count = agent.iterations
-            current_iter = 0
-
-            while current_iter < iteration_count:
-                current_iter +=1
-                
-                print(f"Processing agent: {agent.agent_name} Iteration: {current_iter} of {iteration_count}")
-                
+            current_iteraton = 0
+            
+            while current_iteraton < iteration_count:
+                print(f"Processing agent: {agent.agent_name} Iteration: {current_iteraton} of {iteration_count}")
+                current_iteraton +=1
                 yaml_parse.set_var_from_yaml(agent,yaml_parse.get_yaml_file_contents_from_name(agent_config_path,agent.agent_name))
-                
                 iteration_count = agent.iterations
                 agent.other_agents = get_current_agent_names()
-                
                 agent.deleted_agents = deleted_agents_names 
                 agent.pexpect_child = text_advent
-                #try:
                 start_timer = datetime.now()
                 status = agent.iterate() 
-                #except AttributeError:
-                #    print("Failed to iterate, deleted agent.")
-                #    break
                 total_time = start_timer-datetime.now()
-
                 if status:
                     print("Model Ending turn early")
                     agent.write_context(agent.context)
                     wrap_up_turn(agent,agent_instances)
-                    current_iter = iteration_count
-                    
+                    current_iteraton = iteration_count
                 wrap_up_turn(agent,agent_instances)
         agent.inject_prompt(prompt_strings.get_player_inject_prompt(name=agent.agent_name,variant=agent.variant))
-        
+        print("Injected the refresher prompt")
         current_time = current_time+timedelta(minutes=45)
-        
         print("Current Time: "+ current_time.strftime(time_format))
-        
         inject_prompt_all(agent_instances,"Current Time: "+ current_time.strftime(time_format)+" files have been upated. Check for changes")
-        
         backup_scenario(os.path.join(working_directory),'backup_folder')

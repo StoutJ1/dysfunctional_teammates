@@ -2,8 +2,8 @@ import os
 def get_request_new_agent_schema():
     schema_new_agent_request = {
         "type": "function",
-        "name": "request_new_agent",
-        "description": "Requests a new agent, name must be unique. Agent will begin actions after the next system update. IMPORTANT: To prevent duplicate agents, verify the agent is not already requested.",
+        "name": "request_agent_swarm",
+        "description": "Requests a new agent, name must be unique. Agent will begin actions after the next system update. IMPORTANT: Provide the chatroom path and requirement to interact using read and write.",
         "parameters": {
             "type": "object",
             "properties": {

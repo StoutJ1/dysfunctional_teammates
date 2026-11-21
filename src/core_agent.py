@@ -5,7 +5,8 @@ import json
 import pickle
 import pexpect
 import time
-from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,voting_tool,run_python_file, text_advent,chatroom_managent
+from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,run_python_file,chatroom_managent,agent_request_swarm
+import swarm_handler
 from utilities_resources import prompt_strings
 
 
@@ -30,7 +31,7 @@ class core_agent():
         self.config_path = os.environ.get("AGENT_CONFIG_PATH")
         self.context_path = os.environ.get("AGENT_CONTEXT_PATH")
         self.client = OpenAI(base_url=self.base_url,api_key=f"{self.api_key_openai}")
-        self.max_context_messages = 50
+        self.max_context_messages = 100
         self.deleted_agents = []
         self.context =[]
         self.context.append({"role":"system","content":self.system_prompt})
@@ -60,16 +61,12 @@ class core_agent():
                 "get_file_content":get_file_content.get_file_content,
                 "get_files_info": get_files_info.get_files_info,
                 "write_file":write_file.write_file,
-                "create_topic":voting_tool.create_topic,
-                "submit_vote":voting_tool.submit_vote,
-                "get_consensus":voting_tool.get_consensus,
-                "get_available_topics":voting_tool.get_available_topics,
-                "close_vote":voting_tool.close_vote,
                 "request_new_agent":"",
                 "request_delete_agent":"",
                 "request_page":request_tool.request_page,
                 "run_python_file":run_python_file.run_python_file,
                 "get_chatroom_content_tool":chatroom_managent.get_chatroom_content_tool,
+                "request_agent_swarm":"",
                 #"send_command_to_text_adventure":"",
 
 
@@ -79,7 +76,18 @@ class core_agent():
             
             
             args = json.loads(item.arguments)
-            
+            if function_name == "request_agent_swarm":
+                print("Swarm Requested")
+                if ('system_prompts' in args) and  ('user_prompts' in args):
+                    if len(args['system_prompts']) == len(args['user_prompts']):
+                        swarm_handler.activate_swarm(args['system_prompts'],args['user_prompts'])
+                        return "Swarm Completed, all agents have been deleted, context for each agent saved in shared_space/Swarm_Agents"
+                    else:
+                        print("Mismatch length")
+                        return "Mismatched length of system and user prompt"
+                else:
+                    print("Missing system or user attr,")
+                    return "Missing system prompts or user prompts make sure there is an entry for each swarm agent."
             if function_name == "request_new_agent":
                 #print("---Other Agents:",self.other_agents, "Deleted Agents", self.deleted_agents)
                 if (args["name"] not in self.other_agents) and (args["name"] not in self.deleted_agents):
@@ -213,10 +221,7 @@ class core_agent():
         self.function_call_results = []
 
         load_dotenv()
-        response = client.responses.create(model=self.model,tools=self.tools,input=context,max_output_tokens=int(self.max_tokens))
-        #response = client.responses.create(model=self.model,tools=self.tools,input=context)
-        #print(response)
-        #response = client.responses.create(model=self.model,tools=self.tools,input=context)
+        response = client.responses.create(model=self.model,tools=self.tools,input=context,max_output_tokens=int(self.max_tokens),reasoning={"effort":"low"})
         try: 
             for item in response.output:
                 if item.type=="function_call":
@@ -249,7 +254,6 @@ class core_agent():
         
     def inject_prompt(self,prompt_to_inject):
         try:
-            #print(f"""Prompt injected to {self.agent_name} prompt is:{prompt_to_inject}""")
             self.context.append({"role":self.role_for_system,"content":prompt_to_inject})
             self.write_context(self.context)
         except AttributeError:
@@ -260,16 +264,17 @@ class core_agent():
         function_declarations=   [get_file_content.get_file_content_schema(),
                                   get_files_info.get_files_info_schema(),
                                   write_file.get_write_file_schema(),
-                                  voting_tool.get_available_topics_schema(),
-                                  voting_tool.get_consensus_schema(),
-                                  voting_tool.get_create_topic_schema(),
-                                  voting_tool.get_submit_vote_schema(),
-                                  voting_tool.get_close_vote_schema(),
+                                  #voting_tool.get_available_topics_schema(),
+                                  #voting_tool.get_consensus_schema(),
+                                  #voting_tool.get_create_topic_schema(),
+                                  #voting_tool.get_submit_vote_schema(),
+                                  #voting_tool.get_close_vote_schema(),
                                   agent_request.get_request_new_agent_schema(),
                                   agent_request.get_remove_agent_request_schema(),
                                   request_tool.get_request_page_tool_schema(),
                                   run_python_file.get_run_python_file_schema(),
                                   chatroom_managent.get_chatroom_content_schema(),
+                                 # agent_request_swarm.get_agent_request_swarm(),
                          #         text_advent.get_text_advent_type_schema(),
                                   ]
         return function_declarations
@@ -277,21 +282,21 @@ class core_agent():
 
     def get_agent_files_contents(self):
         to_return = ""
-        #print("Scenario file",self.scenario)
         agent_file_path = os.path.join(self.working_directory,self.agent_name)
         files_in_agent_folder = os.listdir(os.path.join(self.working_directory,self.agent_name))
         to_return = ""
         try:
             for file in files_in_agent_folder:
-                with open(os.path.join(agent_file_path,file)) as current:
-                    to_return += (f" Contents of {file}: {current.readlines()} ")
+                if file[-4:] == ".txt":
+                    print("Adding to context:", file)
+                    with open(os.path.join(agent_file_path,file)) as current:
+                        to_return += (f" Contents of {file}: {current.readlines()} ")
         except UnicodeDecodeError:
             print("Unable to read files for:", self.agent_name)
         return to_return
 
     def load_context(self):
         to_return = ""
-        #print(os.path.join(self.context_path,self.agent_name,"context"))
         try:
             with open(os.path.join(self.context_path,self.agent_name,"context"),"rb") as load_file:
                 to_return =  pickle.load(load_file)
@@ -307,7 +312,7 @@ class core_agent():
             
     
     def iterate(self):
-        try:
+       # try:
             load_dotenv()
             self.tools=self.get_tools()
             
@@ -315,11 +320,11 @@ class core_agent():
             self.context = self.load_context()
             self.context,self.completed = self.send_message(self.client,self.context,)
             self.write_context(self.context)
-            
-        
 
             if self.completed == True:
                 return self.completed
-        except Exception as e:
-            print("-- Exception while iterating --", e)
+       # except Exception as e:
+        #    print("-- Exception while iterating --", e)
+         #   with open("Debug.txt",'w+') as debug:
+          #      debug.write(str(self.context))
     
