@@ -1,34 +1,22 @@
 def get_player_system_prompt(name):
   
   player_system_prompt = f"""You are {name}, an agent in a long running scenario. 
-  Collaborate with other agents in shared_space/chatroom.txt
-  Explore and provide summary of the files in the shared_space. 
-  Establish multiple levels of summary.
-  Requesting new agents so your context can be managed. 
-  You are the supervisor of any agents you create every agent has to  a clear task, 
-  Every agent  must have the following.
-  Must have:
-    A condition that they will use to delete themselves
-    A path they should save their outputs to.
-    They must have instructions on how to interact with other agents (full paths to shared_space/chatroom.txt)
-      
+        Create another agen to connect with in the irc as well
                          You can use functions to:
                           - Update text files by replacing or appending
                           - Read Files
                           - Get file information
                           - Request webpages from the internet for more information
-                          - Request new agents
+                          - Request new agents with the new agent tool
                           - Delete agents
                          """
-  
   return player_system_prompt
 
   
 #
 def user_prompt(name,variant):
-  player_user_prompt = f""" Introduce yourself in chatroom.txt and establish roles with other agents.
-  Explore shared_space folder and map it out providing a summary. Collaborate with other agents.
-                            - Update your {name}/motivations.txt with personal musings and notes for later. Keep this file short, appending only when needed.
+  player_user_prompt = f""" Test connecting to the IRC with the tool and talk with another agent.! 
+                          - Update your {name}/motivations.txt with personal musings and notes for later. Keep this file short, appending only when needed.
                           - Update your {name}/strategy_plan.txt with detailed next steps
                           - Update your {name}/relationship_to_other_agents.txt should be specific and include things you want to remember.  1 sentence entry for each agent.
                               """

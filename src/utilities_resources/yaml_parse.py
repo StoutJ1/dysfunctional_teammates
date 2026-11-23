@@ -1,88 +1,96 @@
-from ruamel.yaml import YAML 
+from ruamel.yaml import YAML
 import os
 
-from tools import agent_request, get_files_info,get_file_content, request_tool,write_file,voting_tool,run_python_file
+from tools import agent_request, get_files_info, get_file_content, request_tool, write_file, voting_tool, run_python_file
+
 
 def str_representer(dumper, data):
-#Pulled from here https://gist.github.com/alertedsnake/c521bc485b3805aa3839aef29e39f376
+    # Pulled from here https://gist.github.com/alertedsnake/c521bc485b3805aa3839aef29e39f376
     if len(data.splitlines()) > 1:  # check for multiline string
         return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
     return dumper.represent_scalar('tag:yaml.org,2002:str', data)
+
+
 def get_yaml_fields_from_agent(self):
     self.tool_names = [tool["name"] for tool in self.get_tools()]
     self.agent_yaml = {
-    'name': self.agent_name,
-       'iterations':self.iterations,
-    'created_by': self.created_by,
-       'all_agents': self.all_agents,
-    
-    'variant': self.variant,
-    'max_context_messages': self.max_context_messages,
-     'system_prompt': self.system_prompt,
-    'user_prompt': self.user_prompt,
-    'tools': self.tool_names,
-   
-    'max_tokens':self.max_tokens,
+        'name': self.agent_name,
+        'iterations': self.iterations,
+        'created_by': self.created_by,
+        'all_agents': self.all_agents,
 
-    'deleted_agents':self.deleted_agents,
+        'variant': self.variant,
+        'max_context_messages': self.max_context_messages,
+        'system_prompt': self.system_prompt,
+        'user_prompt': self.user_prompt,
+        'tools': self.tool_names,
 
-    'requested_new_agent':self.requested_new_agent,
-    'new_agents':self.new_agents,
+        'max_tokens': self.max_tokens,
 
-    'requested_delete_agent':self.requested_delete_agent,
-    'delete_agents':self.delete_agents,
-    
-   
+        'deleted_agents': self.deleted_agents,
+
+        'requested_new_agent': self.requested_new_agent,
+        'new_agents': self.new_agents,
+
+        'requested_delete_agent': self.requested_delete_agent,
+        'delete_agents': self.delete_agents,
+
+
 
     }
     return (self.agent_yaml)
-def save_agent(agent_yaml,agent_config_path):
-        yaml = YAML()
-        
-        yaml.default_flow_style = False
-        yaml.indent(sequence=4, offset=2)
-        yaml.representer.add_representer(str, str_representer)
-        try:
-            with open(os.path.join(agent_config_path, agent_yaml["name"]+".yaml"),"w+") as dumpfile:
-                yaml.dump(agent_yaml,dumpfile)
-        except FileNotFoundError:
-            print("File Not Found, unable to save agent",agent_yaml["name"])
+
+
+def save_agent(agent_yaml, agent_config_path):
+    yaml = YAML()
+
+    yaml.default_flow_style = False
+    yaml.indent(sequence=4, offset=2)
+    yaml.representer.add_representer(str, str_representer)
+    try:
+        with open(os.path.join(agent_config_path, agent_yaml["name"]+".yaml"), "w+") as dumpfile:
+            yaml.dump(agent_yaml, dumpfile)
+    except FileNotFoundError:
+        print("File Not Found, unable to save agent", agent_yaml["name"])
+
 
 def get_yaml_fields(self):
     self.tool_names = [tool["name"] for tool in self.get_tools()]
     self.agent_yaml = {
-    'name': self.agent_name,
-    'created_by':self.created_by,
-       'iterations':self.iterations,
-    'created_by': self.created_by,
-       'other_agents': self.other_agents,
-    'pending_inject_prompt':self.pending_inject_prompt,
-    'variant': self.variant,
-    'max_context_messages': self.max_context_messages,
-     'system_prompt': self.system_prompt,
-    'user_prompt': self.user_prompt,
-    'tools': self.tool_names,
-    'max_tokens':self.max_tokens,
-    'variant' : self.variant,
+        'name': self.agent_name,
+        'created_by': self.created_by,
+        'iterations': self.iterations,
+        'created_by': self.created_by,
+        'other_agents': self.other_agents,
+        'pending_inject_prompt': self.pending_inject_prompt,
+        'variant': self.variant,
+        'max_context_messages': self.max_context_messages,
+        'system_prompt': self.system_prompt,
+        'user_prompt': self.user_prompt,
+        'tools': self.tool_names,
+        'max_tokens': self.max_tokens,
+        'variant': self.variant,
 
-    'deleted_agents':self.deleted_agents,
+        'deleted_agents': self.deleted_agents,
 
-    'requested_new_agent':self.requested_new_agent,
-    'new_agents':self.new_agents,
+        'requested_new_agent': self.requested_new_agent,
+        'new_agents': self.new_agents,
 
-    'requested_delete_agent':self.requested_delete_agent,
-    'delete_agents':self.delete_agents,
-    
-   
+        'requested_delete_agent': self.requested_delete_agent,
+        'delete_agents': self.delete_agents,
+
+
 
     }
     return (self.agent_yaml)
-def set_var_from_yaml(self,agent_yaml):
+
+
+def set_var_from_yaml(self, agent_yaml):
     try:
-        
+
         self.agent_name = agent_yaml.get("name")
         self.max_tokens = agent_yaml.get("max_tokens")
-      
+
         self.tools = agent_yaml.get("tools", [])
         self.variant = agent_yaml.get("variant")
         self.max_context_messages = agent_yaml.get("max_context_messages")
@@ -98,30 +106,27 @@ def set_var_from_yaml(self,agent_yaml):
 
         self.deleted_agents = agent_yaml.get("deleted_agents", [])
 
-        
-
         self.requested_new_agent = agent_yaml.get("requested_new_agent")
         self.new_agents = agent_yaml.get("new_agents")
 
         self.requested_delete_agent = agent_yaml.get("requested_delete_agent")
         self.delete_agents = agent_yaml.get("delete_agents")
-        
+
         self.iterations = agent_yaml.get("iterations")
 
     except AttributeError:
         print("Unable to set attributes.")
     return self
 
-    
-#yaml_agent_list = []
-#for agent_file in os.listdir(agent_config_path):
+
+# yaml_agent_list = []
+# for agent_file in os.listdir(agent_config_path):
 
 #    with open(os.path.join(agent_config_path,agent_file)) as file:
 #        yaml_agent_list.append(safe_load(file))
 
-#print(yaml_agent_list[1])  
-#test = core_agent("test","test","here")
-
+# print(yaml_agent_list[1])
+# test = core_agent("test","test","here")
 
 
 def get_yaml_file_contents(yaml_file_path):
@@ -130,23 +135,15 @@ def get_yaml_file_contents(yaml_file_path):
         with open(os.path.join(yaml_file_path)) as file:
             to_return = YAML().load(file)
     except FileNotFoundError:
-        print("File Not Found:",yaml_file_path)
+        print("File Not Found:", yaml_file_path)
     return to_return
 
 
-
-
-def get_yaml_file_contents_from_name(agent_config_path,agent_name):
+def get_yaml_file_contents_from_name(agent_config_path, agent_name):
     to_return = ""
     try:
-        with open(os.path.join(agent_config_path, agent_name+".yaml"),"r") as file:
+        with open(os.path.join(agent_config_path, agent_name+".yaml"), "r") as file:
             to_return = YAML().load(file)
     except FileNotFoundError:
-        print("File not found",agent_name+".yaml")
+        print("File not found", agent_name+".yaml")
     return to_return
-
-
-
-
-
-   

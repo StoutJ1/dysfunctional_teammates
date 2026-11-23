@@ -1,0 +1,9 @@
+{"event": "server_start", "host": "127.0.0.1", "port": 6697, "ts": 1795351419.0493197}
+{"addr": "127.0.0.1:50820", "event": "connect", "ts": 1795351419.4510334}
+{"event": "nick", "nick": "alice", "ts": 1795351419.4511406}
+{"channel": "#general", "event": "join", "nick": "alice", "ts": 1795351419.4513733}
+{"channel": "#general", "event": "part", "nick": "alice", "reason": "shutdown", "ts": 1795351419.9516437}
+{"event": "quit", "nick": "alice", "reason": "shutdown", "ts": 1795351419.9517658}
+{"event": "quit", "nick": "alice", "reason": "quit", "ts": 1795351419.9518147}
+{"event": "server_stop", "ts": 1795351419.951859}
+{"event": "server_stop", "ts": 1795351419.9519658}
